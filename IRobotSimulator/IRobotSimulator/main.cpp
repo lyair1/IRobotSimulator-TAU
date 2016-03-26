@@ -5,7 +5,7 @@ Yair Levi ID
 #include <iostream>
 #include <string>
 #include <windows.h>
-#include <time.h>
+#include <ctime>
 #include "Simulator.h"
 
 void createExampleHouse(const string filePath);
