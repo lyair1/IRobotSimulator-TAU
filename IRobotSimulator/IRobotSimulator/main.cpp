@@ -10,6 +10,7 @@ Yair Levi ID
 
 void createExampleHouse(const string filePath);
 void writeConfigFile(const string iniPath);
+bool isFileExists(const string name);
 
 const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
@@ -17,9 +18,10 @@ const string _pathPrefix = "./";
 
 int main(int argc, char* argv[])
 {
-	if (argc > 5){
+	if (argc > 3){
 		// Inform the user of how to use the program:
-		std::cout << "Usage is -config <config_file_location> -house_path<houses_path_location>\n"; 
+		//std::cout << "Usage is -config <config_file_location> -house_path<houses_path_location>\n"; 
+		std::cout << "Usage is -config <config_file_location>\n"; 
 		std::cin.get();
 		exit(0);
 	}
@@ -32,17 +34,24 @@ int main(int argc, char* argv[])
 				// We know the next argument *should* be the filename:
 				config_file_path = argv[i + 1];
 			}
+			/*
 			else if (strcmp(argv[i], "-house_path") == 0) {
 				houses_path = argv[i + 1];
-			}
+			}*/
 		} 
 	}
-	//TODO in LINUX: check if file exists in config_file_path. if NOT:
-	writeConfigFile(config_file_path);
+
+	// Temp for ex_1 - create default config file if config file doesn't exists in path
+	if (!isFileExists(config_file_path))
+	{
+		writeConfigFile(config_file_path);
+	}
+
 	//TODO: update config_file_path = INI_CONFIG_PATH;
 	//TODO in LINUX: check if a *.house file exists in houses_path. if NOT:
 	createExampleHouse(houses_path);
 	//TODO: make sure this works for path that end with '/' and without it. example: /usr/targil1/simufiles/	OR  	/usr/targil1/simufiles
+
 	srand ((unsigned int)time(NULL));
     Simulator simul;
 	simul.runSimulation(config_file_path, houses_path);
@@ -116,4 +125,16 @@ void writeConfigFile(const string iniPath)
   {
     cout << line << endl;
   }
+}
+
+bool isFileExists(const string name) {
+	ifstream f(name.c_str());
+	if (f.good()) {
+		f.close();
+		return true;
+	}
+	else {
+		f.close();
+		return false;
+	}
 }
