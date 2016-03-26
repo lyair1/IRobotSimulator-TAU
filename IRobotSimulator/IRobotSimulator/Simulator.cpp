@@ -98,13 +98,21 @@ void Simulator::executeAllAlgoOnAllHouses()
 			actualPositionInCopmetition += numberOfWinnersInPosition;
 			numberOfWinnersInPosition = 0; // after incrementingPositionInCompetition, initiate numberOfWinnersInPosition in order to count from 0 at next iteration.
 			simulationStepsCounter += 1;
+			
+			// Update the winner number of steps to the value of the one algorithm that ran and finished (and didn't win)
+			if (winnerNumberOfSteps == 0)
+			{
+				winnerNumberOfSteps = simulationStepsCounter;
+			}
+
 			if (simulationStepsCounter >= maxSimulatorStepsPerHouse)
 			{
 				winnerNumberOfSteps = maxSimulatorStepsPerHouse;
 				break; //exit from while loop
 			}
-
-		}//all algorithms stopped - terminate simulation and calculate scores
+		}
+		
+		//all algorithms stopped - terminate simulation and calculate scores
 		for (std::vector<Simulation*>::iterator iter3 = simulationVectorPerHouse.begin(); iter3 != simulationVectorPerHouse.end(); ++iter3){
 			(*iter3)->setSimulationScore(winnerNumberOfSteps);
 			cout << "[" << (*iter3)->getHouse()->getName() << "]" << "\t" << (*iter3)->getSimulationScore() << "\n";
