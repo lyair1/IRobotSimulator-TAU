@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #include "Simulation.h"
 
 //return value: boolean representhing if the algorithm finished running SUCCESSFULLY (house is clean and robot is in docking station)

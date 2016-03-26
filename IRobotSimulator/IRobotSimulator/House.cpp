@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #include "House.h"
 
 //TODO: make sure number of rows is R

@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #include "AlgorithmNaive.h"
 
 // setSensor is called once when the Algorithm is initialized 

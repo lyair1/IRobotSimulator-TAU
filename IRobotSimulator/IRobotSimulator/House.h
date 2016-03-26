@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #ifndef HOUSE_H
 #define HOUSE_H
 #define DEBUG 1

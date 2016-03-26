@@ -1,6 +1,8 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #include "configReader.h"
-
-
 
   void ConfigReader::loadFromFile(const string& iniPath)
   {

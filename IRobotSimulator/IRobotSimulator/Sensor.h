@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #ifndef SENSOR_H
 #define SENSOR_H
 #include <utility> // std::pair

@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID
+*/
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #include <list>

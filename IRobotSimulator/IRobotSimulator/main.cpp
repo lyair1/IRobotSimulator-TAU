@@ -1,6 +1,6 @@
-/* 
+/*
 Author: Nir Orman ID 201588902
-		Yair Levi ID 
+Yair Levi ID
 */
 #include <iostream>
 #include <string>
