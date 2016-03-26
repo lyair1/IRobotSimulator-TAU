@@ -2,7 +2,7 @@
 #include <string>
 #include <windows.h>
 #include <time.h>
-#include "../include/Simulator.h"
+#include "Simulator.h"
 
 void createExampleHouse();
 void writeConfigFile(const string &iniPath);

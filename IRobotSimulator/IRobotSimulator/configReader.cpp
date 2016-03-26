@@ -1,4 +1,4 @@
-#include "../include/configReader.h"
+#include "configReader.h"
 
 
 

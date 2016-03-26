@@ -1,4 +1,4 @@
-#include "../include/Sensor.h"
+#include "Sensor.h"
 
 SensorInformation Sensor::sense()const
 {

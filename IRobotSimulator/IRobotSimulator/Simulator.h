@@ -2,7 +2,7 @@
 #define SIMULATOR_H
 #include <list>
 #include "Simulation.h"
-#include "../include/configReader.h"
+#include "configReader.h"
 #define INI_CONFIG_PATH "config.ini"
 
 

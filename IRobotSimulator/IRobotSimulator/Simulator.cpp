@@ -1,4 +1,4 @@
-#include "../include/Simulator.h"
+#include "Simulator.h"
 
 using namespace std;
 

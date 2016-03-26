@@ -1,4 +1,4 @@
-#include "../include/AlgorithmNaive.h"
+#include "AlgorithmNaive.h"
 
 // setSensor is called once when the Algorithm is initialized 
 void AlgorithmNaive::setSensor(const AbstractSensor& sensor)

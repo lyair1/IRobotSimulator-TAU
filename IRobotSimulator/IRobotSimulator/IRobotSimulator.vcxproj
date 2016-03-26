@@ -64,6 +64,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractAlgorithm.h" />
+    <ClInclude Include="AbstractSensor.h" />
+    <ClInclude Include="AlgorithmNaive.h" />
+    <ClInclude Include="configReader.h" />
+    <ClInclude Include="Direction.h" />
+    <ClInclude Include="House.h" />
+    <ClInclude Include="Sensor.h" />
+    <ClInclude Include="SensorInformation.h" />
+    <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Simulator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AlgorithmNaive.cpp" />
+    <ClCompile Include="configReader.cpp" />
+    <ClCompile Include="House.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sensor.cpp" />
+    <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

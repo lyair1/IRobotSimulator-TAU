@@ -1,7 +1,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
-#include "../include/House.h"
-#include "../include/AlgorithmNaive.h"
+#include "House.h"
+#include "AlgorithmNaive.h"
 
 class Simulation
 {
