@@ -24,11 +24,33 @@ bool House::fillHouseInfo(string filePath)
   this->matrix = new string[this->getR()];
   for (int i =0; i < this->getR(); ++i)
   {
-    std::getline(fin, this->matrix[i]);
-  }
-  initDustInHouse();
+	  // Check if stream is over before the rows count
+	  if (fin.eof())
+	  {
+		  cout << "Input error, not enough rows for house description" << endl;
 
-  return initDockingLocation();
+		  return false;
+	  }
+	  std::getline(fin, this->matrix[i]);
+
+	  // Check if stream isn't over but this is an empty line
+	  if (matrix[i].length() == 0)
+	  {
+		  cout << "Input error, not enough rows for house description" << endl;
+
+		  return false;
+	  }
+
+	  // Check if a row is shorter than expected
+	  if (matrix[i].length() != C)
+	  {
+		  cout << "Input error, not enough columns for house description" << endl;
+
+		  return false;
+	  }
+  }
+
+  return isLegalHouse();
 }
 
 void House:: printHouse() const
@@ -36,9 +58,9 @@ void House:: printHouse() const
   cout << "Printing house from instance into standard output" << endl;
   cout << "House name: " << getName() << endl;
   cout << "House description: " << getDescription() << endl;
-  for (int i = 0; i < getR(); ++i)
+  for (int i = 0; i < R; ++i)
   {
-    for (int j =0; j < getC() ; ++j)
+    for (int j =0; j < C ; ++j)
     {
       cout << matrix[i][j];
     }
@@ -48,16 +70,33 @@ void House:: printHouse() const
 
 //TODO: comlete this with fill rows and cols if matrix is not in size C*R
 bool House::isLegalHouse(){
-	this->R;
-	this->C;
-	this->matrix;
-	for (int i = 0; i < this->R; ++i){
-		for (int j =0; j < this->C; ++j){
+	// Make sure that that house souranded by walls
+	for (int i = 0; i < R; ++i){
+		matrix[i][0] = 'W';
+		matrix[i][C-1] = 'W';
+	}
+	for (int i = 0; i < C; ++i){
+		matrix[R-1][i] = 'W';
+		matrix[0][i] = 'W';
+	}
 
-			
+	// Overwrite any unknown chars to ' '
+	for (int i = 0; i < R; ++i)
+	{
+		for (int j = 0; j < C; ++j)
+		{
+			if (matrix[i][j] != 'W' && matrix[i][j] != 'D' && (matrix[i][j] < '0' || matrix[i][j] > '9'))
+			{
+				matrix[i][j] = ' ';
+			}
 		}
 	}
-	return true;
+
+	
+
+	initDustInHouse();
+
+	return initDockingLocation();
 }
 
 string House::getName() const {
@@ -154,6 +193,7 @@ bool House::isDirtCollected(pair<int, int> location){
 	{
 		matrix[location.second][location.first] --;
 		mDustInHouse--;
+
 		return true;
 	}
 	return false;
@@ -170,9 +210,9 @@ bool House::isCleanHouse(){
 
 void House::initDustInHouse(){
 	mDustInHouse = 0;
-	for (int row = 0; row < getR(); ++row) 
+	for (int row = 0; row < R; ++row) 
 	{
-		for (int col = 0; col < getC(); ++col) 
+		for (int col = 0; col < C; ++col) 
 		{
 			if (matrix[row][col] >= '1' &&
 				matrix[row][col] <= '9')
