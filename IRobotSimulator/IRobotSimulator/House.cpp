@@ -42,35 +42,34 @@ void House:: printHouse() const
 }
 
 //TODO: comlete this with fill rows and cols if matrix is not in size C*R
-	bool House::isLegalHouse(){
-		this->R;
-		this->C;
-		this->matrix;
-		for (int i = 0; i < this->R; ++i){
-			for (int j =0; j < this->C; ++j){
+bool House::isLegalHouse(){
+	this->R;
+	this->C;
+	this->matrix;
+	for (int i = 0; i < this->R; ++i){
+		for (int j =0; j < this->C; ++j){
 
 			
-			}
 		}
-		return true;
 	}
+	return true;
+}
 
-	string House::getName() const {
-		return name;
-	}
+string House::getName() const {
+	return name;
+}
 
-	string House::getDescription() const {
-		return desc;
-	}
+string House::getDescription() const {
+	return desc;
+}
 
-	int House::getR() const {
-		return R;
-	}
+int House::getR() const {
+	return R;
+}
 
-	int House::getC() const {
-		return C;	
-	}
-
+int House::getC() const {
+	return C;	
+}
 
 SensorInformation House::getLocationInfo(std::pair<const int,const int> location) const {
 	SensorInformation locationInfo; 
@@ -92,79 +91,79 @@ SensorInformation House::getLocationInfo(std::pair<const int,const int> location
 	return locationInfo;
 }
 
-	void House::setR(int r){
-		R = r;
-	}
-	void House::setC(int c)
-	{
-		C = c;
-	}
-	void House::setName(string houseName)
-	{
-		name = houseName;
-	}
+void House::setR(int r){
+	R = r;
+}
+void House::setC(int c)
+{
+	C = c;
+}
+void House::setName(string houseName)
+{
+	name = houseName;
+}
 
-	void House::setDescription(string description)
-	{
-		desc = description;
-	}
+void House::setDescription(string description)
+{
+	desc = description;
+}
 
-	void House:: initDockingLocation()
-	{
-		for (int row = 0; row < getR(); ++row) {
-			for (int col = 0; col < getC(); ++col) {
-				if (matrix[row][col] == 'D') {
-					mDockingLocation.first = col;
-					mDockingLocation.second = row; // col == X, row == Y
-					return;
-				}
+void House:: initDockingLocation()
+{
+	for (int row = 0; row < getR(); ++row) {
+		for (int col = 0; col < getC(); ++col) {
+			if (matrix[row][col] == 'D') {
+				mDockingLocation.first = col;
+				mDockingLocation.second = row; // col == X, row == Y
+				return;
 			}
 		}
-		cout << "House:: initDockingLocation() : no docking station was found! this house is Illegal" << endl;
-		mDockingLocation.first = -1;// no docking location is found...
-		mDockingLocation.second = -1; 
 	}
+	cout << "House:: initDockingLocation() : no docking station was found! this house is Illegal" << endl;
+	mDockingLocation.first = -1;// no docking location is found...
+	mDockingLocation.second = -1; 
+}
 
-	pair <int, int> House::getDockingLocation(){
-		return mDockingLocation;
-	}
+pair <int, int> House::getDockingLocation(){
+	return mDockingLocation;
+}
 
-	bool House::isDirtCollected(pair<int, int> location){
-		//clean the dust if it exists:
-		if (matrix[location.second][location.first] >= '1' &&
-			matrix[location.second][location.first] <= '9')
-		{
-			matrix[location.second][location.first] --;
-			mDustInHouse--;
-			return true;
-		}
-		return false;
-	}
-
-	char House::getLocationValue(pair<int, int> location)
+bool House::isDirtCollected(pair<int, int> location){
+	//clean the dust if it exists:
+	if (matrix[location.second][location.first] >= '1' &&
+		matrix[location.second][location.first] <= '9')
 	{
-		return matrix[location.second][location.first];
+		matrix[location.second][location.first] --;
+		mDustInHouse--;
+		return true;
 	}
+	return false;
+}
 
-	bool House::isCleanHouse(){
-		return (mDustInHouse == 0);
-	}
+char House::getLocationValue(pair<int, int> location)
+{
+	return matrix[location.second][location.first];
+}
 
-	void House::initDustInHouse(){
-		mDustInHouse = 0;
-		for (int row = 0; row < getR(); ++row) 
+bool House::isCleanHouse(){
+	return (mDustInHouse == 0);
+}
+
+void House::initDustInHouse(){
+	mDustInHouse = 0;
+	for (int row = 0; row < getR(); ++row) 
+	{
+		for (int col = 0; col < getC(); ++col) 
 		{
-			for (int col = 0; col < getC(); ++col) 
+			if (matrix[row][col] >= '1' &&
+				matrix[row][col] <= '9')
 			{
-				if (matrix[row][col] >= '1' &&
-					matrix[row][col] <= '9')
-				{
-					mDustInHouse += (matrix[row][col] - '0');
-				}
+				mDustInHouse += (matrix[row][col] - '0');
 			}
 		}
 	}
+}
 
-	int House::getDustInHouse(){
-		return mDustInHouse;
-	}
+int House::getDustInHouse(){
+	return mDustInHouse;
+}

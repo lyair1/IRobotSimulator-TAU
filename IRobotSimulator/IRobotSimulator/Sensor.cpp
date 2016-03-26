@@ -5,7 +5,6 @@ SensorInformation Sensor::sense()const
 	return mSensorHouse->getLocationInfo(mSensorLocation);
 }
 
-
 pair <int, int> Sensor::getSensorLocation(){
 	return mSensorLocation;
 }

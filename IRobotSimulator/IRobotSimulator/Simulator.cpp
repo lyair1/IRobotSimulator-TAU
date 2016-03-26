@@ -54,12 +54,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 	
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
-		
 		vector< Simulation*> simulationVectorPerHouse;
 		//insert all initialized simulations on the current house into the vector simulationVectorPerHouse:
 		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 		{
-
 			pSimulation = new Simulation((*listAlgorithmIter), (*listHouseIter), mConfiguration->getParametersMap());
 			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
 			simulationVectorPerHouse.push_back(pSimulation);
@@ -92,8 +90,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 						}
 						(*iter)->setPositionInCompetition((actualPositionInCopmetition < 4) ? actualPositionInCopmetition : 4);
 						numberOfWinnersInPosition += 1;
-						//update steps counter for all other algorithm to : 
-
+						//update steps counter for all other algorithm too: 
 						
 					}
 				}
@@ -113,6 +110,4 @@ void Simulator::executeAllAlgoOnAllHouses()
 			cout << "[" << (*iter3)->getHouse()->getName() << "]" << "\t" << (*iter3)->getSimulationScore() << "\n";
 		}
 	}
-
-
 }
