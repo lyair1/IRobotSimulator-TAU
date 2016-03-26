@@ -58,6 +58,7 @@ void createExampleHouse(const string filePath)
   ofstream fout(filePath + _defaultHosuseFileName);
   fout << "Simple1" << endl;
   fout << "2 Bedrooms + Kitchen Isle" << endl;
+  /*
   fout << 8 << endl;
   fout << 10 << endl;
   fout << "WWWWWWWWWW" << endl;
@@ -68,6 +69,32 @@ void createExampleHouse(const string filePath)
   fout << "W78W  W  W" << endl;
   fout << "W99W  W  W" << endl;
   fout << "WWWWWWWWWW" << endl;
+  */
+
+  fout << 19 << endl;
+  fout << 80 << endl;
+  //                 1         2         3         4         5         6         7        
+  //       01234567890123456789012345678901234567890123456789012345678901234567890123456789
+  fout << "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl; // 0
+  fout << "W  99   D              1234321                                                 W" << endl; // 1
+  fout << "W  99      WWWWWWW     1234321                     W                       1   W" << endl; // 2
+  fout << "W              W                                   W   555                 2   W" << endl; // 3
+  fout << "W              W                                   W   555                 3   W" << endl; // 4
+  fout << "W              W           WWWWWWWWWWWWWWWWWWWWWWWWW                       4   W" << endl; // 5
+  fout << "W              W                                                           5   W" << endl; // 6
+  fout << "W              W                                                           6   W" << endl; // 7
+  fout << "W                          WWWWWWWWWWWWWWWWWWWWWW  WWWWWWW                 7   W" << endl; // 8
+  fout << "W         1         2         3         4         5W 999 W  6         7        W" << endl; // 9
+  fout << "W              W           444                     W 999 W                 9   W" << endl; // 10
+  fout << "W              W           444                     W 999 W                 8   W" << endl; // 11
+  fout << "W              W                                   W     W                 7   W" << endl; // 12
+  fout << "W              W                                   WW   WW                 6   W" << endl; // 13
+  fout << "W              W                                    W   W                  5   W" << endl; // 14
+  fout << "W              W                                                           4   W" << endl; // 15
+  fout << "W              W                                                           3   W" << endl; // 16
+  fout << "W              W                                                               W" << endl; // 17
+  fout << "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl; // 18
+
   fout.close();
 }
 

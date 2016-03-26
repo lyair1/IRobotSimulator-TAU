@@ -92,8 +92,6 @@ bool House::isLegalHouse(){
 		}
 	}
 
-	
-
 	initDustInHouse();
 
 	return initDockingLocation();
