@@ -28,7 +28,7 @@ void Simulator:: readAllHouses(string houses_path)
 	//	loadHouse()
 	//TODO: in ex2 we need to go over all the files with extension *.house which are in houses_path. 
 	House *house = new House();
-	string filePath = "simple.house";
+	string filePath = "default_generated_house.house";
 	house->fillHouseInfo(filePath);
 	if (DEBUG){
 		house->printHouse();
