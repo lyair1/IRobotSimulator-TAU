@@ -5,7 +5,7 @@ Yair Levi ID
 #include "House.h"
 
 //TODO: make sure number of rows is R
-void House::fillHouseInfo(string filePath)
+bool House::fillHouseInfo(string filePath)
 {
   cout << "Reading house from file path: %s into class House" <<filePath << endl;
   ifstream fin(filePath);
@@ -26,8 +26,9 @@ void House::fillHouseInfo(string filePath)
   {
     std::getline(fin, this->matrix[i]);
   }
-  initDockingLocation();
   initDustInHouse();
+
+  return initDockingLocation();
 }
 
 void House:: printHouse() const
@@ -112,20 +113,34 @@ void House::setDescription(string description)
 	desc = description;
 }
 
-void House:: initDockingLocation()
+bool House:: initDockingLocation()
 {
+	bool didFindDocking = false;
 	for (int row = 0; row < getR(); ++row) {
 		for (int col = 0; col < getC(); ++col) {
 			if (matrix[row][col] == 'D') {
+				if (didFindDocking == true)
+				{
+					cout << "House:: initDockingLocation() : more than one docking station was found! this house is Illegal" << endl;
+
+					return false;
+				}
+
+				didFindDocking = true;
 				mDockingLocation.first = col;
 				mDockingLocation.second = row; // col == X, row == Y
-				return;
 			}
 		}
 	}
+
+	if (didFindDocking)
+	{
+		return true;
+	}
+
 	cout << "House:: initDockingLocation() : no docking station was found! this house is Illegal" << endl;
-	mDockingLocation.first = -1;// no docking location is found...
-	mDockingLocation.second = -1; 
+
+	return false;
 }
 
 pair <int, int> House::getDockingLocation(){

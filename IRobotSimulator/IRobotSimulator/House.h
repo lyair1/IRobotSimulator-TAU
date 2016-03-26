@@ -48,7 +48,7 @@ public:
 	SensorInformation getLocationInfo(std::pair<const int, const int> location)const;
 	bool isLegalHouse();
 	void printHouse()const;
-	void fillHouseInfo(string filePath);
+	bool fillHouseInfo(string filePath);
 	bool isDirtCollected(pair<int, int> location);
 	char getLocationValue(pair<int, int> location);
 	bool isCleanHouse();
@@ -67,14 +67,8 @@ private:
 	void setC(int C);
 	void setName(string name);
 	void setDescription(string description);
-	void initDockingLocation();
+	bool initDockingLocation();
 	void initDustInHouse();
 };
-
-	
-
-
-
-
 
 #endif //HOUSE_H

@@ -33,11 +33,17 @@ void Simulator:: readAllHouses(string houses_path)
 	//TODO: in ex2 we need to go over all the files with extension *.house which are in houses_path. 
 	House *house = new House();
 	string filePath = "default_generated_house.house";
-	house->fillHouseInfo(filePath);
-	if (DEBUG){
-		house->printHouse();
+	if (!house->fillHouseInfo(filePath)){
+		// House is illigle - delete
+		delete(house);
 	}
-	mHouseList->push_back(house);
+	else{
+		// Add house to the list
+		if (DEBUG){
+			house->printHouse();
+		}
+		mHouseList->push_back(house);
+	}
 }
 
 void Simulator:: loadAllAlgorithms()
