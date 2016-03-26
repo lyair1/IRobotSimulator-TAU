@@ -36,3 +36,7 @@ void AlgorithmNaive:: aboutToFinish(int stepsTillFinishing){
 
 	// for ex1 this function is left empty since the algorithm is naive.
 } 
+
+void AlgorithmNaive::cleanResources(){
+
+}

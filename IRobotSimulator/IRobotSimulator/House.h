@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #ifndef HOUSE_H
 #define HOUSE_H
@@ -54,6 +54,7 @@ public:
 	bool isCleanHouse();
 	pair <int, int> getDockingLocation();
 	int getDustInHouse();
+	void cleanResources();
 private:
 	string name;
 	string desc;

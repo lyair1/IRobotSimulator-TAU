@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #include "Simulator.h"
 
@@ -25,11 +25,34 @@ void Simulator::runSimulation(string config_file_path, string houses_path)
 	executeAllAlgoOnAllHouses();
 }
 
+void Simulator::cleanResources(){
+	// Clean simulationVectorPerHouse
+	for (std::vector<Simulation*>::iterator iter = simulationVectorPerHouse.begin(); iter != simulationVectorPerHouse.end(); ++iter){
+		(*iter)->cleanResources();
+	}
+
+	// Clean Houses
+	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
+	{
+		(*listHouseIter)->cleanResources();
+		delete(*listHouseIter);
+	}
+	delete(mHouseList);
+
+	// Clean algorithms
+	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
+	{
+		(*listAlgorithmIter)->cleanResources();
+		delete(*listAlgorithmIter);
+	}
+	delete(mAlgorithmList);
+
+	// clean configuration
+	delete(mConfiguration);
+}
+
 void Simulator:: readAllHouses(string houses_path)
 {
-	//for (file in houses_path)
-	//if fileExtention == ".house"
-	//	loadHouse()
 	//TODO: in ex2 we need to go over all the files with extension *.house which are in houses_path. 
 	House *house = new House();
 	string filePath = "default_generated_house.house";
@@ -55,7 +78,6 @@ void Simulator:: loadAllAlgorithms()
 	mAlgorithmList->push_back(algoNaive);
 }
 
-
 void Simulator::executeAllAlgoOnAllHouses()
 {
 	int numOfSteps = 0;
@@ -64,7 +86,6 @@ void Simulator::executeAllAlgoOnAllHouses()
 	
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
-		vector< Simulation*> simulationVectorPerHouse;
 		//insert all initialized simulations on the current house into the vector simulationVectorPerHouse:
 		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 		{

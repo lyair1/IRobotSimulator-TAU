@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
@@ -37,10 +37,12 @@ public:
 		}
 	}
 	void runSimulation(string config_file_path,string houses_path);
+	void cleanResources();
 	
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;
+	vector<Simulation*> simulationVectorPerHouse;
 	void readAllHouses(string houses_path);
 	void loadAllAlgorithms();
 	void executeAllAlgoOnAllHouses();

@@ -1,3 +1,7 @@
+/*
+Author: Nir Orman ID 201588902
+Yair Levi ID 200945657
+*/
 #ifndef ALGO_NAIVE_H
 #define ALGO_NAIVE_H
 //#include "Direction.h" //TODO: bring back this line
@@ -36,6 +40,7 @@ public:
     // parameter stepsTillFinishing == MaxStepsAfterWinner 
     void aboutToFinish(int stepsTillFinishing); 
 
+	void cleanResources();
 private:
 	const AbstractSensor* mSensor; // the only info the algorithm has about the house it's cleaning comes from the sensor itself.
 	//House * house; //algorithm does not have any given information about the house, but it can gather that information along the way

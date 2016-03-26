@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #include "House.h"
 
@@ -111,6 +111,10 @@ int House::getR() const {
 
 int House::getC() const {
 	return C;	
+}
+
+void House::cleanResources(){
+	delete(matrix);
 }
 
 SensorInformation House::getLocationInfo(std::pair<const int,const int> location) const {

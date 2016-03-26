@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #include "Simulation.h"
 
@@ -93,6 +93,9 @@ bool Simulation :: makeSimulationStep()
 
 }
 
+void Simulation::cleanResources(){
+	delete(mSensor);
+}
 
 bool Simulation::isSimulationRunning(){
 	return mIsRunning;

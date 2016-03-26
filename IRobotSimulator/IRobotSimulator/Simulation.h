@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #ifndef SIMULATION_H
 #define SIMULATION_H
@@ -78,7 +78,7 @@ public:
 	void setSimulationScore(int winnerNumberOfSteps);
 	const House* getHouse();
 	const int getSimulationScore();
-
+	void cleanResources();
 private:
 	AlgorithmNaive* mAlgorithm;
 	House* mHouse;

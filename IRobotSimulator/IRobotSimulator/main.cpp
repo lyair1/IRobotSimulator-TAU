@@ -1,6 +1,6 @@
 /*
 Author: Nir Orman ID 201588902
-Yair Levi ID
+Yair Levi ID 200945657
 */
 #include <iostream>
 #include <string>
@@ -44,7 +44,14 @@ int main(int argc, char* argv[])
 	// Temp for ex_1 - create default config file if config file doesn't exists in path
 	if (!isFileExists(config_file_path))
 	{
-		writeConfigFile(config_file_path);
+		if (DEBUG){
+			writeConfigFile(config_file_path);
+		}
+		else{
+			std::cout << "Can't find config file in path \n";
+
+			return 0;
+		}
 	}
 
 	//TODO: update config_file_path = INI_CONFIG_PATH;
