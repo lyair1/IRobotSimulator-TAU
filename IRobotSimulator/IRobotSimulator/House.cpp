@@ -114,7 +114,7 @@ int House::getC() const {
 }
 
 void House::cleanResources(){
-	delete(matrix);
+
 }
 
 SensorInformation House::getLocationInfo(std::pair<const int,const int> location) const {

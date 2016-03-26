@@ -20,21 +20,7 @@ public:
 		mAlgorithmList = new AlgorithmList();
 	}
 	~Simulator(){
-		if (mHouseList != NULL)	{
-			for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
-			{
-				delete *listHouseIter;
-			}
-			delete mHouseList;
-		}
-		if (mAlgorithmList != NULL)
-		{				
-			for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
-			{
-				delete *listAlgorithmIter;
-			}
-			mAlgorithmList;
-		}
+		cleanResources();
 	}
 	void runSimulation(string config_file_path,string houses_path);
 	void cleanResources();

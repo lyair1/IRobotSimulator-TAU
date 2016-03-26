@@ -35,20 +35,20 @@ void Simulator::cleanResources(){
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
 		(*listHouseIter)->cleanResources();
-		delete(*listHouseIter);
+		delete *listHouseIter;
 	}
-	delete(mHouseList);
+	delete mHouseList;
 
 	// Clean algorithms
 	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 	{
 		(*listAlgorithmIter)->cleanResources();
-		delete(*listAlgorithmIter);
+		delete *listAlgorithmIter;
 	}
-	delete(mAlgorithmList);
+	delete mAlgorithmList;
 
 	// clean configuration
-	delete(mConfiguration);
+	delete mConfiguration;
 }
 
 void Simulator:: readAllHouses(string houses_path)
