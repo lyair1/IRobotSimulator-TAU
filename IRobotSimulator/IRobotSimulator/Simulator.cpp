@@ -2,9 +2,8 @@
 
 using namespace std;
 
-void Simulator:: runSimulation(char * config_file_path,char* houses_path)
+void Simulator::runSimulation(string config_file_path, string houses_path)
 {
-
 	mConfiguration = new ConfigReader(config_file_path);
 	if (DEBUG)
 	{
@@ -22,14 +21,14 @@ void Simulator:: runSimulation(char * config_file_path,char* houses_path)
 	executeAllAlgoOnAllHouses();
 }
 
-void Simulator:: readAllHouses(char* houses_path)
+void Simulator:: readAllHouses(string houses_path)
 {
 	//for (file in houses_path)
 	//if fileExtention == ".house"
 	//	loadHouse()
 	//TODO: in ex2 we need to go over all the files with extension *.house which are in houses_path. 
 	House *house = new House();
-	string filePath = "simple1.txt";
+	string filePath = "simple.house";
 	house->fillHouseInfo(filePath);
 	if (DEBUG){
 		house->printHouse();

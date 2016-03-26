@@ -1,7 +1,5 @@
 #include "House.h"
 
-
-
 //TODO: make sure number of rows is R
 void House::fillHouseInfo(string filePath)
 {

@@ -4,8 +4,13 @@
 #include <time.h>
 #include "Simulator.h"
 
-void createExampleHouse();
-void writeConfigFile(const string &iniPath);
+void createExampleHouse(const string filePath);
+void writeConfigFile(const string iniPath);
+
+const string _defaultConfigFileName = "config.ini";
+const string _defaultHosuseFileName = "default_generated_house.house";
+const string _pathPrefix = "./";
+
 int main(int argc, char* argv[])
 {
 	if (argc > 5){
@@ -15,7 +20,7 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	char* config_file_path = NULL, *houses_path = NULL;
+	string config_file_path = _pathPrefix + _defaultConfigFileName, houses_path = _pathPrefix;
 	for (int i = 1; i < argc; i++){ //skip program name -> i=1
 		if (i + 1 != argc){
 			// Check that we haven't finished parsing already
@@ -29,23 +34,24 @@ int main(int argc, char* argv[])
 		} 
 	}
 	//TODO in LINUX: check if file exists in config_file_path. if NOT:
-	writeConfigFile(INI_CONFIG_PATH);
+	writeConfigFile(config_file_path);
 	//TODO: update config_file_path = INI_CONFIG_PATH;
 	//TODO in LINUX: check if a *.house file exists in houses_path. if NOT:
-	createExampleHouse();
+	createExampleHouse(houses_path);
 	//TODO: make sure this works for path that end with '/' and without it. example: /usr/targil1/simufiles/	OR  	/usr/targil1/simufiles
 	srand ((unsigned int)time(NULL));
     Simulator simul;
 	simul.runSimulation(config_file_path, houses_path);
 
+	system("pause");
 	return 0;
 }
 
 
-void createExampleHouse()
+void createExampleHouse(const string filePath)
 {
-  cout << "Creating file: simple1.txt" << endl;
-  ofstream fout("simple1.txt");
+  cout << "Creating default house file" << endl;
+  ofstream fout(filePath + _defaultHosuseFileName);
   fout << "Simple1" << endl;
   fout << "2 Bedrooms + Kitchen Isle" << endl;
   fout << 8 << endl;
@@ -61,9 +67,7 @@ void createExampleHouse()
   fout.close();
 }
 
-
-
-void writeConfigFile(const string &iniPath)
+void writeConfigFile(const string iniPath)
 {
 	//write info into configuration file:
   ofstream fout(iniPath.c_str());
@@ -82,52 +86,3 @@ void writeConfigFile(const string &iniPath)
     cout << line << endl;
   }
 }
-
-		/*String optfileName ="";        
-		String inputFolderPath =""; 
-		String extension = "*.house*";
-		getFilesList(inputFolderPath,extension,filesPaths);
-		vector<string>::const_iterator it = filesPaths.begin();
-		while( it != filesPaths.end())
-		{
-			frame = imread(*it);//read file names
-				//doyourwork here ( frame );
-			sprintf(buf, "%s/Out/%d.jpg", optfileName.c_str(),it->c_str());
-			imwrite(buf,frame);   
-			it++;
-		}
-		
-		if (config_file_location == NULL){
-			string working_dir = getexepath();
-			// on windows:
-			config_file_location = working_dir + "\\" + "config.ini";
-			//on Linux:
-		}
-		if (houses_path_location == NULL){
-			houses_path_location = 
-		}*/
-	
-
-/*	
-	std::string getexepath()
-	{
-		char result[ MAX_PATH ];
-		return std::string( result, GetModuleFileName( NULL, result, MAX_PATH ) );
-	}
-	
-	
-void getFilesList(string filePath,string extension, vector<string> & returnFileName)
-	{
-		WIN32_FIND_DATA fileInfo;
-		HANDLE hFind;   
-		string  fullPath = filePath + extension;
-		hFind = FindFirstFile(fullPath.c_str(), &fileInfo);
-		if (hFind != INVALID_HANDLE_VALUE){
-			returnFileName.push_back(filePath+fileInfo.cFileName);
-			while (FindNextFile(hFind, &fileInfo) != 0){
-				returnFileName.push_back(filePath+fileInfo.cFileName);
-			}
-		}
-	}
-
-*/
