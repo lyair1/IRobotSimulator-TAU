@@ -23,7 +23,7 @@ public:
   int getParameter(const string parameter);
   void loadFromFile(const string& iniPath);
   string toString();
-  const map<string, int> getParametersMap();
+  map<string, int>* getParametersMap();
 private:
 	/* map<string, int> parameters contains the following: 
 	-	MaxSteps:

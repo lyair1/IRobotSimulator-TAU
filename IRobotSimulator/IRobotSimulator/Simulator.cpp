@@ -72,7 +72,7 @@ void Simulator:: readAllHouses(string houses_path)
 void Simulator:: loadAllAlgorithms()
 {
 	AlgorithmNaive* algoNaive = new AlgorithmNaive();
-	algoNaive->setConfiguration(mConfiguration->getParametersMap());
+	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	mAlgorithmList->push_back(algoNaive);

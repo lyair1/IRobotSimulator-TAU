@@ -72,6 +72,6 @@ int ConfigReader::getParameter(const string parameter){
 }
 
 
-const map<string, int> ConfigReader::getParametersMap(){
-	return parameters;
+map<string, int>* ConfigReader::getParametersMap(){
+	return &parameters;
 }
