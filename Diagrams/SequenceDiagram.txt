@@ -20,7 +20,10 @@ note right of Simulation:Update run details for algorithm
 note right of Simulation:End Make Simulation Step
 Simulation->Simulator:
 note right of Simulator:End iteration on all algorithms and all houses
-note right of Simulator:All algorithms stopped
-Simulator->Simulator:SetSimulationScore
+note right of Simulator:Start iteration on all algorithms
+Simulator->Simulation:
+Simulation->Simulation:SetSimulationScore
+Simulation->Simulation:PrintSimulationScore
+note right of Simulator:End iteration on all algorithms
 Simulator->Main:
 note right of Main: Clean Resources
