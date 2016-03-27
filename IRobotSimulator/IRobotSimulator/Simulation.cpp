@@ -120,6 +120,7 @@ void Simulation::resetMaxStepsAccordingToWinner(){
 void Simulation::setSimulationScore(int winnerNumberOfSteps){
 	if (mCrashedIntoWall){
 		mScore = 0;
+
 		return;
 	}
 	else{
@@ -129,6 +130,8 @@ void Simulation::setSimulationScore(int winnerNumberOfSteps){
 		score -= (mInitialDustSumInHouse - mDirtCollected) * 3;
 		score += (mIsBackInDocking ? 50 : -200);
 		mScore = score;
+
+		return;
 	}
 }
 const House* Simulation::getHouse(){
