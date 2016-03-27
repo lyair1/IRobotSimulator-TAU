@@ -1,0 +1,18 @@
+// https://www.websequencediagrams.com/
+
+note right of Main: Load configuration and houses 
+Main->Simulator: RunSimulation
+note right of Simulator: load configuration
+Simulator->ConfigReader:New ConfigReader
+note right of Simulator: Read all houses from path
+Simulator->Simulator:ReadAllHouses
+note right of Simulator: Load all algorithms
+Simulator->Simulator:LoadAllAlgorithms
+note right of Simulator:Execute all algorithms on all houses
+Simulator->Simulation:MakeSimulationStep
+note right of Simulator:Update run details for algorithms
+Simulation->Simulator:
+note right of Simulator:All algorithms stopped
+Simulator->Simulator:SetSimulationScore
+Simulator->Main:
+note right of Main: Clean Resources
