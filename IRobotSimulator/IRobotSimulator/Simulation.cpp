@@ -129,7 +129,7 @@ void Simulation::setSimulationScore(int winnerNumberOfSteps){
 		score += (winnerNumberOfSteps - mStepsCounter) * 10;
 		score -= (mInitialDustSumInHouse - mDirtCollected) * 3;
 		score += (mIsBackInDocking ? 50 : -200);
-		mScore = score;
+		mScore = score < 0 ? 0 : score;
 
 		return;
 	}
