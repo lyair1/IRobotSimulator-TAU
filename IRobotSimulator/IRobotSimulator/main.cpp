@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	for (int i = 1; i < argc; i++){ //skip program name -> i=1
 		if (i + 1 != argc){
 			// Check that we haven't finished parsing already
-			if (strcmp(argv[i],"-config")==0) {
+			if (argv[i] == "-config") {
 				// We know the next argument *should* be the filename:
 				config_file_path = argv[i + 1];
 			}
