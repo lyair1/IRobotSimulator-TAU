@@ -11,6 +11,7 @@ Yair Levi ID 200945657
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
 	typedef std::list<House*> HouseList;
 	typedef std::list<AlgorithmNaive*> AlgorithmList;
+	typedef std::list<Simulation*> SimulationList;
 class Simulator
 {
 public:
@@ -18,6 +19,7 @@ public:
 	{
 		mHouseList = new HouseList();
 		mAlgorithmList = new AlgorithmList();
+		
 	}
 	~Simulator(){
 		cleanResources();
@@ -28,7 +30,6 @@ public:
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;
-	vector<Simulation*> simulationVectorPerHouse;
 	void readAllHouses(string houses_path);
 	void loadAllAlgorithms();
 	void executeAllAlgoOnAllHouses();

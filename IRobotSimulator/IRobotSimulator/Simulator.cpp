@@ -26,10 +26,7 @@ void Simulator::runSimulation(string config_file_path, string houses_path)
 }
 
 void Simulator::cleanResources(){
-	// Clean simulationVectorPerHouse
-	for (std::vector<Simulation*>::iterator iter = simulationVectorPerHouse.begin(); iter != simulationVectorPerHouse.end(); ++iter){
-		(*iter)->cleanResources();
-	}
+
 
 	// Clean Houses
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
@@ -81,16 +78,17 @@ void Simulator:: loadAllAlgorithms()
 void Simulator::executeAllAlgoOnAllHouses()
 {
 	Simulation* pSimulation;
-	//initialize a vector that holds information about all simulations:
-	
+	//initialize a list that holds information about all simulations on current house:
+	SimulationList* simulationListPerHouse;
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
-		//insert all initialized simulations on the current house into the vector simulationVectorPerHouse:
+		simulationListPerHouse = new SimulationList();
+		//insert all initialized simulations on the current house into the list simulationListPerHouse:
 		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 		{
 			pSimulation = new Simulation((*listAlgorithmIter), (*listHouseIter), mConfiguration->getParametersMap());
 			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
-			simulationVectorPerHouse.push_back(pSimulation);
+			simulationListPerHouse->push_back(pSimulation);
 		}
 		int winnerNumberOfSteps = 0;
 		/*	For every house, the simulator should run all algorithms in parallel, in a "round-robin" fashion.
@@ -106,7 +104,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 		int simulationStepsCounter = 0;
 		while (isAnyAlgorithmStillRunning){ // while none of the algorithms finished cleaning and back in docking
 			isAnyAlgorithmStillRunning = false;
-			for (std::vector<Simulation*>::iterator iter = simulationVectorPerHouse.begin(); iter != simulationVectorPerHouse.end(); ++iter){
+			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter){
 				if ((*iter)->isSimulationRunning()){
 					isAnyAlgorithmStillRunning = true;
 					if ((*iter)->makeSimulationStep()){ 
@@ -114,7 +112,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 						{
 							isFirstWinner = false;
 							winnerNumberOfSteps = (*iter)->getNumberOfSteps();
-							for (std::vector<Simulation*>::iterator iter2 = simulationVectorPerHouse.begin(); iter2 != simulationVectorPerHouse.end(); ++iter2){
+							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2){
 								(*iter2)->resetMaxStepsAccordingToWinner();
 							}
 						}
@@ -143,9 +141,15 @@ void Simulator::executeAllAlgoOnAllHouses()
 		}
 		
 		//all algorithms stopped - terminate simulation and calculate scores
-		for (std::vector<Simulation*>::iterator iter3 = simulationVectorPerHouse.begin(); iter3 != simulationVectorPerHouse.end(); ++iter3){
+		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
 			(*iter3)->setSimulationScore(winnerNumberOfSteps);
 			cout << "[" << (*iter3)->getHouse()->getName() << "]" << "\t" << (*iter3)->getSimulationScore() << "\n";
 		}
+		// Clean simulationListPerHouse (in next exercise: TODO: write the score into a score matrix before freeing it)
+		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
+			(*iter4)->cleanResources();
+			delete *iter4;
+		}
+		delete simulationListPerHouse;
 	}
 }
