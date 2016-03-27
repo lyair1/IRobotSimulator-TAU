@@ -72,7 +72,7 @@ bool Simulation :: makeSimulationStep()
 			stop the simulation of this specific algorithm,
 			and output that the algorithm made an invalid step.
 		*/
-		if (info.isWall[(int)stepInDirection])
+		if (stepInDirection != Direction::Stay && info.isWall[(int)stepInDirection])
 		{
 			mIsRunning = false;
 			setPositionInCompetition(10);
