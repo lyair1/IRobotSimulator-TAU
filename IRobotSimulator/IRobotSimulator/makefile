@@ -1,7 +1,7 @@
-.DEFAULT_GOAL := simulator
+.DEFAULT_GOAL	:=	simulator
 
 # place here your source files
-src = main.cpp AlgorithmNaive.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp
+src = main.cppAlgorithmNaive.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp
 obj = $(src:.cpp=.o)
 
 CC_FLAGS = -std=c++11 -g -Wall -O2 -pedantic -pthread
