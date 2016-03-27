@@ -4,7 +4,6 @@ Yair Levi ID 200945657
 */
 #include <iostream>
 #include <string>
-#include <windows.h>
 #include <ctime>
 #include "Simulator.h"
 
