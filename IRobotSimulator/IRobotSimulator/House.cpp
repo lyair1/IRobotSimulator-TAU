@@ -42,7 +42,7 @@ bool House::fillHouseInfo(string filePath)
 	  }
 
 	  // Check if a row is shorter than expected
-	  if (matrix[i].length() != C)
+	  if ((int)matrix[i].length() != C)
 	  {
 		  cout << "Input error, not enough columns for house description" << endl;
 

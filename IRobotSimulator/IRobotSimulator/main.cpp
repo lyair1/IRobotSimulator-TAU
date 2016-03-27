@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
     Simulator simul;
 	simul.runSimulation(config_file_path, houses_path);
 
-	system("pause");
 	return 0;
 }
 

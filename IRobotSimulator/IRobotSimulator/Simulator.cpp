@@ -80,7 +80,6 @@ void Simulator:: loadAllAlgorithms()
 
 void Simulator::executeAllAlgoOnAllHouses()
 {
-	int numOfSteps = 0;
 	Simulation* pSimulation;
 	//initialize a vector that holds information about all simulations:
 	
