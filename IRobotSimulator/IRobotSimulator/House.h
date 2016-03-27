@@ -4,7 +4,7 @@ Yair Levi ID 200945657
 */
 #ifndef HOUSE_H
 #define HOUSE_H
-#define DEBUG 1
+#define DEBUG 0
 #include <iostream>
 #include <string>
 #include <fstream>
