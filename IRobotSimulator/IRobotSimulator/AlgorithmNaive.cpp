@@ -13,7 +13,7 @@ void AlgorithmNaive::setSensor(const AbstractSensor& sensor)
 // setConfiguration is called once when the Algorithm is initialized - see below 
 void AlgorithmNaive::setConfiguration(map<string, int> config)
 {
-	mConfiguration = config;
+	mConfiguration = &config;
 }
     
 // step is called by the simulation for each time unit 

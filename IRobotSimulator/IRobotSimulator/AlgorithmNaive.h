@@ -45,7 +45,7 @@ private:
 	const AbstractSensor* mSensor; // the only info the algorithm has about the house it's cleaning comes from the sensor itself.
 	//House * house; //algorithm does not have any given information about the house, but it can gather that information along the way
 	std:: pair <int, int> mLocation;
-	map<string, int> mConfiguration;
+	map<string, int>* mConfiguration;
 };
 
 #endif //ALGO_NAIVE_H
