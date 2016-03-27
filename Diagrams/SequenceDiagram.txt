@@ -3,15 +3,23 @@
 note right of Main: Load configuration and houses 
 Main->Simulator: RunSimulation
 note right of Simulator: load configuration
-Simulator->ConfigReader:New ConfigReader
+Simulator->ConfigReader:
+ConfigReader->ConfigReader:New ConfigReader
 note right of Simulator: Read all houses from path
 Simulator->Simulator:ReadAllHouses
 note right of Simulator: Load all algorithms
 Simulator->Simulator:LoadAllAlgorithms
-note right of Simulator:Execute all algorithms on all houses
-Simulator->Simulation:MakeSimulationStep
-note right of Simulator:Update run details for algorithms
+note right of Simulator:Start iteration on all algorithms and all houses
+Simulator->Simulation:
+note right of Simulation:Start Make Simulation Step
+Simulation->Sensor:
+Sensor->Sensor:Sense
+Simulation->Algorithm:
+Algorithm->Algorithm:Step
+note right of Simulation:Update run details for algorithm
+note right of Simulation:End Make Simulation Step
 Simulation->Simulator:
+note right of Simulator:End iteration on all algorithms and all houses
 note right of Simulator:All algorithms stopped
 Simulator->Simulator:SetSimulationScore
 Simulator->Main:
