@@ -69,10 +69,15 @@ int main(int argc, char* argv[])
 
 void createExampleHouse(const string filePath)
 {
-  cout << "Creating default house file" << endl;
-  ofstream fout(filePath + _defaultHosuseFileName);
-  fout << "Simple1" << endl;
-  fout << "2 Bedrooms + Kitchen Isle" << endl;
+	if (DEBUG)
+	{
+		cout << "Creating default house file" << endl;
+	}
+  
+	ofstream fout(filePath + _defaultHosuseFileName);
+	fout << "Simple1" << endl;
+	fout << "2 Bedrooms + Kitchen Isle" << endl;
+
   /*
   fout << 8 << endl;
   fout << 10 << endl;

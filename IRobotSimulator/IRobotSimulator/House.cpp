@@ -7,7 +7,11 @@ Yair Levi ID 200945657
 //TODO: make sure number of rows is R
 bool House::fillHouseInfo(string filePath)
 {
-  cout << "Reading house from file path: %s into class House" <<filePath << endl;
+	if (DEBUG)
+	{
+		cout << "Reading house from file path: %s into class House" << filePath << endl;
+	}
+  
   ifstream fin(filePath);
   string name;
   getline(fin, name);
