@@ -1,0 +1,11 @@
+// Cool Class Diagram
+// http://yuml.me/diagram/nofunky/class/draw
+[Simulator]0<>-..*>[House]
+[Simulator]0<>-..*>[AlgorithmNaive]
+[Simulator]0<>-..*>[Simulation]
+[Simulator]<>-[ConfigReader]
+[Simulation]<>->[AlgorithmNaive]
+[Simulation]<>->[House]
+[Simulation]<>->[Sensor]
+[AbstractAlgorithm]^-[AlgorithmNaive]
+[AbstractSensor]^-[Sensor]
