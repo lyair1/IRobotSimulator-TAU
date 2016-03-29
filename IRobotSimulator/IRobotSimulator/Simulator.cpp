@@ -26,9 +26,8 @@ void Simulator::runSimulation(string config_file_path, string houses_path)
 	executeAllAlgoOnAllHouses();
 }
 
-void Simulator::cleanResources(){
-
-
+void Simulator::cleanResources()
+{
 	// Clean Houses
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
@@ -51,11 +50,11 @@ void Simulator::cleanResources(){
 
 void Simulator:: readAllHouses(string houses_path)
 {
-	//TODO: in ex2 we need to go over all the files with extension *.house which are in houses_path. 
+	//TODO in Ex2 : We need to go over all the files with extension *.house which are in houses_path. 
 	House *house = new House();
 	string filePath = "default_generated_house.house";
 	if (!house->fillHouseInfo(filePath)){
-		// House is illigle - delete
+		// House is illegal - delete
 		delete(house);
 	}
 	else{
@@ -103,50 +102,58 @@ void Simulator::executeAllAlgoOnAllHouses()
 		bool isFirstWinner = true;
 		int maxSimulatorStepsPerHouse = mConfiguration->getParameter("MaxSteps");
 		int simulationStepsCounter = 0;
-		while (isAnyAlgorithmStillRunning){ // while none of the algorithms finished cleaning and back in docking
+		while (isAnyAlgorithmStillRunning)// while none of the algorithms finished cleaning and back in docking
+		{ 
 			isAnyAlgorithmStillRunning = false;
-			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter){
-				if ((*iter)->isSimulationRunning()){
+			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter)
+			{
+				if ((*iter)->isSimulationRunning())
+				{
 					isAnyAlgorithmStillRunning = true;
-					if ((*iter)->makeSimulationStep()){ 
+					if ((*iter)->makeSimulationStep())
+					{ 
 						if (isFirstWinner)// this is the first algorithm that finished running successfully!
 						{
 							isFirstWinner = false;
 							winnerNumberOfSteps = (*iter)->getNumberOfSteps();
-							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2){
-								(*iter2)->resetMaxStepsAccordingToWinner();
+							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2)
+							{
+								(*iter2)->resetMaxStepsAccordingToWinner();//update steps counter for all other algorithm too:
 							}
 						}
-						(*iter)->setPositionInCompetition((actualPositionInCopmetition < 4) ? actualPositionInCopmetition : 4);
+						(*iter)->setPositionInCompetition(actualPositionInCopmetition);
 						numberOfWinnersInPosition += 1;
-						//update steps counter for all other algorithm too: 
-						
 					}
+				}
+				else if ((*iter)->getPositionInCompetition() == -1) // this algorithm finished running but not successfully
+				{
+					(*iter)->setPositionInCompetition(-1);
 				}
 			}
 			actualPositionInCopmetition += numberOfWinnersInPosition;
 			numberOfWinnersInPosition = 0; // after incrementingPositionInCompetition, initiate numberOfWinnersInPosition in order to count from 0 at next iteration.
-			simulationStepsCounter += 1;
-			
-			// Update the winner number of steps to the value of the one algorithm that ran and finished (and didn't win)
-			if (winnerNumberOfSteps == 0)
+			if (isAnyAlgorithmStillRunning)
 			{
-				winnerNumberOfSteps = simulationStepsCounter;
+				simulationStepsCounter += 1;
 			}
-
-			if (simulationStepsCounter >= maxSimulatorStepsPerHouse)
+			
+			if (simulationStepsCounter >= maxSimulatorStepsPerHouse) // all simulations on the current house exceeded maxSteps
 			{
 				winnerNumberOfSteps = maxSimulatorStepsPerHouse;
-				break; //exit from while loop
+				break; //exit from while loop - go to next house
 			}
 		}
-		
+		// if no algorithm finished successfully:
+		if (winnerNumberOfSteps == 0)
+		{
+			winnerNumberOfSteps = simulationStepsCounter;
+		}
 		//all algorithms stopped - terminate simulation and calculate scores
 		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
-			(*iter3)->setSimulationScore(winnerNumberOfSteps);
-			cout << "[" << (*iter3)->getHouse()->getName() << "]" << "\t" << (*iter3)->getSimulationScore() << "\n";
+			(*iter3)->setSimulationScore(winnerNumberOfSteps, simulationStepsCounter);
+			(*iter3)->printSimulationScore((*iter3)->getHouse()->getName(), (*iter3)->getSimulationScore());
 		}
-		// Clean simulationListPerHouse (in next exercise: TODO: write the score into a score matrix before freeing it)
+		// Clean simulationListPerHouse (TODO in Ex 2: write the score into a score matrix before freeing it)
 		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
 			(*iter4)->cleanResources();
 			delete *iter4;
@@ -154,3 +161,5 @@ void Simulator::executeAllAlgoOnAllHouses()
 		delete simulationListPerHouse;
 	}
 }
+
+
