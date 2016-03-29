@@ -14,6 +14,7 @@
     {
       this->processLine(line);
     }
+	
   }
   
   string ConfigReader::toString()
@@ -75,4 +76,19 @@ int ConfigReader::getParameter(const string parameter){
 
 map<string, int>* ConfigReader::getParametersMap(){
 	return &parameters;
+}
+
+
+bool ConfigReader ::isLegalConfigFile()
+{
+	if (getParameter("BatteryConsumptionRate") == -1	||
+		getParameter("MaxSteps") == -1					||
+		getParameter("BatteryRechargeRate") == -1		||
+		getParameter("BatteryCapacity") == -1			||
+		getParameter("MaxStepsAfterWinner") == -1)
+	{
+		return false;
+	}
+
+	return true;
 }

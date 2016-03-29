@@ -25,6 +25,7 @@ public:
   void loadFromFile(const string& iniPath);
   string toString();
   map<string, int>* getParametersMap();
+  bool isLegalConfigFile();
 private:
 	/* map<string, int> parameters contains the following: 
 	-	MaxSteps:

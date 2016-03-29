@@ -25,48 +25,13 @@ public:
 		mCrashedIntoWall = false;
 		mInitialDustSumInHouse = mHouse->getDustInHouse();
 		mIsBackInDocking = mHouse->isCleanHouse() ?true : false; // we start simulation at location 'D'. if the house is clean - we're considered back in docking
-		if (mConfiguration->find("BatteryConsumptionRate") != mConfiguration->end())
-		{
-			mBattreyConsumptionRate = mConfiguration->find("BatteryConsumptionRate")->second;
-		}
-		else{
-			cout << "Simulation constructor could not find BattreyConsumptionRate in parameters from configuration file." << endl;
-		}
-		mMaxSteps = 0;
-		if (mConfiguration->find("MaxSteps") != mConfiguration->end())
-		{
-			mMaxSteps = mConfiguration->find("MaxSteps")->second;
-		}
-		else{
-			cout << "Simulation constructor could not find maxSteps in parameters from configuration file." << endl;
-		}
-		mBatteryRechargeRate = 0;
-		if (mConfiguration->find("BatteryRechargeRate") != mConfiguration->end()) 
-		{
-			mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
-		}
-		else{
-			cout << "Simulation constructor could not find BatteryRechargeRate in parameters from configuration file." << endl;
-		}
-		mBatteryCapacity = 0;
-		mBatteryLeft = 0;
-		if (mConfiguration->find("BatteryCapacity") != mConfiguration->end())
-		{
-			mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
-			mBatteryLeft = mBatteryCapacity;
-		}
-		else{
-			cout << "Simulation constructor could not find BatteryCapacity in parameters from configuration file." << endl;
-		}
-		mMaxStepsAfterWinner = 0;
-		if (mConfiguration->find("MaxStepsAfterWinner") != mConfiguration->end())
-		{
-			mBatteryCapacity = mConfiguration->find("MaxStepsAfterWinner")->second;
-		}
-		else{
-			cout << "Simulation constructor could not find MaxStepsAfterWinner in parameters from configuration file." << endl;
-		}
-
+		//all parameters are located in the configuration file, otherwise it's an Illegal file and program would have exit at ConfigReader.
+		mBattreyConsumptionRate = mConfiguration->find("BatteryConsumptionRate")->second;
+		mMaxSteps = mConfiguration->find("MaxSteps")->second;
+		mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
+		mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
+		mBatteryLeft = mBatteryCapacity;
+		mBatteryCapacity = mConfiguration->find("MaxStepsAfterWinner")->second;
 		mPositionInCompetition = -1;
 		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}

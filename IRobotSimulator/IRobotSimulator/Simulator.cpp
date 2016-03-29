@@ -15,6 +15,10 @@ void Simulator::runSimulation(string config_file_path, string houses_path)
 		cout << endl << endl << "Parameters read:" << endl;
 		cout << mConfiguration->toString() << endl;
 	}
+	if (!mConfiguration->isLegalConfigFile())
+	{
+		return ;
+	}
 	
 	//The simulator should read all houses descriptions from text files including dust levels:
 	readAllHouses(houses_path);
