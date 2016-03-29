@@ -75,7 +75,7 @@ public:
 	bool makeSimulationStep();
 	int getNumberOfSteps();
 	const AbstractSensor * getSensor();
-	int Simulation::getPositionInCompetition();
+	int getPositionInCompetition();
 	void setPositionInCompetition(int actualPositionInCompetition);
 	void resetMaxStepsAccordingToWinner();
 	void setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter);
