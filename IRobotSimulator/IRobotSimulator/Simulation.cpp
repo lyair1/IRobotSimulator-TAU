@@ -119,8 +119,22 @@ const AbstractSensor* Simulation::getSensor(){
 	return mSensor;
 }
 
-void Simulation::setPositionInCompetition(int position){
-	mPositionInCompetition = position;
+int Simulation::getPositionInCompetition(){
+	return mPositionInCompetition;
+}
+
+void Simulation::setPositionInCompetition(int actualPositionInCompetition){
+	if (actualPositionInCompetition == -1)
+	{
+		mPositionInCompetition = 10;
+		return;
+	}
+	if (mHouse->isCleanHouse() && mIsBackInDocking)
+	{
+		mPositionInCompetition = actualPositionInCompetition < 4 ? actualPositionInCompetition : 4;
+	}
+	
+	return;
 }
 //TODO: make sure this formula is according to stepsLeft = min {maxStepsAfterWinner, maxSteps - stepsCounter }
 //this means that: mMaxSteps = minimum { mMaxSteps, stepsCounter + mMaxStepsAfterWinner }
@@ -128,22 +142,29 @@ void Simulation::resetMaxStepsAccordingToWinner(){
 	mMaxSteps = mMaxSteps < (mStepsCounter + mMaxStepsAfterWinner) ? mMaxSteps : (mStepsCounter + mMaxStepsAfterWinner);
 }
 
-void Simulation::setSimulationScore(int winnerNumberOfSteps){
+void Simulation::setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter){
 	if (mCrashedIntoWall){
 		mScore = 0;
 
 		return;
 	}
-	else{
-		int score = 2000;
-		score -= (mPositionInCompetition - 1) * 50;
-		score += (winnerNumberOfSteps - mStepsCounter) * 10;
-		score -= (mInitialDustSumInHouse - mDirtCollected) * 3;
-		score += (mIsBackInDocking ? 50 : -200);
-		mScore = score < 0 ? 0 : score;
-
-		return;
+	
+	int score = 2000;
+	score -= (mPositionInCompetition - 1) * 50;
+	if (mIsOutOfBattery)
+	{
+		score += (winnerNumberOfSteps - simulationStepsCounter) * 10;
 	}
+	else
+	{
+		score += (winnerNumberOfSteps - mStepsCounter) * 10;
+	}
+		
+	score -= (mInitialDustSumInHouse - mDirtCollected) * 3;
+	score += (mIsBackInDocking ? 50 : -200);
+	mScore = score < 0 ? 0 : score;
+
+	return;
 }
 const House* Simulation::getHouse(){
 	return mHouse;
@@ -152,4 +173,19 @@ const House* Simulation::getHouse(){
 const int Simulation::getSimulationScore()
 {
 	return mScore;
+}
+
+void Simulation::printSimulationScore(string houseName, const int score)
+{
+	// TODO in Ex2:
+	//Save score into matrix of scores and print matrix at the end 
+	//cout << "[" << houseName << "]" << "\t" << score << "\n";
+
+	//in Ex 1:
+	cout << score << endl;
+	if (mCrashedIntoWall) // exercise demands this is the only message that will be printed, after score is printed!
+	{
+		cout << " Simulation terminated due to  an invalid step! (crashed into a wall) " << endl;
+	}
+	return;
 }
