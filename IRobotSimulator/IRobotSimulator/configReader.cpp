@@ -67,7 +67,7 @@ int ConfigReader::getParameter(const string parameter){
 		 return pos->second;
 	 }
 	 cout << "Error in ConfigReader::getParameter, parameter " << parameter<<" was not found in configuration file"<<endl;
-	 //TODO: release all resources and exit! 
+	 //(all resources are released and program terminates) 
 	 return -1;
 
 }
