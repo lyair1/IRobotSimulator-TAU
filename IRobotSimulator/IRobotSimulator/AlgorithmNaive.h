@@ -5,7 +5,6 @@
 */
 #ifndef ALGO_NAIVE_H
 #define ALGO_NAIVE_H
-//#include "Direction.h" //TODO: bring back this line
 #include "AbstractAlgorithm.h"
 #include "House.h"
 #include "Sensor.h"
