@@ -14,6 +14,7 @@
 void createExampleHouse(const string filePath);
 void writeConfigFile(const string iniPath);
 bool isFileExists(const string name);
+void outOfMemHandler();
 
 const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
@@ -29,7 +30,8 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	string config_file_path = _pathPrefix + _defaultConfigFileName, houses_path = _pathPrefix;
+	string config_file_path = _pathPrefix + _defaultConfigFileName;
+	string houses_path = _pathPrefix;
 	for (int i = 1; i < argc; i++){ //skip program name -> i=1
 		if (i + 1 != argc){
 			// Check that we haven't finished parsing already
@@ -63,7 +65,10 @@ int main(int argc, char* argv[])
 	createExampleHouse(houses_path);
 	//TODO: make sure this works for path that end with '/' and without it. example: /usr/targil1/simufiles/	OR  	/usr/targil1/simufiles
 
-	srand ((unsigned int)time(NULL));
+	srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm
+	//set the new_handler for handling cases where "new" failed to allocate memory
+	std::set_new_handler(outOfMemHandler);
+
     Simulator simul;
 	simul.runSimulation(config_file_path, houses_path);
 
@@ -82,7 +87,7 @@ void createExampleHouse(const string filePath)
 	fout << "Simple1" << endl;
 	fout << "2 Bedrooms + Kitchen Isle" << endl;
 
-  /*
+/*
   fout << 8 << endl;
   fout << 10 << endl;
   fout << "WWWWWWWWWW" << endl;
@@ -93,7 +98,7 @@ void createExampleHouse(const string filePath)
   fout << "W78W  W  W" << endl;
   fout << "W99W  W  W" << endl;
   fout << "WWWWWWWWWW" << endl;
-  */
+*/  
 
   fout << 19 << endl;
   fout << 80 << endl;
@@ -118,7 +123,7 @@ void createExampleHouse(const string filePath)
   fout << "W              W                                                           3   W" << endl; // 16
   fout << "W              W                                                               W" << endl; // 17
   fout << "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl; // 18
-
+ 
   fout.close();
 }
 
@@ -152,4 +157,12 @@ bool isFileExists(const string name) {
 		f.close();
 		return false;
 	}
+}
+
+
+// function to call if operator new can't allocate enough memory or error arises
+void outOfMemHandler()
+{
+	std::cerr << "Unable to satisfy request for memory\n";
+	exit(1);
 }
