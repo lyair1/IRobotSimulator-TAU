@@ -1,6 +1,7 @@
-/*
-Author: Nir Orman ID 201588902
-Yair Levi ID 200945657
+/**
+@author Nir Orman ID 201588902
+@author Yair Levi ID 200945657
+@version 1.0 30/1/16
 */
 #include "AlgorithmNaive.h"
 
@@ -19,14 +20,23 @@ void AlgorithmNaive::setConfiguration(map<string, int> config)
 // step is called by the simulation for each time unit 
 Direction AlgorithmNaive:: step(){
 	SensorInformation info = mSensor->sense();
-	int randomDirection = rand() % 5 ;
-	while (randomDirection != 4 && info.isWall[randomDirection])
+	//if there's still dust - stay in current location:
+	Direction chosenDirection = Direction::Stay;
+	if (info.dirtLevel >= 1 && info.dirtLevel <= 9)
 	{
-		//robot is stepping into a wall - choose a different direction!
-		randomDirection = rand() % 5 ;
+		return chosenDirection;
 	}
-	Direction dir = (Direction)randomDirection;
-	return dir;
+	//if there's no dust - move from current location:
+	else if (info.dirtLevel == 0)
+	{
+		chosenDirection = (Direction) (rand() % 4);
+		while (info.isWall[(int)chosenDirection])
+		{
+			//robot is stepping into a wall - choose a different direction!
+			chosenDirection = (Direction) (rand() % 4);
+		}
+	}
+	return chosenDirection;
 }
     
 // this method is called by the simulation either when there is a winner or 
