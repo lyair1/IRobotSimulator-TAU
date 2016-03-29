@@ -68,18 +68,21 @@ public:
 		}
 
 		mPositionInCompetition = -1;
+		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}
 
 	bool isSimulationRunning();
 	bool makeSimulationStep();
 	int getNumberOfSteps();
 	const AbstractSensor * getSensor();
-	void setPositionInCompetition(int position);
+	int Simulation::getPositionInCompetition();
+	void setPositionInCompetition(int actualPositionInCompetition);
 	void resetMaxStepsAccordingToWinner();
-	void setSimulationScore(int winnerNumberOfSteps);
+	void setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter);
 	const House* getHouse();
 	const int getSimulationScore();
 	void cleanResources();
+	void printSimulationScore(string houseName, int score);
 private:
 	AlgorithmNaive* mAlgorithm;
 	House* mHouse;
@@ -99,5 +102,7 @@ private:
 	int mPositionInCompetition;
 	bool mIsBackInDocking;
 	bool mCrashedIntoWall;
+	bool mIsOutOfBattery;
+	
 };
 #endif // SIMULATION_H
