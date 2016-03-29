@@ -1,6 +1,7 @@
-/*
-Author: Nir Orman ID 201588902
-Yair Levi ID 200945657
+/**
+@author Nir Orman ID 201588902
+@author Yair Levi ID 200945657
+@version 1.0 30/1/16
 */
 #include "House.h"
 
@@ -9,7 +10,7 @@ bool House::fillHouseInfo(string filePath)
 {
 	if (DEBUG)
 	{
-		cout << "Reading house from file path: %s into class House" << filePath << endl;
+		cout << "Reading house from file path: " << filePath << "into class House" << endl;
 	}
   
   ifstream fin(filePath);
@@ -121,19 +122,20 @@ void House::cleanResources(){
 	
 }
 
+
+// 
 SensorInformation House::getLocationInfo(std::pair<const int,const int> location) const {
 	SensorInformation locationInfo; 
-	if (matrix[location.second][location.first] > '0' &&
+	if (matrix[location.second][location.first] >= '1' &&
 		matrix[location.second][location.first] <= '9')
 	{
 		locationInfo.dirtLevel = matrix[location.second][location.first] - '0'; // convert char to int
 	}
-	else if (matrix[location.second][location.first] == ' ' ||
-		matrix[location.second][location.first] == 'D' ||
-		matrix[location.second][location.first] == 'W')
+	else //char which is neither 'D'/' '/'W'/'0'-'9' is considered as ' '. 
 	{
 		locationInfo.dirtLevel = 0;
 	}
+
 	locationInfo.isWall[0] = matrix[location.second][location.first + 1] == 'W' ? true : false;
 	locationInfo.isWall[1] = matrix[location.second][location.first - 1] == 'W' ? true : false;
 	locationInfo.isWall[2] = matrix[location.second + 1][location.first] == 'W' ? true : false;
