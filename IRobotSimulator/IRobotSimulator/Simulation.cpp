@@ -1,6 +1,7 @@
-/*
-Author: Nir Orman ID 201588902
-Yair Levi ID 200945657
+/**
+@author Nir Orman ID 201588902
+@author Yair Levi ID 200945657
+@version 1.0 30/1/16
 */
 #include "Simulation.h"
 
