@@ -35,8 +35,10 @@ bool Simulation :: makeSimulationStep()
 		if (mStepsCounter >= mMaxSteps)
 		{
 			mIsRunning = false;
-			setPositionInCompetition(10);
-			cout << "Simulation terminated due to exceeding MaxSteps !" << endl;
+			if (DEBUG)
+			{
+				cout << "Simulation terminated due to exceeding MaxSteps !" << endl;
+			}
 		}
 		if (mHouse->getLocationValue(mSensor->getSensorLocation()) != 'D') // battery is spent only when not in docking station
 		{ 		
@@ -44,8 +46,11 @@ bool Simulation :: makeSimulationStep()
 			if ( mBatteryLeft <= 0)
 			{
 				mIsRunning = false;
-				setPositionInCompetition(10);
-				cout << " Simulation terminated due to exceeding BatteryCapacity !" << endl;
+				mIsOutOfBattery = true;
+				if (DEBUG)
+				{
+					cout << " Simulation terminated due to exceeding BatteryCapacity !" << endl;
+				}
 			}
 		}
 		else{ // the robot is in docking and battery is recharged 
@@ -60,7 +65,10 @@ bool Simulation :: makeSimulationStep()
 			{
 				mIsRunning = false;
 				mIsBackInDocking = true;
-				cout << "Simulation successfully finished!  The house is clean, The robot is in the docking station" << endl;
+				if (DEBUG)
+				{
+					cout << "Simulation successfully finished!  The house is clean, The robot is in the docking station" << endl;
+				}
 				return true;
 			}
 		}
@@ -76,9 +84,11 @@ bool Simulation :: makeSimulationStep()
 		if (stepInDirection != Direction::Stay && info.isWall[(int)stepInDirection])
 		{
 			mIsRunning = false;
-			setPositionInCompetition(10);
 			mCrashedIntoWall = true;
-			cout << " Simulation terminated due to  an invalid step! (crashed into a wall) " << endl;
+			if (DEBUG)
+			{
+				cout << " Simulation terminated due to  an invalid step! (crashed into a wall) " << endl;
+			}
 			return false;
 		}
 		else{ // this simulation terminated in the previous step - don't print an error again.
