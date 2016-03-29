@@ -19,6 +19,8 @@ void outOfMemHandler();
 const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
 const string _pathPrefix = "./";
+const string _seperator = "\\";
+const string _config = "-config";
 
 int main(int argc, char* argv[])
 {
@@ -36,9 +38,9 @@ int main(int argc, char* argv[])
 		if (i + 1 != argc){
 			// Check that we haven't finished parsing already
 			string arg = argv[i];
-			if (arg.compare("-config")) {
+			if (arg.compare(_config) == 0) {
 				// We know the next argument *should* be the filename:
-				config_file_path = argv[i + 1];
+				config_file_path = argv[i + 1] + _seperator + _defaultConfigFileName;
 			}
 			/*
 			else if (strcmp(argv[i], "-house_path") == 0) {
