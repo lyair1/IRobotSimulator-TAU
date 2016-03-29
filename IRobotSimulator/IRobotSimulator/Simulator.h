@@ -33,10 +33,10 @@ public:
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;
+	ConfigReader* mConfiguration;
 	void readAllHouses(string houses_path);
 	void loadAllAlgorithms();
 	void executeAllAlgoOnAllHouses();
-	ConfigReader* mConfiguration;
 };
 
 #endif //SIMULATOR_H
