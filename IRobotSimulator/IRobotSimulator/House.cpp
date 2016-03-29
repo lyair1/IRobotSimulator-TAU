@@ -5,7 +5,7 @@
 */
 #include "House.h"
 
-//TODO: make sure number of rows is R
+
 bool House::fillHouseInfo(string filePath)
 {
 	if (DEBUG)
@@ -27,6 +27,7 @@ bool House::fillHouseInfo(string filePath)
   this->setR(r);
   fin.ignore(); //skip newline and go the begining of matrix
   this->matrix = new string[this->getR()];
+  //TODO: make sure number of rows is R - if it's not then fill it!
   for (int i =0; i < this->getR(); ++i)
   {
 	  // Check if stream is over before the rows count
@@ -73,7 +74,7 @@ void House:: printHouse() const
   }
 }
 
-//TODO: comlete this with fill rows and cols if matrix is not in size C*R
+//TODO: complete this with fill rows and cols if matrix is not in size C*R
 bool House::isLegalHouse(){
 	// Make sure that that house souranded by walls
 	for (int i = 0; i < R; ++i){
