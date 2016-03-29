@@ -136,7 +136,7 @@ void Simulation::setPositionInCompetition(int actualPositionInCompetition){
 	
 	return;
 }
-//TODO: make sure this formula is according to stepsLeft = min {maxStepsAfterWinner, maxSteps - stepsCounter }
+//formula is according to stepsLeft = min {maxStepsAfterWinner, maxSteps - stepsCounter }
 //this means that: mMaxSteps = minimum { mMaxSteps, stepsCounter + mMaxStepsAfterWinner }
 void Simulation::resetMaxStepsAccordingToWinner(){
 	mMaxSteps = mMaxSteps < (mStepsCounter + mMaxStepsAfterWinner) ? mMaxSteps : (mStepsCounter + mMaxStepsAfterWinner);
