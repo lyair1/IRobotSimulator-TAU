@@ -41,7 +41,7 @@ public:
 			cout << "Simulation constructor could not find maxSteps in parameters from configuration file." << endl;
 		}
 		mBatteryRechargeRate = 0;
-		if (mConfiguration->find("BatteryRechargeRate") != mConfiguration->end()) // grammer mistake is on purpose! this is how it was written in the exercise file.
+		if (mConfiguration->find("BatteryRechargeRate") != mConfiguration->end()) 
 		{
 			mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
 		}
