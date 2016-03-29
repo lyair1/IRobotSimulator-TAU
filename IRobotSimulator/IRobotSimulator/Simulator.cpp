@@ -101,6 +101,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 		int numberOfWinnersInPosition = 0;
 		bool isFirstWinner = true;
 		int maxSimulatorStepsPerHouse = mConfiguration->getParameter("MaxSteps");
+		if (maxSimulatorStepsPerHouse < 0)
+		{
+			return;
+		}
 		int simulationStepsCounter = 0;
 		while (isAnyAlgorithmStillRunning)// while none of the algorithms finished cleaning and back in docking
 		{ 
@@ -118,7 +122,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 							winnerNumberOfSteps = (*iter)->getNumberOfSteps();
 							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2)
 							{
-								(*iter2)->resetMaxStepsAccordingToWinner();//update steps counter for all other algorithm too:
+								if ((*iter2) != (*iter))//update steps counter for all OTHER algorithms BUT for the first winner 
+								{
+									(*iter2)->resetMaxStepsAccordingToWinner();
+								}
 							}
 						}
 						(*iter)->setPositionInCompetition(actualPositionInCopmetition);
