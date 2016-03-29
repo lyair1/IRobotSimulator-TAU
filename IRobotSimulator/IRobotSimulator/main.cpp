@@ -1,6 +1,10 @@
-/*
-Author: Nir Orman ID 201588902
-Yair Levi ID 200945657
+/**
+	Advanced Topics In Computer Programming - iRobot Project
+	Ex 1
+
+	@author Nir Orman ID 201588902
+	@author Yair Levi ID 200945657
+	@version 1.0 30/1/16
 */
 #include <iostream>
 #include <string>
