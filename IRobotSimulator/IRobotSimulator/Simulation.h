@@ -32,7 +32,7 @@ public:
 		mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
 		mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
 		mBatteryLeft = mBatteryCapacity;
-		mBatteryCapacity = mConfiguration->find("MaxStepsAfterWinner")->second;
+		mMaxStepsAfterWinner = mConfiguration->find("MaxStepsAfterWinner")->second;
 		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}
 
@@ -50,25 +50,25 @@ public:
 	void printSimulationScore(string houseName, int score);
 
 private:
+	long mStepsCounter;
+	int mScore;
+	int mDirtCollected;
+	int mBattreyConsumptionRate;
+	bool mCrashedIntoWall;
+	int mPositionInCompetition;
+	bool mIsRunning;
+	
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	Sensor* mSensor;
-	bool mIsRunning;
-	long mStepsCounter;
-	int mScore;
-	int mBatteryLeft;
-	int mBattreyConsumptionRate;
+	map<string, int>* mConfiguration;
+	int mInitialDustSumInHouse;
+	bool mIsBackInDocking;
 	int mMaxSteps;
 	int mBatteryRechargeRate; 
 	int mBatteryCapacity;
-	int mDirtCollected;
+	int mBatteryLeft;
 	int mMaxStepsAfterWinner;
-	int mInitialDustSumInHouse;
-	map<string, int>* mConfiguration;
-	int mPositionInCompetition;
-	bool mIsBackInDocking;
-	bool mCrashedIntoWall;
 	bool mIsOutOfBattery;
-	
 };
 #endif // SIMULATION_H
