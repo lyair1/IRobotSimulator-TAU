@@ -48,8 +48,9 @@ public:
 	const int getSimulationScore();
 	void cleanResources();
 	void printSimulationScore(string houseName, int score);
+
 private:
-	AlgorithmNaive* mAlgorithm;
+	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	Sensor* mSensor;
 	bool mIsRunning;
