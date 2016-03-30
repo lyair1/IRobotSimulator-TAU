@@ -26,6 +26,7 @@ public:
   string toString();
   map<string, int>* getParametersMap();
   bool isLegalConfigFile();
+
 private:
 	/* map<string, int> parameters contains the following: 
 	-	MaxSteps:
@@ -45,13 +46,11 @@ private:
 		The current battery load is an integer between zero (empty battery) and BatteryCapacity (full-charged).
 		Each time unit the robot is not in its docking station, the current battery load is reduced by this number,
 		per each time unit the robot is not at the docking station.
+
 	-	BatteryRechargeRate:
 		this is the rate at which the battery is charged.
 		Each time unit the robot is at the docking station, the current battery load increases by the amount RechargeRate.
 	*/
-
-
-
   map<string, int> parameters;
   static std::vector<std::string> split(const std::string &s, char delim);
   static std::string trim(std::string& str);

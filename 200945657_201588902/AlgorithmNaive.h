@@ -26,6 +26,10 @@ class AlgorithmNaive : public AbstractAlgorithm
 {
 public:
 	AlgorithmNaive(){}
+	~AlgorithmNaive()
+	{
+		cleanResources();
+	}
     // setSensor is called once when the Algorithm is initialized 
     void setSensor(const AbstractSensor& sensor) ; 
     

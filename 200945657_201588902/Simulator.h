@@ -12,7 +12,7 @@ using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
 	typedef std::list<House*> HouseList;
-	typedef std::list<AlgorithmNaive*> AlgorithmList;
+	typedef std::list<AbstractAlgorithm*> AlgorithmList;
 	typedef std::list<Simulation*> SimulationList;
 
 class Simulator
@@ -22,6 +22,7 @@ public:
 	{
 		mHouseList = new HouseList();
 		mAlgorithmList = new AlgorithmList();
+		mConfiguration = NULL;
 		
 	}
 	~Simulator(){

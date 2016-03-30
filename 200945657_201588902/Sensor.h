@@ -39,6 +39,7 @@ public:
 	pair <int, int> getSensorLocation();
 
 private:
+
 	std::pair <int, int> mSensorLocation ;
 	House* mSensorHouse;
 

@@ -43,8 +43,7 @@ void Simulator::cleanResources()
 	// Clean algorithms
 	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 	{
-		(*listAlgorithmIter)->cleanResources();
-		delete *listAlgorithmIter;
+		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
 	}
 	delete mAlgorithmList;
 

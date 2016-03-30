@@ -27,32 +27,31 @@ bool House::fillHouseInfo(string filePath)
   this->setR(r);
   fin.ignore(); //skip newline and go the begining of matrix
   this->matrix = new string[this->getR()];
-  //TODO: make sure number of rows is R - if it's not then fill it!
   for (int i =0; i < this->getR(); ++i)
   {
 	  // Check if stream is over before the rows count
 	  if (fin.eof())
 	  {
-		  cout << "Input error, not enough rows for house description" << endl;
-
-		  return false;
+		  for (int j = 0; j < getC(); ++j)
+		  {
+			  matrix[i] += " ";
+		  }
 	  }
 	  std::getline(fin, this->matrix[i]);
 
 	  // Check if stream isn't over but this is an empty line
 	  if (matrix[i].length() == 0)
 	  {
-		  cout << "Input error, not enough rows for house description" << endl;
-
-		  return false;
+		  for (int j = 0; j < getC(); ++j)
+		  {
+			  matrix[i] += " ";
+		  }
 	  }
 
 	  // Check if a row is shorter than expected
-	  if ((int)matrix[i].length() != C)
+	  while ((int)matrix[i].length() < C)
 	  {
-		  cout << "Input error, not enough columns for house description" << endl;
-
-		  return false;
+		  matrix[i] += " ";
 	  }
   }
 
