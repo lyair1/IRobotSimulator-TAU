@@ -151,15 +151,11 @@ void writeConfigFile(const string iniPath)
 }
 
 bool isFileExists(const string name) {
-	ifstream f(name.c_str());
-	if (f.good()) {
-		f.close();
+	if (ifstream(name)){
 		return true;
 	}
-	else {
-		f.close();
-		return false;
-	}
+
+	return false;
 }
 
 
