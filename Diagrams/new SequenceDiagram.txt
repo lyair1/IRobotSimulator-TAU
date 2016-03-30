@@ -1,0 +1,38 @@
+title iRobot Sequence Diagram
+
+
+Main->Main: Load config.ini path
+Main->Main: createExampleHouse
+Main-> +Simulator : <<create>>
+Main->Simulator: runSimulation(config_file_path, houses_path);
+Simulator->*ConfigReader: <<create>>
+Simulator->Simulator:readAllHouses()
+Simulator->*House: <<create>
+Simulator->Simulator:loadAllAlgorithms()
+Simulator-> *Algorithm: <<create>>
+loop executeAllAlgoOnAllHouses():  for each house
+    loop for each algorihtm
+        Simulator->+Simulation: <<create>>
+        Simulation->Algorithm: setSensor()
+    end
+    loop for each algorithm
+        Simulation->Simulation: makeSimulationStep()
+        Simulation-> +Sensor: sense()
+        Sensor-->-Simulation: sensorInformation()
+        Simulation->+Algorithm: step()
+        Algorithm-->-Simulation : Direction
+    end
+    loop for each algorithm
+        Simulation->Simulation:SetSimulationScore()
+        Simulation->Simulation:PrintSimulationScore
+        Simulation-->-Simulator:<<destroy>>
+
+    end
+end
+House-->-Simulator:<<destroy>>
+Algorithm-->-Simulator:<<destory>><<destroy>>
+ConfigReader-->Simulator: <<destroy>>
+distroy ConfigReader
+
+Simulator --> -Main : <<destroy>>
+
