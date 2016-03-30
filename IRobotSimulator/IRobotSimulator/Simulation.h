@@ -11,18 +11,19 @@
 class Simulation
 {
 public:
-	Simulation(AlgorithmNaive* algorithm, House* house, map<string, int>* parametersMap)
+	Simulation(AbstractAlgorithm* algorithm, House* house, map<string, int>* parametersMap):
+		mStepsCounter(0),
+		mScore(0),
+		mDirtCollected(0),
+		mBattreyConsumptionRate(0),
+		mCrashedIntoWall(false),
+		mPositionInCompetition(-1),
+		mIsRunning(true) // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
 	{
 		mAlgorithm = algorithm;
 		mHouse = house;
 		mSensor = new Sensor(mHouse->getDockingLocation(), mHouse);
-		mIsRunning = true; // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
-		mStepsCounter = 0;
-		mScore = 0;
-		mDirtCollected = 0;
-		mConfiguration = parametersMap;
-		mBattreyConsumptionRate = 0;
-		mCrashedIntoWall = false;
+		mConfiguration = parametersMap;		
 		mInitialDustSumInHouse = mHouse->getDustInHouse();
 		mIsBackInDocking = mHouse->isCleanHouse() ?true : false; // we start simulation at location 'D'. if the house is clean - we're considered back in docking
 		//all parameters are located in the configuration file, otherwise it's an Illegal file and program would have exit at ConfigReader.
@@ -32,7 +33,6 @@ public:
 		mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
 		mBatteryLeft = mBatteryCapacity;
 		mBatteryCapacity = mConfiguration->find("MaxStepsAfterWinner")->second;
-		mPositionInCompetition = -1;
 		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}
 
