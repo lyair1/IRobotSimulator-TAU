@@ -82,7 +82,6 @@ map<string, int>* ConfigReader::getParametersMap(){
 bool ConfigReader ::isLegalConfigFile()
 {
 	if (getParameter("BatteryConsumptionRate") == -1	||
-		getParameter("MaxSteps") == -1					||
 		getParameter("BatteryRechargeRate") == -1		||
 		getParameter("BatteryCapacity") == -1			||
 		getParameter("MaxStepsAfterWinner") == -1)

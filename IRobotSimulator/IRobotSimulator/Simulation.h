@@ -28,7 +28,7 @@ public:
 		mIsBackInDocking = mHouse->isCleanHouse() ?true : false; // we start simulation at location 'D'. if the house is clean - we're considered back in docking
 		//all parameters are located in the configuration file, otherwise it's an Illegal file and program would have exit at ConfigReader.
 		mBattreyConsumptionRate = mConfiguration->find("BatteryConsumptionRate")->second;
-		mMaxSteps = mConfiguration->find("MaxSteps")->second;
+		mMaxSteps = mHouse->getMaxSteps();
 		mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
 		mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
 		mBatteryLeft = mBatteryCapacity;

@@ -85,11 +85,12 @@ void Simulator::executeAllAlgoOnAllHouses()
 	SimulationList* simulationListPerHouse;
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
 	{
+		House* house = (*listHouseIter);
 		simulationListPerHouse = new SimulationList();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
 		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
 		{
-			pSimulation = new Simulation((*listAlgorithmIter), (*listHouseIter), mConfiguration->getParametersMap());
+			pSimulation = new Simulation((*listAlgorithmIter), house, mConfiguration->getParametersMap());
 			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
 			simulationListPerHouse->push_back(pSimulation);
 		}
@@ -103,7 +104,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 		int actualPositionInCopmetition = 1;
 		int numberOfWinnersInPosition = 0;
 		bool isFirstWinner = true;
-		int maxSimulatorStepsPerHouse = mConfiguration->getParameter("MaxSteps");
+		int maxSimulatorStepsPerHouse = house->getMaxSteps();
 		if (maxSimulatorStepsPerHouse < 0)
 		{
 			return;
