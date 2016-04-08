@@ -21,8 +21,8 @@ using namespace std;
 	8 rows(so R = 8)
 	10 columns(so C = 10)
 	A house description is stored as a file, as following :
-	Line 1 : House Short Name
-	Line 2 : House Long Description
+	Line 1 : House / description
+	Line 2 : Max Steps
 	Line 3 : R(number of rows in the house, in our example 8)
 	Line 4 : C(number of columns in the house, in our example 10)
 	Lines 5 to R + 4 : a matrix representing the house, where :
@@ -36,14 +36,14 @@ class House
 {
 public:
 
-	House() : matrix(NULL) {}
+	House() : _matrix(NULL) {}
 	~House(){
-		if (matrix != NULL)	{
-			delete[] matrix;
+		if (_matrix != NULL)	{
+			delete[] _matrix;
 		}
 	}
 	string getName()const;
-	string getDescription()const;
+	int getMaxSteps()const;
 	int getR() const;
 	int getC()const;
 	SensorInformation getLocationInfo(std::pair<const int, const int> location)const;
@@ -57,18 +57,17 @@ public:
 	int getDustInHouse();
 	void cleanResources();
 private:
-	string name;
-	string desc;
-	int R;
-	int C;
-	string* matrix;
-	int mDustInHouse;
-	pair <int, int> mDockingLocation;
-
+	string _name;
+	int _maxSteps;
+	int _R;
+	int _C;
+	string* _matrix;
+	int _mDustInHouse;
+	pair <int, int> _mDockingLocation;
 	void setR(int R);
 	void setC(int C);
 	void setName(string name);
-	void setDescription(string description);
+	void setMaxSteps(int maxSteps);
 	bool initDockingLocation();
 	void initDustInHouse();
 };

@@ -75,6 +75,12 @@ int main(int argc, char* argv[])
     Simulator simul;
 	simul.runSimulation(config_file_path, houses_path);
 
+	// Only on windows
+	#if defined (_WIN32)
+		system("pause");
+	#endif
+
+
 	return 0;
 }
 
@@ -88,7 +94,7 @@ void createExampleHouse(const string filePath)
   
 	ofstream fout(filePath + _defaultHosuseFileName);
 	fout << "Simple1" << endl;
-	fout << "2 Bedrooms + Kitchen Isle" << endl;
+	fout << 100 << endl;
 
 /*
   fout << 8 << endl;
