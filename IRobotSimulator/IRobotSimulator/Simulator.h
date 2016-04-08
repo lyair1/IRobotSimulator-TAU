@@ -28,7 +28,7 @@ public:
 	~Simulator(){
 		cleanResources();
 	}
-	void runSimulation(string config_file_path,string houses_path);
+	void runSimulation(string config_file_path, string houses_path, string algorithms_path);
 	void cleanResources();
 	
 private:
@@ -36,7 +36,7 @@ private:
 	AlgorithmList  *mAlgorithmList;
 	ConfigReader* mConfiguration;
 	void readAllHouses(string houses_path);
-	void loadAllAlgorithms();
+	void loadAllAlgorithms(string algorithms_path);
 	void executeAllAlgoOnAllHouses();
 };
 

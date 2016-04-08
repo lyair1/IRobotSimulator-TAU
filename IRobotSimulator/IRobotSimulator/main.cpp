@@ -20,52 +20,63 @@ const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
 const string _pathPrefix = "./";
 const string _seperator = "/";
-const string _config = "-config";
+const string _paramConfig = "-config";
+const string _paramHouse = "-house_path";
+const string _paramAlgorithm = "-algorithm_path";
 
 int main(int argc, char* argv[])
 {
 	if (argc > 3){
 		// Inform the user of how to use the program:
 		//std::cout << "Usage is -config <config_file_location> -house_path<houses_path_location>\n"; 
-		std::cout << "Usage is -config <config_file_location>\n"; 
+		std::cout << "Usage: simulator [­config <config path>] [­house_path <house path>] [­algorithm_path <algorithm path>]\n"; 
 		std::cin.get();
 		exit(0);
 	}
 
-	string config_file_path = _pathPrefix + _defaultConfigFileName;
+	// Set default paramters:
 	string houses_path = _pathPrefix;
+	string algorithms_path = _pathPrefix;
+	string config_file_path = _pathPrefix + _defaultConfigFileName;
+
+	// Get parameters from arg
 	for (int i = 1; i < argc-1; i++){ //skip program name -> i=1
 		string arg = argv[i];
-		if (arg.compare(_config) == 0) {
+		if (arg.compare(_paramConfig) == 0) {
 			// We know the next argument *should* be the filename:
 			config_file_path = _pathPrefix + argv[i + 1] + _seperator + _defaultConfigFileName;
+
+			continue;
 		}
-		/*
-		else if (strcmp(argv[i], "-house_path") == 0) {
-			houses_path = argv[i + 1];
-		}*/
+
+		if (arg.compare(_paramHouse) == 0) {
+			// We know the next argument *should* be the path:
+			houses_path = _pathPrefix + argv[i + 1] + _seperator;
+
+			continue;
+		}
+
+		if (arg.compare(_paramAlgorithm) == 0) {
+			// We know the next argument *should* be the path:
+			algorithms_path = _pathPrefix + argv[i + 1] + _seperator;
+
+			continue;
+		}
 	}
 
 	// Temp for ex_1 - create default config file if config file doesn't exists in path
-	if (!isFileExists(config_file_path))
+	if (DEBUG && !isFileExists(config_file_path))
 	{
 		config_file_path = _pathPrefix + _defaultConfigFileName;
 		if (!isFileExists(config_file_path))
 		{
-			if (DEBUG){
-				writeConfigFile(config_file_path);
-			}
-			else{
-				std::cout << "Can't find config file in path \n";
-
-				return 0;
-			}
+			writeConfigFile(config_file_path);
 		}
 	}
 
 	//TODO: update config_file_path = INI_CONFIG_PATH;
 	//TODO in LINUX: check if a *.house file exists in houses_path. if NOT:
-	createExampleHouse(houses_path);
+	//createExampleHouse(houses_path);
 	//TODO: make sure this works for path that end with '/' and without it. example: /usr/targil1/simufiles/	OR  	/usr/targil1/simufiles
 
 	srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm
@@ -73,7 +84,7 @@ int main(int argc, char* argv[])
 	std::set_new_handler(outOfMemHandler);
 
     Simulator simul;
-	simul.runSimulation(config_file_path, houses_path);
+	simul.runSimulation(config_file_path, houses_path, algorithms_path);
 
 	// Only on windows
 	#if defined (_WIN32)

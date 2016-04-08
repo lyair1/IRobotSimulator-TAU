@@ -4,10 +4,12 @@
 @version 1.0 30/1/16
 */
 #include "Simulator.h"
+#include <boost/filesystem.hpp>
 
+namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(string config_file_path, string houses_path)
+void Simulator::runSimulation(string config_file_path, string houses_path, string algorithms_path)
 {
 	mConfiguration = new ConfigReader(config_file_path);
 	if (DEBUG)
@@ -24,7 +26,7 @@ void Simulator::runSimulation(string config_file_path, string houses_path)
 	readAllHouses(houses_path);
 
 	//The simulator should dynamically load libraries for all the algorithms:
-	loadAllAlgorithms();
+	loadAllAlgorithms(algorithms_path);
 
 	//The simulator should execute every algorithm on every house:
 	executeAllAlgoOnAllHouses();
@@ -69,7 +71,7 @@ void Simulator:: readAllHouses(string houses_path)
 	}
 }
 
-void Simulator:: loadAllAlgorithms()
+void Simulator:: loadAllAlgorithms(string algorithms_path)
 {
 	AlgorithmNaive* algoNaive = new AlgorithmNaive();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
