@@ -9,17 +9,13 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(string config_file_path, string houses_path, string algorithms_path)
+void Simulator::runSimulation(ConfigReader *configuration, string houses_path, string algorithms_path)
 {
-	mConfiguration = new ConfigReader(config_file_path);
+	mConfiguration = configuration;
 	if (DEBUG)
 	{
 		cout << endl << endl << "Parameters read:" << endl;
 		cout << mConfiguration->toString() << endl;
-	}
-	if (!mConfiguration->isLegalConfigFile())
-	{
-		return ;
 	}
 	
 	//The simulator should read all houses descriptions from text files including dust levels:
@@ -48,9 +44,6 @@ void Simulator::cleanResources()
 		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
 	}
 	delete mAlgorithmList;
-
-	// clean configuration
-	delete mConfiguration;
 }
 
 void Simulator:: readAllHouses(string houses_path)

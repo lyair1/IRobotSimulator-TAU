@@ -23,13 +23,13 @@ const string _seperator = "/";
 const string _paramConfig = "-config";
 const string _paramHouse = "-house_path";
 const string _paramAlgorithm = "-algorithm_path";
+const string _usage = "Usage: simulator [­config <config path>] [­house_path <house path>] [­algorithm_path <algorithm path>]\n";
 
 int main(int argc, char* argv[])
 {
-	if (argc > 3){
+	if (argc > 7){
 		// Inform the user of how to use the program:
-		//std::cout << "Usage is -config <config_file_location> -house_path<houses_path_location>\n"; 
-		std::cout << "Usage: simulator [­config <config path>] [­house_path <house path>] [­algorithm_path <algorithm path>]\n"; 
+		std::cout << _usage;
 		std::cin.get();
 		exit(0);
 	}
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	for (int i = 1; i < argc-1; i++){ //skip program name -> i=1
 		string arg = argv[i];
 		if (arg.compare(_paramConfig) == 0) {
-			// We know the next argument *should* be the filename:
+			// We know the next argument *should* be the config file dir:
 			config_file_path = _pathPrefix + argv[i + 1] + _seperator + _defaultConfigFileName;
 
 			continue;
@@ -64,14 +64,23 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// Temp for ex_1 - create default config file if config file doesn't exists in path
-	if (DEBUG && !isFileExists(config_file_path))
+	// Show usage and return if config file doesn't exists in path
+	if (!isFileExists(config_file_path))
 	{
-		config_file_path = _pathPrefix + _defaultConfigFileName;
-		if (!isFileExists(config_file_path))
-		{
-			writeConfigFile(config_file_path);
-		}
+		std::cout << _usage;
+		std::cin.get();
+		exit(0);
+	}
+
+	// check if config file can be loaded and if values are missing
+	ConfigReader *configReader = new ConfigReader(config_file_path);
+	if (!configReader->isLegalConfigFile())
+	{
+		delete configReader;
+
+		std::cout << _usage;
+		std::cin.get();
+		exit(0);
 	}
 
 	//TODO: update config_file_path = INI_CONFIG_PATH;
@@ -84,13 +93,14 @@ int main(int argc, char* argv[])
 	std::set_new_handler(outOfMemHandler);
 
     Simulator simul;
-	simul.runSimulation(config_file_path, houses_path, algorithms_path);
+	simul.runSimulation(configReader, houses_path, algorithms_path);
 
 	// Only on windows
 	#if defined (_WIN32)
 		system("pause");
 	#endif
 
+	delete configReader;
 
 	return 0;
 }

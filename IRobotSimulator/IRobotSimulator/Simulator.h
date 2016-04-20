@@ -28,7 +28,7 @@ public:
 	~Simulator(){
 		cleanResources();
 	}
-	void runSimulation(string config_file_path, string houses_path, string algorithms_path);
+	void runSimulation(ConfigReader *configuration, string houses_path, string algorithms_path);
 	void cleanResources();
 	
 private:
