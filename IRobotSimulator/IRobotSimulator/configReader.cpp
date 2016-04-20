@@ -5,16 +5,23 @@
 */
 #include "configReader.h"
 
-  void ConfigReader::loadFromFile(const string& iniPath)
+  bool ConfigReader::loadFromFile(const string& iniPath)
   {
     this->parameters.clear();
-    ifstream fin(iniPath.c_str());
+	ifstream fin;
+	fin.open(iniPath.c_str(), ios::in);
+	if (!fin)
+	{
+		return false;
+	}
+
     string line;
     while (getline(fin, line))
     {
       this->processLine(line);
     }
 	
+	return true;
   }
   
   string ConfigReader::toString()
@@ -62,32 +69,61 @@
 
 
 
-int ConfigReader::getParameter(const string parameter){
-	 auto pos = this->parameters.find(parameter);
-	 if(pos != parameters.end()){
-		 return pos->second;
-	 }
-	 cout << "Error in ConfigReader::getParameter, parameter " << parameter<<" was not found in configuration file"<<endl;
-	 //(all resources are released and program terminates) 
-	 return -1;
+	int ConfigReader::getParameter(const string parameter){
+		 auto pos = this->parameters.find(parameter);
+		 if(pos != parameters.end()){
+			 return pos->second;
+		 }
+		 cout << "Error in ConfigReader::getParameter, parameter " << parameter<<" was not found in configuration file"<<endl;
+		 //(all resources are released and program terminates) 
+		 return -1;
 
-}
-
-
-map<string, int>* ConfigReader::getParametersMap(){
-	return &parameters;
-}
-
-
-bool ConfigReader ::isLegalConfigFile()
-{
-	if (getParameter("BatteryConsumptionRate") == -1	||
-		getParameter("BatteryRechargeRate") == -1		||
-		getParameter("BatteryCapacity") == -1			||
-		getParameter("MaxStepsAfterWinner") == -1)
-	{
-		return false;
 	}
 
-	return true;
-}
+
+	map<string, int>* ConfigReader::getParametersMap(){
+		return &parameters;
+	}
+
+
+	bool ConfigReader ::isLegalConfigFile()
+	{
+		if (getParameter(BATTERY_CONSUMPTION_RATE) == -1	||
+			getParameter(BATTERY_RECHARGE_RATE) == -1		||
+			getParameter(BATTERY_CAPACITY) == -1			||
+			getParameter(MAX_STEPS_AFTER_WINNER) == -1)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	string ConfigReader::getMessageForIlegalConfigFile(){
+		int missingParams = 0;
+		string missingParamsStr = "";
+		bool first = true;
+		string paramsArray[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_RATE, BATTERY_CAPACITY, MAX_STEPS_AFTER_WINNER };
+
+		int size = _countof(paramsArray);
+		for (int i = 0; i < size; i++)
+		{
+			string param = paramsArray[i];
+			if (getParameter(param) == -1)
+			{
+				missingParams++;
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					missingParamsStr.append(",");
+				}
+
+				missingParamsStr.append(param);
+			}
+		}
+		
+		return "config.ini missing " + to_string(missingParams) + " parameter(s): " + missingParamsStr + "\n";
+	}

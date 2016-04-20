@@ -7,6 +7,7 @@
 #define SIMULATION_H
 #include "House.h"
 #include "AlgorithmNaive.h"
+#include "configReader.h"
 
 class Simulation
 {
@@ -27,12 +28,12 @@ public:
 		mInitialDustSumInHouse = mHouse->getDustInHouse();
 		mIsBackInDocking = mHouse->isCleanHouse() ?true : false; // we start simulation at location 'D'. if the house is clean - we're considered back in docking
 		//all parameters are located in the configuration file, otherwise it's an Illegal file and program would have exit at ConfigReader.
-		mBattreyConsumptionRate = mConfiguration->find("BatteryConsumptionRate")->second;
+		mBattreyConsumptionRate = mConfiguration->find(BATTERY_CONSUMPTION_RATE)->second;
 		mMaxSteps = mHouse->getMaxSteps();
-		mBatteryRechargeRate = mConfiguration->find("BatteryRechargeRate")->second;
-		mBatteryCapacity = mConfiguration->find("BatteryCapacity")->second;
+		mBatteryRechargeRate = mConfiguration->find(BATTERY_RECHARGE_RATE)->second;
+		mBatteryCapacity = mConfiguration->find(BATTERY_CAPACITY)->second;
 		mBatteryLeft = mBatteryCapacity;
-		mMaxStepsAfterWinner = mConfiguration->find("MaxStepsAfterWinner")->second;
+		mMaxStepsAfterWinner = mConfiguration->find(MAX_STEPS_AFTER_WINNER)->second;
 		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}
 

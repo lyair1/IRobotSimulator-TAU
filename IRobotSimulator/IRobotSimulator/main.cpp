@@ -74,11 +74,20 @@ int main(int argc, char* argv[])
 
 	// check if config file can be loaded and if values are missing
 	ConfigReader *configReader = new ConfigReader(config_file_path);
+	if (!configReader->isLoaded)
+	{
+		std::cout << "config.ini exists in '" << config_file_path << "' but cannot be opened\n";
+		std::cin.get();
+		exit(0);
+	}
+
 	if (!configReader->isLegalConfigFile())
 	{
+		string message = configReader->getMessageForIlegalConfigFile();
+
 		delete configReader;
 
-		std::cout << _usage;
+		std::cout << message;
 		std::cin.get();
 		exit(0);
 	}

@@ -12,6 +12,10 @@
 #include <map>
 using namespace std;
 
+#define BATTERY_CONSUMPTION_RATE "BatteryConsumptionRate"
+#define BATTERY_RECHARGE_RATE "BatteryRechargeRate"
+#define BATTERY_CAPACITY "BatteryCapacity"
+#define MAX_STEPS_AFTER_WINNER "MaxStepsAfterWinner"
 
 class ConfigReader
 {
@@ -19,13 +23,15 @@ public:
   ConfigReader() { }
   ConfigReader(const string& iniPath)
   {
-    this->loadFromFile(iniPath);
+	  isLoaded = this->loadFromFile(iniPath);
   }
   int getParameter(const string parameter);
-  void loadFromFile(const string& iniPath);
+  bool loadFromFile(const string& iniPath);
   string toString();
+  string getMessageForIlegalConfigFile();
   map<string, int>* getParametersMap();
   bool isLegalConfigFile();
+  bool isLoaded;
 
 private:
 	/* map<string, int> parameters contains the following: 
@@ -56,8 +62,5 @@ private:
   static std::string trim(std::string& str);
   void processLine(const string& line);
 };
-
-
-
 
 #endif
