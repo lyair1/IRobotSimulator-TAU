@@ -6,23 +6,35 @@
 #include "House.h"
 
 
-bool House::fillHouseInfo(string filePath)
+string House::fillHouseInfo(string filePath)
 {
 	if (DEBUG)
 	{
-		cout << "Reading house from file path: " << filePath << "into class House" << endl;
+		cout << "Reading house from file path: " << filePath << " into class House" << endl;
 	}
-  
+	housePath = filePath;
   ifstream fin(filePath);
   string name;
   getline(fin, name);
   this->setName(name);
   int maxSteps;
   fin >> maxSteps;
+  if (maxSteps < 0)
+	{
+	  return housePath + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
+	}
   this->setMaxSteps(maxSteps);
   int r,c;
   fin >> r;
+  if (r < 0)
+  {
+	  return housePath + ": line number 3 in house file shall be a positive number, found: " + to_string(r) + "\n";
+  }
   fin >> c;
+  if (c < 0)
+  {
+	  return housePath + ": line number 4 in house file shall be a positive number, found: " + to_string(c) + "\n";
+  }
   this->setC(c);
   this->setR(r);
   fin.ignore(); //skip newline and go the begining of matrix
@@ -74,7 +86,7 @@ void House:: printHouse() const
 }
 
 //TODO: complete this with fill rows and cols if matrix is not in size C*R
-bool House::isLegalHouse(){
+string House::isLegalHouse(){
 	// Make sure that that house souranded by walls
 	for (int i = 0; i < _R; ++i){
 		_matrix[i][0] = 'W';
@@ -86,11 +98,11 @@ bool House::isLegalHouse(){
 	}
 
 	// Overwrite any unknown chars to ' '
-	for (int i = 0; i < _R; ++i)
+	for (int i = 1; i < _R-1; ++i)
 	{
-		for (int j = 0; j < _C; ++j)
+		for (int j = 1; j < _C-1; ++j)
 		{
-			if (_matrix[i][j] != 'W' && _matrix[i][j] != 'D' && (_matrix[i][j] < '0' || _matrix[i][j] > '9'))
+			if (_matrix[i][j] != 'D' && (_matrix[i][j] < '0' || _matrix[i][j] > '9'))
 			{
 				_matrix[i][j] = ' ';
 			}
@@ -160,7 +172,7 @@ void House::setMaxSteps(int maxSteps)
 	_maxSteps = maxSteps;
 }
 
-bool House:: initDockingLocation()
+string House:: initDockingLocation()
 {
 	bool didFindDocking = false;
 	for (int row = 0; row < getR(); ++row) {
@@ -168,9 +180,7 @@ bool House:: initDockingLocation()
 			if (_matrix[row][col] == 'D') {
 				if (didFindDocking == true)
 				{
-					cout << "House:: initDockingLocation() : more than one docking station was found! this house is Illegal" << endl;
-
-					return false;
+					return housePath + ": too many docking stations/n";
 				}
 
 				didFindDocking = true;
@@ -182,12 +192,10 @@ bool House:: initDockingLocation()
 
 	if (didFindDocking)
 	{
-		return true;
+		return "";
 	}
 
-	cout << "House:: initDockingLocation() : no docking station was found! this house is Illegal" << endl;
-
-	return false;
+	return housePath + ": missing docking station/n";
 }
 
 pair <int, int> House::getDockingLocation(){

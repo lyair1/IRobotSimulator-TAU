@@ -5,11 +5,12 @@
 */
 #include "Simulator.h"
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp> 
 
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(ConfigReader *configuration, string houses_path, string algorithms_path)
+void Simulator::runSimulation(ConfigReader *configuration, HouseList* houses_list, string algorithms_path)
 {
 	mConfiguration = configuration;
 	if (DEBUG)
@@ -18,8 +19,8 @@ void Simulator::runSimulation(ConfigReader *configuration, string houses_path, s
 		cout << mConfiguration->toString() << endl;
 	}
 	
-	//The simulator should read all houses descriptions from text files including dust levels:
-	readAllHouses(houses_path);
+	// Set the houses list
+	mHouseList = houses_list;
 
 	//The simulator should dynamically load libraries for all the algorithms:
 	loadAllAlgorithms(algorithms_path);
@@ -36,7 +37,6 @@ void Simulator::cleanResources()
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
 	}
-	delete mHouseList;
 
 	// Clean algorithms
 	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
@@ -46,22 +46,49 @@ void Simulator::cleanResources()
 	delete mAlgorithmList;
 }
 
-void Simulator:: readAllHouses(string houses_path)
+int Simulator::countHousesInPath(string houses_path)
 {
-	//TODO in Ex2 : We need to go over all the files with extension *.house which are in houses_path. 
-	House *house = new House();
-	string filePath = "default_generated_house.house";
-	if (!house->fillHouseInfo(filePath)){
-		// House is illegal - delete
-		delete(house);
-	}
-	else{
-		// Add house to the list
-		if (DEBUG){
-			house->printHouse();
+	int count = 0;
+	fs::path targetDir(houses_path);
+	fs::directory_iterator it(targetDir), eod;
+	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+	{
+		if (fs::is_regular_file(p) && p.extension() == HOUSE_EXT)
+		{
+			count++;
 		}
-		mHouseList->push_back(house);
 	}
+
+	return count;
+}
+
+HouseList* Simulator::readAllHouses(string houses_path)
+{
+	HouseList *housesList = new HouseList();;
+	fs::path targetDir(houses_path);
+	fs::directory_iterator it(targetDir), eod;
+	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+	{
+		if (fs::is_regular_file(p) && p.extension() == HOUSE_EXT)
+		{
+			House *house = new House();
+			string errMsg = house->fillHouseInfo(p.string());
+			if (errMsg.length() > 0){
+				// House is illegal - delete
+				delete(house);
+				housesErrorMessages += errMsg;
+			}
+			else{
+				// Add house to the list
+				if (DEBUG){
+					house->printHouse();
+				}
+				housesList->push_back(house);
+			}
+		}
+	}
+
+	return housesList;
 }
 
 void Simulator:: loadAllAlgorithms(string algorithms_path)

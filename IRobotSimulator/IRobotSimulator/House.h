@@ -5,12 +5,13 @@
 */
 #ifndef HOUSE_H
 #define HOUSE_H
-#define DEBUG 0
+#define DEBUG 1
 #include <iostream>
 #include <string>
 #include <fstream>
 #include "SensorInformation.h"
 using namespace std;
+#define HOUSE_EXT ".house"
 
 
 /*	W – wall
@@ -47,15 +48,16 @@ public:
 	int getR() const;
 	int getC()const;
 	SensorInformation getLocationInfo(std::pair<const int, const int> location)const;
-	bool isLegalHouse();
+	string isLegalHouse();
 	void printHouse()const;
-	bool fillHouseInfo(string filePath);
+	string fillHouseInfo(string filePath);
 	bool isDirtCollected(pair<int, int> location);
 	char getLocationValue(pair<int, int> location);
 	bool isCleanHouse();
 	pair <int, int> getDockingLocation();
 	int getDustInHouse();
 	void cleanResources();
+	string housePath;
 private:
 	string _name;
 	int _maxSteps;
@@ -68,7 +70,7 @@ private:
 	void setC(int C);
 	void setName(string name);
 	void setMaxSteps(int maxSteps);
-	bool initDockingLocation();
+	string initDockingLocation();
 	void initDustInHouse();
 };
 

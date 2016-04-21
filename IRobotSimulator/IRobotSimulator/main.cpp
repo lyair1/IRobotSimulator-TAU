@@ -92,24 +92,49 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	//TODO: update config_file_path = INI_CONFIG_PATH;
-	//TODO in LINUX: check if a *.house file exists in houses_path. if NOT:
-	//createExampleHouse(houses_path);
-	//TODO: make sure this works for path that end with '/' and without it. example: /usr/targil1/simufiles/	OR  	/usr/targil1/simufiles
-
 	srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
     Simulator simul;
-	simul.runSimulation(configReader, houses_path, algorithms_path);
+
+	// TODO check algorithms
+
+	// Print usage and return if there are no houses in the path
+	if (simul.countHousesInPath(houses_path) == 0)
+	{
+		std::cout << _usage;
+		std::cin.get();
+		exit(0);
+	}
+
+	// Print message and return if all houses in path are invalid
+	HouseList* houses_list = simul.readAllHouses(houses_path);
+	// Check if all houses are invalid
+	if (houses_list->size() == 0)
+	{
+		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.housesErrorMessages;
+		std::cin.get();
+		exit(0);
+	}
+
+	simul.runSimulation(configReader, houses_list, algorithms_path);
+
+
+	// Print error list
+	if (simul.housesErrorMessages.length() > 0)
+	{
+		std::cout << "\nErrors:\n" << simul.housesErrorMessages;
+	}
+
+	simul.cleanResources();
+	delete houses_list;
+	delete configReader;
 
 	// Only on windows
 	#if defined (_WIN32)
 		system("pause");
 	#endif
-
-	delete configReader;
 
 	return 0;
 }
