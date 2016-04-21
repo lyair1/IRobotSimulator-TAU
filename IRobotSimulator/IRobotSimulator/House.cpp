@@ -6,13 +6,14 @@
 #include "House.h"
 
 
-string House::fillHouseInfo(string filePath)
+string House::fillHouseInfo(string filePath, string fileName)
 {
 	if (DEBUG)
 	{
 		cout << "Reading house from file path: " << filePath << " into class House" << endl;
 	}
 	housePath = filePath;
+	houseFileName = fileName;
   ifstream fin(filePath);
   string name;
   getline(fin, name);

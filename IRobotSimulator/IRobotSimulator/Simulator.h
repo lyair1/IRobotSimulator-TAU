@@ -14,6 +14,7 @@ using namespace std;
 	typedef std::list<House*> HouseList;
 	typedef std::list<AbstractAlgorithm*> AlgorithmList;
 	typedef std::list<Simulation*> SimulationList;
+	typedef std::list<list<string>*> StringMatrix;
 
 class Simulator
 {
@@ -23,6 +24,7 @@ public:
 		mAlgorithmList = new AlgorithmList();
 		mConfiguration = NULL;
 		housesErrorMessages = "";
+		mAlgorithmNames = new list<string>;
 	}
 	~Simulator(){
 	}
@@ -31,13 +33,17 @@ public:
 	int countHousesInPath(string houses_path);
 	HouseList* readAllHouses(string houses_path);
 	string housesErrorMessages;
-	
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;
 	ConfigReader* mConfiguration;
+	list<string>* mAlgorithmNames;
 	void loadAllAlgorithms(string algorithms_path);
 	void executeAllAlgoOnAllHouses();
+	void printScores();
+	string getSupparatorLine();
+	string getAlgoPrintLine(int ind, string algoName);
+	string Simulator::getHeaderPrintLine();
 };
 
 #endif //SIMULATOR_H

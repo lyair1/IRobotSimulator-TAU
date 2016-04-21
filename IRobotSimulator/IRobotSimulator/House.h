@@ -5,11 +5,12 @@
 */
 #ifndef HOUSE_H
 #define HOUSE_H
-#define DEBUG 1
+#define DEBUG 0
 #include <iostream>
 #include <string>
 #include <fstream>
 #include "SensorInformation.h"
+#include <list>
 using namespace std;
 #define HOUSE_EXT ".house"
 
@@ -37,11 +38,15 @@ class House
 {
 public:
 
-	House() : _matrix(NULL) {}
+	House() : _matrix(NULL)
+	{
+		algorithmScores = new list<int>();
+	}
 	~House(){
 		if (_matrix != NULL)	{
 			delete[] _matrix;
 		}
+		delete algorithmScores;
 	}
 	string getName()const;
 	int getMaxSteps()const;
@@ -50,7 +55,7 @@ public:
 	SensorInformation getLocationInfo(std::pair<const int, const int> location)const;
 	string isLegalHouse();
 	void printHouse()const;
-	string fillHouseInfo(string filePath);
+	string fillHouseInfo(string filePath, string fileName);
 	bool isDirtCollected(pair<int, int> location);
 	char getLocationValue(pair<int, int> location);
 	bool isCleanHouse();
@@ -58,6 +63,8 @@ public:
 	int getDustInHouse();
 	void cleanResources();
 	string housePath;
+	string houseFileName;
+	list<int>* algorithmScores;
 private:
 	string _name;
 	int _maxSteps;

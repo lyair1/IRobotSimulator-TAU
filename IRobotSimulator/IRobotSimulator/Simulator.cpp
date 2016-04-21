@@ -6,6 +6,7 @@
 #include "Simulator.h"
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp> 
+#include <iomanip>
 
 namespace fs = ::boost::filesystem;
 using namespace std;
@@ -27,6 +28,132 @@ void Simulator::runSimulation(ConfigReader *configuration, HouseList* houses_lis
 
 	//The simulator should execute every algorithm on every house:
 	executeAllAlgoOnAllHouses();
+
+	printScores();
+}
+
+void Simulator::printScores()
+{
+	cout << getSupparatorLine();
+	cout << getHeaderPrintLine();
+	cout << getSupparatorLine();
+	int i = 0;
+	for (list<string>::iterator it = mAlgorithmNames->begin(); it != mAlgorithmNames->end(); it++)
+	{
+		cout << getAlgoPrintLine(i, (*it));
+		cout << getSupparatorLine();
+		i++;
+	}
+}
+
+string Simulator::getHeaderPrintLine()
+{
+	string line = "|";
+	for (int j = 0; j < 13; j++)
+	{
+		line += " ";
+	}
+	line += "|";
+
+	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); it++)
+	{
+		House* house = (*it);
+		string fileName = house->houseFileName;
+		if (fileName.length() > 10)
+		{
+			line += fileName.substr(0, 10);
+		}
+		else
+		{
+			line += fileName;
+			for (int j = 0; j < (10 - house->houseFileName.length()); j++)
+			{
+				line += " ";
+			}
+		}
+
+		line += "|";
+	}
+
+	line += "AVG";
+	for (int j = 0; j < (10 - 3); j++)
+	{
+		line += " ";
+	}
+	line += "|";
+
+	return line + "\n";
+}
+
+string Simulator::getAlgoPrintLine(int ind, string algoName)
+{
+	string line = "|";
+	for (int j = 0; j < 13; j++)
+	{
+		if (j < algoName.length())
+		{
+			line += algoName[j];
+			continue;
+		}
+		line += " ";
+	}
+	line += "|";
+
+
+	int counter = 0;
+	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); it++)
+	{
+		int i = 0;
+		House* house = (*it);
+		for (list<int>::iterator algoIt = house->algorithmScores->begin(); algoIt != house->algorithmScores->end(); algoIt++)
+		{
+			int score(*algoIt);
+			if (i == ind)
+			{
+				counter += score;
+				string numStr = to_string(score);
+				for (int j = 0; j < (10 - numStr.length()); j++)
+				{
+					line += " ";
+				}
+				line += numStr + "|";
+			}
+			i++;
+		}
+	}
+
+	double avg = counter / (double)mHouseList->size();
+	string numStr = to_string(avg);
+	string numStr2Dec = "";
+	for (int j = 0; j < numStr.length(); j++)
+	{
+		numStr2Dec += numStr[j];
+		if (numStr[j] == '.')
+		{
+			numStr2Dec += numStr[j+1];
+			numStr2Dec += numStr[j+2];
+			break;
+		}
+	}
+
+	for (int j = 0; j < (10 - numStr2Dec.length()); j++)
+	{
+		line += " ";
+	}
+	line += numStr2Dec + "|";
+
+	return line + "\n";
+}
+
+string Simulator::getSupparatorLine()
+{
+	string line = "";
+	for (int i = 0; i < 15 + (mHouseList->size() + 1) * 11; i++)
+	{
+		line += "-";
+	}
+
+	return line + "\n";
 }
 
 void Simulator::cleanResources()
@@ -44,6 +171,8 @@ void Simulator::cleanResources()
 		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
 	}
 	delete mAlgorithmList;
+	
+	delete mAlgorithmNames;
 }
 
 int Simulator::countHousesInPath(string houses_path)
@@ -72,7 +201,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 		if (fs::is_regular_file(p) && p.extension() == HOUSE_EXT)
 		{
 			House *house = new House();
-			string errMsg = house->fillHouseInfo(p.string());
+			string errMsg = house->fillHouseInfo(p.string(), p.stem().string());
 			if (errMsg.length() > 0){
 				// House is illegal - delete
 				delete(house);
@@ -95,9 +224,24 @@ void Simulator:: loadAllAlgorithms(string algorithms_path)
 {
 	AlgorithmNaive* algoNaive = new AlgorithmNaive();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
+	mAlgorithmNames->push_back("algo1");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	mAlgorithmList->push_back(algoNaive);
+
+	AlgorithmNaive* algoNaive2 = new AlgorithmNaive();
+	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
+	mAlgorithmNames->push_back("algo2");
+	//don't set the sensor yet.
+	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
+	mAlgorithmList->push_back(algoNaive2);
+
+	AlgorithmNaive* algoNaive3 = new AlgorithmNaive();
+	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
+	mAlgorithmNames->push_back("algo3");
+	//don't set the sensor yet.
+	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
+	mAlgorithmList->push_back(algoNaive3);
 }
 
 void Simulator::executeAllAlgoOnAllHouses()
@@ -117,6 +261,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 			simulationListPerHouse->push_back(pSimulation);
 		}
 		int winnerNumberOfSteps = 0;
+
 		/*	For every house, the simulator should run all algorithms in parallel, in a "round-robin" fashion.
 		That is, every time unit we iterate all algorithms and run a single step of the algorithm.
 		We stop either when each algorithm has run for MaxSteps time unite,
@@ -181,11 +326,13 @@ void Simulator::executeAllAlgoOnAllHouses()
 		{
 			winnerNumberOfSteps = simulationStepsCounter;
 		}
+
 		//all algorithms stopped - terminate simulation and calculate scores
 		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
 			(*iter3)->setSimulationScore(winnerNumberOfSteps, simulationStepsCounter);
-			(*iter3)->printSimulationScore((*iter3)->getHouse()->getName(), (*iter3)->getSimulationScore());
+			(*iter3)->getHouse()->algorithmScores->push_back((*iter3)->getSimulationScore());
 		}
+
 		// Clean simulationListPerHouse (TODO in Ex 2: write the score into a score matrix before freeing it)
 		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
 			(*iter4)->cleanResources();

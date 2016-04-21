@@ -174,18 +174,3 @@ const int Simulation::getSimulationScore()
 {
 	return mScore;
 }
-
-void Simulation::printSimulationScore(string houseName, const int score)
-{
-	// TODO in Ex2:
-	//Save score into matrix of scores and print matrix at the end 
-	//cout << "[" << houseName << "]" << "\t" << score << "\n";
-
-	//in Ex 1:
-	cout << score << endl;
-	if (mCrashedIntoWall) // exercise demands this is the only message that will be printed, after score is printed!
-	{
-		cout << " Simulation terminated due to  an invalid step! (crashed into a wall) " << endl;
-	}
-	return;
-}

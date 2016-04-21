@@ -48,8 +48,6 @@ public:
 	const House* getHouse();
 	const int getSimulationScore();
 	void cleanResources();
-	void printSimulationScore(string houseName, int score);
-
 private:
 	long mStepsCounter;
 	int mScore;
