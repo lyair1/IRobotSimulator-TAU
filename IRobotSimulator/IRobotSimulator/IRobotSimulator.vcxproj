@@ -67,6 +67,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="200945657_A_.h" />
+    <ClInclude Include="200945657_B_.h" />
+    <ClInclude Include="200945657_C_.h" />
     <ClInclude Include="AbstractAlgorithm.h" />
     <ClInclude Include="AbstractSensor.h" />
     <ClInclude Include="AlgorithmLoader.h" />
@@ -81,6 +84,9 @@
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="200945657_A_.cpp" />
+    <ClCompile Include="200945657_B_.cpp" />
+    <ClCompile Include="200945657_C_.cpp" />
     <ClCompile Include="AlgorithmLoader.cpp" />
     <ClCompile Include="AlgorithmNaive.cpp" />
     <ClCompile Include="configReader.cpp" />

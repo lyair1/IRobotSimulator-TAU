@@ -1,12 +1,9 @@
 #include "AlgorithmLoader.h"
 #include <iostream>
 #include <boost/filesystem.hpp>
-
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif
-
-
 map<string, instanceCreator> globalFactory;
 
 #ifndef _WIN32
@@ -26,10 +23,8 @@ AlgorithmLoader::AlgorithmLoader(string algorithmPath_, string algorithmName_)
 		return;
 	}
 
-	// getAbstractAlgorithmPointer is the instance creator method
-	void* p = dlsym(handle, "getAbstractAlgorithmPointer");
-
-	// Safe casting
+	// getAbstractAlgorithm is the instance creator method
+	void* p = dlsym(handle, "getAbstractAlgorithm");
 	instanceCreator function1 = reinterpret_cast<instanceCreator>(reinterpret_cast<long>(p));
 
 	if (function1 == nullptr) {
@@ -51,7 +46,6 @@ AlgorithmLoader::~AlgorithmLoader()
 }
 
 #else
-// loading in Windows without shared objects - only for tests!
 AlgorithmLoader::AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_)
 {
 	isAlgoValid = true;
