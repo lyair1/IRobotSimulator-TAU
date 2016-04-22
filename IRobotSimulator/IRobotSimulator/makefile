@@ -1,23 +1,33 @@
-.DEFAULT_GOAL := simulator
-
-# place here your source files
-src = main.cpp AlgorithmNaive.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp
+# source files and object files
+src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp AlgorithmLoader.cpp
 obj = $(src:.cpp=.o)
 
+# shared object source files and object files
+so_src = AlgorithmNaive.cpp
+s_obj = $(so_src:.cpp=.so)
+
+target = simulator
+
+# flags
 CC_FLAGS = -c -O2 -Wall -pthread -std=c++11 -pedantic -g
+SO_FLAGS = -Wall -pthread -std=c++11 -pedantic -g -shared -fPIC
+LD_FLAGS = -lm -lboost_system -lboost_filesystem -ldl
 CC = g++
 
-# may add boost libraries here
-LD_FLAGS = -lm
+.DEFAULT_GOAL := all
+.PHONY: all clean
 
-all: simulator
 
-simulator: $(obj)
-	$(CC) -o $@ $^ $(LD_FLAGS)
+all: clean $(target)
+
+$(target): $(obj) $(s_obj)
+	$(CC) -o $@ $(obj) $(LD_FLAGS)
+
+$(s_obj): %.so: %.cpp $(so_dep)
+	$(CC) $(SO_FLAGS) $^ -o $@
 
 $(obj): %.o: %.cpp
 	$(CC) $(CC_FLAGS) $< -o $@
-
-.PHONY: clean
+	
 clean:
-	rm -f $(obj) simulator
+	rm -f $(obj) $(s_obj) $(target)

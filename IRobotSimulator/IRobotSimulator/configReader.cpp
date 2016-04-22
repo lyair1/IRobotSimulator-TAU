@@ -105,7 +105,7 @@
 		bool first = true;
 		string paramsArray[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_RATE, BATTERY_CAPACITY, MAX_STEPS_AFTER_WINNER };
 
-		int size = _countof(paramsArray);
+		int size = paramsArray->size();
 		for (int i = 0; i < size; i++)
 		{
 			string param = paramsArray[i];

@@ -8,42 +8,46 @@
 #include <list>
 #include "Simulation.h"
 #include "configReader.h"
+#include "AlgorithmLoader.h"
 using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
 	typedef std::list<House*> HouseList;
 	typedef std::list<AbstractAlgorithm*> AlgorithmList;
 	typedef std::list<Simulation*> SimulationList;
+	typedef std::list<AlgorithmLoader*> LoadersList;
 	typedef std::list<list<string>*> StringMatrix;
 
 class Simulator
 {
 public:
-	Simulator()
+	Simulator(ConfigReader *configuration)
 	{
+		mConfiguration = configuration;
 		mAlgorithmList = new AlgorithmList();
-		mConfiguration = NULL;
 		housesErrorMessages = "";
+		algorithmErrorMessages = "";
 		mAlgorithmNames = new list<string>;
 	}
 	~Simulator(){
 	}
-	void runSimulation(ConfigReader *configuration, HouseList* houses_list, string algorithms_path);
+	void runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList);
 	void cleanResources();
 	int countHousesInPath(string houses_path);
 	HouseList* readAllHouses(string houses_path);
+	AlgorithmList *loadAllAlgorithms(string algorithms_path);
 	string housesErrorMessages;
+	string algorithmErrorMessages;
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;
 	ConfigReader* mConfiguration;
 	list<string>* mAlgorithmNames;
-	void loadAllAlgorithms(string algorithms_path);
 	void executeAllAlgoOnAllHouses();
 	void printScores();
 	string getSupparatorLine();
 	string getAlgoPrintLine(int ind, string algoName);
-	string Simulator::getHeaderPrintLine();
+	string getHeaderPrintLine();
 };
 
 #endif //SIMULATOR_H

@@ -23,11 +23,15 @@ const string _seperator = "/";
 const string _paramConfig = "-config";
 const string _paramHouse = "-house_path";
 const string _paramAlgorithm = "-algorithm_path";
-const string _usage = "Usage: simulator [­config <config path>] [­house_path <house path>] [­algorithm_path <algorithm path>]\n";
+const string _usage = USAGE;
 
 int main(int argc, char* argv[])
 {
 	if (argc > 7){
+		if (DEBUG)
+		{
+			cout << "argc > 7";
+		}
 		// Inform the user of how to use the program:
 		std::cout << _usage;
 		std::cin.get();
@@ -67,6 +71,11 @@ int main(int argc, char* argv[])
 	// Show usage and return if config file doesn't exists in path
 	if (!isFileExists(config_file_path))
 	{
+		if (DEBUG)
+		{
+			cout << "config file doesn't exist\n";
+		}
+
 		std::cout << _usage;
 		std::cin.get();
 		exit(0);
@@ -96,13 +105,15 @@ int main(int argc, char* argv[])
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
-    Simulator simul;
-
-	// TODO check algorithms
+	Simulator simul = Simulator(configReader);
 
 	// Print usage and return if there are no houses in the path
 	if (simul.countHousesInPath(houses_path) == 0)
 	{
+		if (DEBUG)
+		{
+			cout << "no houses in path \n";
+		}
 		std::cout << _usage;
 		std::cin.get();
 		exit(0);
@@ -118,13 +129,34 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	simul.runSimulation(configReader, houses_list, algorithms_path);
+	AlgorithmList* algo_list = simul.loadAllAlgorithms(algorithms_path);
+
+	if (algo_list == nullptr)
+	{
+		if (simul.algorithmErrorMessages.length() > 0)
+		{
+			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.algorithmErrorMessages;
+			std::cin.get();
+		}
+
+		exit(0);
+	}
+
+	// Check if all algorithms are invalid
+	if (houses_list->size() == 0)
+	{
+		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.algorithmErrorMessages;
+		std::cin.get();
+		exit(0);
+	}
+
+	simul.runSimulation(houses_list, algo_list);
 
 
 	// Print error list
 	if (simul.housesErrorMessages.length() > 0)
 	{
-		std::cout << "\nErrors:\n" << simul.housesErrorMessages;
+		std::cout << "\nErrors:\n" << simul.housesErrorMessages << simul.algorithmErrorMessages;
 	}
 
 	simul.cleanResources();

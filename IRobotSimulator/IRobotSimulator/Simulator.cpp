@@ -11,9 +11,8 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(ConfigReader *configuration, HouseList* houses_list, string algorithms_path)
+void Simulator::runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList)
 {
-	mConfiguration = configuration;
 	if (DEBUG)
 	{
 		cout << endl << endl << "Parameters read:" << endl;
@@ -24,7 +23,7 @@ void Simulator::runSimulation(ConfigReader *configuration, HouseList* houses_lis
 	mHouseList = houses_list;
 
 	//The simulator should dynamically load libraries for all the algorithms:
-	loadAllAlgorithms(algorithms_path);
+	mAlgorithmList = algorithmsList;
 
 	//The simulator should execute every algorithm on every house:
 	executeAllAlgoOnAllHouses();
@@ -66,7 +65,7 @@ string Simulator::getHeaderPrintLine()
 		else
 		{
 			line += fileName;
-			for (int j = 0; j < (10 - house->houseFileName.length()); j++)
+			for (int j = 0; j < (int)(10 - house->houseFileName.length()); j++)
 			{
 				line += " ";
 			}
@@ -90,7 +89,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 	string line = "|";
 	for (int j = 0; j < 13; j++)
 	{
-		if (j < algoName.length())
+		if (j < (int)algoName.length())
 		{
 			line += algoName[j];
 			continue;
@@ -112,7 +111,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 			{
 				counter += score;
 				string numStr = to_string(score);
-				for (int j = 0; j < (10 - numStr.length()); j++)
+				for (int j = 0; j < (int)(10 - numStr.length()); j++)
 				{
 					line += " ";
 				}
@@ -125,7 +124,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 	double avg = counter / (double)mHouseList->size();
 	string numStr = to_string(avg);
 	string numStr2Dec = "";
-	for (int j = 0; j < numStr.length(); j++)
+	for (int j = 0; j < (int)numStr.length(); j++)
 	{
 		numStr2Dec += numStr[j];
 		if (numStr[j] == '.')
@@ -136,7 +135,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 		}
 	}
 
-	for (int j = 0; j < (10 - numStr2Dec.length()); j++)
+	for (int j = 0; j < (int)(10 - numStr2Dec.length()); j++)
 	{
 		line += " ";
 	}
@@ -148,7 +147,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 string Simulator::getSupparatorLine()
 {
 	string line = "";
-	for (int i = 0; i < 15 + (mHouseList->size() + 1) * 11; i++)
+	for (int i = 0; i < (int)(15 + (mHouseList->size() + 1) * 11); i++)
 	{
 		line += "-";
 	}
@@ -220,28 +219,116 @@ HouseList* Simulator::readAllHouses(string houses_path)
 	return housesList;
 }
 
-void Simulator:: loadAllAlgorithms(string algorithms_path)
+AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 {
+#ifndef _WIN32
+	vector<AlgorithmLoader*> allAlgos;
+	fs::path targetDir(algorithms_path);
+	fs::directory_iterator it(targetDir), eod;
+#ifdef _WIN32
+	int i = 0;
+#endif
+	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+	{
+		if (fs::is_regular_file(p) && p.extension() == ".so")
+		{
+			if (DEBUG)
+			{
+				cout << "scan file: :" << p.string() << "\n";
+			}
+		#ifndef _WIN32
+			allAlgos.push_back(new AlgorithmLoader(p.string(), p.stem().string()));
+		#else
+			allAlgos.push_back(new AlgorithmLoader(new AlgorithmNaive(), "ALGO" + i));
+			i++;
+		#endif
+		}
+	}
+
+	if (allAlgos.size() == 0)
+	{
+		if (DEBUG)
+		{
+			cout << "can't find algorithms files\n";
+		}
+		cout << USAGE;
+		return nullptr;
+	}
+
+	LoadersList *algoLoaders = new LoadersList();
+
+	for (AlgorithmLoader* algo : allAlgos)
+	{
+		if (algo->isValid())
+		{
+			algoLoaders->push_back(algo);
+			if (DEBUG)
+			{
+				cout << "Algorithm is valid\n";
+			}
+		}
+		else
+		{
+			algorithmErrorMessages += algo->getErrorLine();
+			delete algo;
+		}
+	}
+
+	if (algoLoaders->size() == 0)
+	{
+		delete algoLoaders;
+		if (DEBUG)
+		{
+			cout << "can't load any algorithm\n";
+		}
+
+		return nullptr;
+	}
+
+	AlgorithmList *algoList = new AlgorithmList();
+
+	for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); it++)
+	{
+		AlgorithmLoader *loader = (*it);
+		AbstractAlgorithm* algo = globalFactory[loader->fileName]();
+		mAlgorithmNames->push_back(loader->fileName);
+		algoList->push_back(algo);
+	}
+
+	if (DEBUG)
+	{
+		cout << "retrun algorithm list\n";
+	}
+
+	return algoList;
+
+#else
+
+	AlgorithmList *algoList = new AlgorithmList();
+
 	AlgorithmNaive* algoNaive = new AlgorithmNaive();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo1");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	mAlgorithmList->push_back(algoNaive);
+	algoList->push_back(algoNaive);
 
 	AlgorithmNaive* algoNaive2 = new AlgorithmNaive();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo2");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	mAlgorithmList->push_back(algoNaive2);
+	algoList->push_back(algoNaive2);
 
 	AlgorithmNaive* algoNaive3 = new AlgorithmNaive();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo3");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	mAlgorithmList->push_back(algoNaive3);
+	algoList->push_back(algoNaive3);
+
+	return algoList;
+#endif
 }
 
 void Simulator::executeAllAlgoOnAllHouses()

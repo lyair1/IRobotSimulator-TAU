@@ -13,7 +13,7 @@
 #include <list>
 using namespace std;
 #define HOUSE_EXT ".house"
-
+#define USAGE "Usage: simulator [­config <config path>] [­house_path <house path>] [­algorithm_path <algorithm path>]\n"
 
 /*	W – wall
 	D – Docking Station(start position and battery recharge)

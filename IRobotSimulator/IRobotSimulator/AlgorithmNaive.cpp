@@ -50,3 +50,10 @@ void AlgorithmNaive:: aboutToFinish(int stepsTillFinishing){
 void AlgorithmNaive::cleanResources(){
 
 }
+
+#ifndef _WIN32
+extern "C" AbstractAlgorithm* getAbstractAlgorithmPointer()
+{
+	return new AlgorithmNaive();
+}
+#endif

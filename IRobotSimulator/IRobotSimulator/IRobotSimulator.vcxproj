@@ -69,9 +69,11 @@
   <ItemGroup>
     <ClInclude Include="AbstractAlgorithm.h" />
     <ClInclude Include="AbstractSensor.h" />
+    <ClInclude Include="AlgorithmLoader.h" />
     <ClInclude Include="AlgorithmNaive.h" />
     <ClInclude Include="configReader.h" />
     <ClInclude Include="Direction.h" />
+    <ClInclude Include="AlgorithmRegister.h" />
     <ClInclude Include="House.h" />
     <ClInclude Include="Sensor.h" />
     <ClInclude Include="SensorInformation.h" />
@@ -79,6 +81,7 @@
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AlgorithmLoader.cpp" />
     <ClCompile Include="AlgorithmNaive.cpp" />
     <ClCompile Include="configReader.cpp" />
     <ClCompile Include="House.cpp" />
