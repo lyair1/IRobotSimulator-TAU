@@ -5,9 +5,9 @@
 */
 #ifndef ___200945657_C_
 #define ___200945657_C_
-#include "AbstractAlgorithm.h"
-#include "House.h"
-#include "Sensor.h"
+
+#include "AlgorithmBase.h"
+
 using namespace std;
 
 /*	The purpose of the algorithm:
@@ -21,34 +21,26 @@ So, the possible steps for the algorithm to decide upon are:
 East, West, North, or South (only one of the directions may be chosen in a single step).
 */
 
-class _200945657_C : public AbstractAlgorithm
+class _200945657_C : public AlgorithmBase
 {
 public:
-	_200945657_C(){}
+	_200945657_C()
+	{
+	}
 	~_200945657_C()
 	{
-		cleanResources();
+		// base class will call clenaResources()
 	}
-	// setSensor is called once when the Algorithm is initialized 
-	void setSensor(const AbstractSensor& sensor);
-
-	// setConfiguration is called once when the Algorithm is initialized - see below 
-	void setConfiguration(map<string, int> config);
-
-	// step is called by the simulation for each time unit 
-	Direction step();
 
 	// this method is called by the simulation either when there is a winner or 
 	// when steps == MaxSteps - MaxStepsAfterWinner 
 	// parameter stepsTillFinishing == MaxStepsAfterWinner 
-	void aboutToFinish(int stepsTillFinishing);
+	void aboutToFinish(int stepsTillFinishing) override;
 
 	void cleanResources();
+
+	Direction getNextStep(SensorInformation info);
 private:
-	const AbstractSensor* mSensor; // the only info the algorithm has about the house it's cleaning comes from the sensor itself.
-	//House * house; //algorithm does not have any given information about the house, but it can gather that information along the way
-	std::pair <int, int> mLocation;
-	map<string, int>* mConfiguration;
 };
 
 #endif //ALGO_NAIVE_H

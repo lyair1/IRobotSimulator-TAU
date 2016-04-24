@@ -18,6 +18,7 @@ using namespace std;
 	typedef std::list<AlgorithmLoader*> LoadersList;
 	typedef std::list<list<string>*> StringMatrix;
 
+
 class Simulator
 {
 public:
@@ -48,6 +49,14 @@ private:
 	string getSupparatorLine();
 	string getAlgoPrintLine(int ind, string algoName);
 	string getHeaderPrintLine();
+	
+	struct less_than_key
+	{
+		inline bool operator() (const AlgorithmLoader *struct1, const AlgorithmLoader *struct2)
+		{
+			return (struct1->fileName < struct2->fileName);
+		}
+	};
 };
 
 #endif //SIMULATOR_H

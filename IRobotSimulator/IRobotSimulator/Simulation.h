@@ -6,8 +6,9 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 #include "House.h"
-#include "AlgorithmNaive.h"
 #include "configReader.h"
+#include "AbstractAlgorithm.h"
+#include "Sensor.h"
 
 class Simulation
 {

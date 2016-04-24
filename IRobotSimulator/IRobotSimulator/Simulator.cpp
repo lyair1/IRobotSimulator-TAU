@@ -7,6 +7,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp> 
 #include <iomanip>
+#include "200945657_C_.h"
+#include "200945657_B_.h"
+#include "200945657_A_.h"
 
 namespace fs = ::boost::filesystem;
 using namespace std;
@@ -245,6 +248,8 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		}
 	}
 
+	sort(allAlgos.begin(), allAlgos.end(), less_than_key());
+
 	if (allAlgos.size() == 0)
 	{
 		if (DEBUG)
@@ -306,21 +311,21 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 
 	AlgorithmList *algoList = new AlgorithmList();
 
-	AlgorithmNaive* algoNaive = new AlgorithmNaive();
+	_200945657_A* algoNaive = new _200945657_A();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo1");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive);
 
-	AlgorithmNaive* algoNaive2 = new AlgorithmNaive();
+	_200945657_B* algoNaive2 = new _200945657_B();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo2");
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive2);
 
-	AlgorithmNaive* algoNaive3 = new AlgorithmNaive();
+	_200945657_C* algoNaive3 = new _200945657_C();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	mAlgorithmNames->push_back("algo3");
 	//don't set the sensor yet.
@@ -369,30 +374,31 @@ void Simulator::executeAllAlgoOnAllHouses()
 			isAnyAlgorithmStillRunning = false;
 			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter)
 			{
-				if ((*iter)->isSimulationRunning())
+				Simulation *simul = (*iter);
+				if (simul->isSimulationRunning())
 				{
 					isAnyAlgorithmStillRunning = true;
-					if ((*iter)->makeSimulationStep())
+					if (simul->makeSimulationStep())
 					{ 
 						if (isFirstWinner)// this is the first algorithm that finished running successfully!
 						{
 							isFirstWinner = false;
-							winnerNumberOfSteps = (*iter)->getNumberOfSteps();
+							winnerNumberOfSteps = simul->getNumberOfSteps();
 							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2)
 							{
-								if ((*iter2) != (*iter))//update steps counter for all OTHER algorithms BUT for the first winner 
+								if ((*iter2) != simul)//update steps counter for all OTHER algorithms BUT for the first winner 
 								{
 									(*iter2)->resetMaxStepsAccordingToWinner();
 								}
 							}
 						}
-						(*iter)->setPositionInCompetition(actualPositionInCopmetition);
+						simul->setPositionInCompetition(actualPositionInCopmetition);
 						numberOfWinnersInPosition += 1;
 					}
 				}
-				else if ((*iter)->getPositionInCompetition() == -1) // this algorithm finished running but not successfully
+				else if (simul->getPositionInCompetition() == -1) // this algorithm finished running but not successfully
 				{
-					(*iter)->setPositionInCompetition(-1);
+					simul->setPositionInCompetition(-1);
 				}
 			}
 			actualPositionInCopmetition += numberOfWinnersInPosition;
