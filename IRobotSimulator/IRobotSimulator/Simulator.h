@@ -22,23 +22,24 @@ using namespace std;
 class Simulator
 {
 public:
-	Simulator(ConfigReader *configuration)
+	Simulator(ConfigReader *configuration):
+		mHouseList(NULL),
+		mHousesErrorMessages(""),
+		mAlgorithmErrorMessages("")
 	{
 		mConfiguration = configuration;
 		mAlgorithmList = new AlgorithmList();
-		housesErrorMessages = "";
-		algorithmErrorMessages = "";
 		mAlgorithmNames = new list<string>;
 	}
 	~Simulator(){
 	}
 	void runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList);
-	void cleanResources();
+	void cleanResources(AlgorithmList* algo_list);
 	int countHousesInPath(string houses_path);
 	HouseList* readAllHouses(string houses_path);
 	AlgorithmList *loadAllAlgorithms(string algorithms_path);
-	string housesErrorMessages;
-	string algorithmErrorMessages;
+	string mHousesErrorMessages;
+	string mAlgorithmErrorMessages;
 private:
 	HouseList *mHouseList;
 	AlgorithmList  *mAlgorithmList;

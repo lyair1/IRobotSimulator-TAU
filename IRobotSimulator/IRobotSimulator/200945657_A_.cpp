@@ -9,7 +9,7 @@
 // when steps == MaxSteps - MaxStepsAfterWinner 
 // parameter stepsTillFinishing == MaxStepsAfterWinner 
 void _200945657_A::aboutToFinish(int stepsTillFinishing){
-	_aboutToFinish = true;
+	mAboutToFinish = true;
 }
 
 void _200945657_A::cleanResources(){
@@ -19,30 +19,30 @@ void _200945657_A::cleanResources(){
 Direction _200945657_A::getNextStep(SensorInformation info)
 {
 	Direction chosenDirection;
-	if (_aboutToFinish)
+	if (mAboutToFinish)
 	{
-		chosenDirection = moves->front();
-		moves->pop_front();
+		chosenDirection = mMoves->front();
+		mMoves->pop_front();
 
 		return oppositeDirection(chosenDirection);
 	}
 
-	if (lastDirection == -1)
+	if (mLastDirection == -1)
 	{
-		lastDirection = 0;
+		mLastDirection = 0;
 	}
 
-	int moveDirection = lastDirection;
-	chosenDirection = static_cast<Direction>((moveDirection*moves->size()*2) % 4);
+	int moveDirection = mLastDirection;
+	chosenDirection = static_cast<Direction>((moveDirection*mMoves->size()*2) % 4);
 	while (info.isWall[static_cast<int>(chosenDirection)])
 	{
 		//robot is stepping into a wall - choose a different direction!
 		moveDirection++;
-		chosenDirection = (Direction)(moveDirection % 4);
+		chosenDirection = static_cast<Direction>(moveDirection % 4);
 	}
-	moves->push_front(chosenDirection);
+	mMoves->push_front(chosenDirection);
 
-	lastDirection = (int)chosenDirection;
+	mLastDirection = (int)chosenDirection;
 	return chosenDirection;
 }
 

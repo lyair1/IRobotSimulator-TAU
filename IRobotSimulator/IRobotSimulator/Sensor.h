@@ -36,7 +36,7 @@ public:
 
 	SensorInformation sense()const;
 	void moveSensor(Direction direction);
-	pair <int, int> getSensorLocation();
+	pair <int, int> getSensorLocation() const;
 
 private:
 

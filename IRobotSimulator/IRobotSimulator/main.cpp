@@ -86,6 +86,7 @@ int main(int argc, char* argv[])
 	if (!configReader->isLoaded)
 	{
 		std::cout << "config.ini exists in '" << config_file_path << "' but cannot be opened\n";
+		
 		std::cin.get();
 		exit(0);
 	}
@@ -101,7 +102,7 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm
+	//srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm (no random algorithms in EX2)
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
@@ -122,9 +123,9 @@ int main(int argc, char* argv[])
 	// Print message and return if all houses in path are invalid
 	HouseList* houses_list = simul.readAllHouses(houses_path);
 	// Check if all houses are invalid
-	if (houses_list->size() == 0)
+	if (houses_list->empty())
 	{
-		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.housesErrorMessages;
+		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.mHousesErrorMessages;
 		std::cin.get();
 		exit(0);
 	}
@@ -133,9 +134,9 @@ int main(int argc, char* argv[])
 
 	if (algo_list == nullptr)
 	{
-		if (simul.algorithmErrorMessages.length() > 0)
+		if (simul.mAlgorithmErrorMessages.length() > 0)
 		{
-			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.algorithmErrorMessages;
+			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.mAlgorithmErrorMessages;
 			std::cin.get();
 		}
 
@@ -143,9 +144,9 @@ int main(int argc, char* argv[])
 	}
 
 	// Check if all algorithms are invalid
-	if (houses_list->size() == 0)
+	if (houses_list->empty())
 	{
-		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.algorithmErrorMessages;
+		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.mAlgorithmErrorMessages;
 		std::cin.get();
 		exit(0);
 	}
@@ -154,12 +155,12 @@ int main(int argc, char* argv[])
 
 
 	// Print error list
-	if (simul.housesErrorMessages.length() > 0)
+	if (simul.mHousesErrorMessages.length() > 0)
 	{
-		std::cout << "\nErrors:\n" << simul.housesErrorMessages << simul.algorithmErrorMessages;
+		std::cout << "\nErrors:\n" << simul.mHousesErrorMessages << simul.mAlgorithmErrorMessages;
 	}
 
-	simul.cleanResources();
+	simul.cleanResources(algo_list);
 	delete houses_list;
 	delete configReader;
 

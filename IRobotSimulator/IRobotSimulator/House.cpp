@@ -131,7 +131,7 @@ int House::getC() const {
 	return _C;	
 }
 
-void House::cleanResources(){
+void House::cleanResources() const{
 	
 }
 
@@ -185,8 +185,8 @@ string House:: initDockingLocation()
 				}
 
 				didFindDocking = true;
-				_mDockingLocation.first = col;
-				_mDockingLocation.second = row; // col == X, row == Y
+				_dockingLocation.first = col;
+				_dockingLocation.second = row; // col == X, row == Y
 			}
 		}
 	}
@@ -199,8 +199,8 @@ string House:: initDockingLocation()
 	return housePath + ": missing docking station/n";
 }
 
-pair <int, int> House::getDockingLocation(){
-	return _mDockingLocation;
+pair <int, int> House::getDockingLocation() const{
+	return _dockingLocation;
 }
 
 bool House::isDirtCollected(pair<int, int> location){
@@ -209,24 +209,23 @@ bool House::isDirtCollected(pair<int, int> location){
 		_matrix[location.second][location.first] <= '9')
 	{
 		_matrix[location.second][location.first] --;
-		_mDustInHouse--;
+		_dustInHouse--;
 
 		return true;
 	}
 	return false;
 }
 
-char House::getLocationValue(pair<int, int> location)
-{
+char House::getLocationValue(pair<int, int> location) const{
 	return _matrix[location.second][location.first];
 }
 
-bool House::isCleanHouse(){
-	return (_mDustInHouse == 0);
+bool House::isCleanHouse() const{
+	return (_dustInHouse == 0);
 }
 
 void House::initDustInHouse(){
-	_mDustInHouse = 0;
+	_dustInHouse = 0;
 	for (int row = 0; row < _R; ++row) 
 	{
 		for (int col = 0; col < _C; ++col) 
@@ -234,12 +233,12 @@ void House::initDustInHouse(){
 			if (_matrix[row][col] >= '1' &&
 				_matrix[row][col] <= '9')
 			{
-				_mDustInHouse += (_matrix[row][col] - '0');
+				_dustInHouse += (_matrix[row][col] - '0');
 			}
 		}
 	}
 }
 
-int House::getDustInHouse(){
-	return _mDustInHouse;
+int House::getDustInHouse() const{
+	return _dustInHouse;
 }

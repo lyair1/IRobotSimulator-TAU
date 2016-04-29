@@ -38,16 +38,16 @@ public:
 		mIsOutOfBattery = (mBatteryLeft <= 0)? true: false;
 	}
 
-	bool isSimulationRunning();
+	bool isSimulationRunning() const;
 	bool makeSimulationStep();
-	int getNumberOfSteps();
-	const AbstractSensor * getSensor();
-	int getPositionInCompetition();
+	int getNumberOfSteps() const;
+	const AbstractSensor * getSensor() const;
+	int getPositionInCompetition() const;
 	void setPositionInCompetition(int actualPositionInCompetition);
 	void resetMaxStepsAccordingToWinner();
 	void setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter);
-	const House* getHouse();
-	const int getSimulationScore();
+	const House* getHouse() const;
+	const int getSimulationScore() const;
 	void cleanResources();
 private:
 	long mStepsCounter;

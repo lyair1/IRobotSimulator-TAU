@@ -38,11 +38,11 @@ Direction AlgorithmBase::step(){
 // when steps == MaxSteps - MaxStepsAfterWinner 
 // parameter stepsTillFinishing == MaxStepsAfterWinner 
 void AlgorithmBase::aboutToFinish(int stepsTillFinishing){
-	_aboutToFinish = true;
+	mAboutToFinish = true;
 }
 
 void AlgorithmBase::cleanResources(){
-	delete moves;
+	delete mMoves;
 }
 
 Direction AlgorithmBase::oppositeDirection(Direction direction_)
@@ -62,10 +62,10 @@ Direction AlgorithmBase::oppositeDirection(Direction direction_)
 Direction AlgorithmBase::getNextStep(SensorInformation info)
 {
 	Direction chosenDirection;
-	if (_aboutToFinish)
+	if (mAboutToFinish)
 	{
-		chosenDirection = moves->front();
-		moves->pop_front();
+		chosenDirection = mMoves->front();
+		mMoves->pop_front();
 
 		return chosenDirection;
 	}
@@ -76,7 +76,7 @@ Direction AlgorithmBase::getNextStep(SensorInformation info)
 		//robot is stepping into a wall - choose a different direction!
 		chosenDirection = (Direction)(rand() % 4);
 	}
-	moves->push_front(chosenDirection);
+	mMoves->push_front(chosenDirection);
 
 	return chosenDirection;
 }

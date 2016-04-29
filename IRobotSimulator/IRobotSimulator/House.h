@@ -5,7 +5,7 @@
 */
 #ifndef HOUSE_H
 #define HOUSE_H
-#define DEBUG 1
+#define DEBUG 0
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -38,7 +38,11 @@ class House
 {
 public:
 
-	House() : _matrix(NULL)
+	House() : _matrix(NULL),
+		_maxSteps(0),
+		_R(0),
+		_C(0),
+		_dustInHouse(0)
 	{
 		algorithmScores = new list<int>();
 	}
@@ -57,11 +61,11 @@ public:
 	void printHouse()const;
 	string fillHouseInfo(string filePath, string fileName);
 	bool isDirtCollected(pair<int, int> location);
-	char getLocationValue(pair<int, int> location);
-	bool isCleanHouse();
-	pair <int, int> getDockingLocation();
-	int getDustInHouse();
-	void cleanResources();
+	char getLocationValue(pair<int, int> location) const;
+	bool isCleanHouse() const;
+	pair <int, int> getDockingLocation() const;
+	int getDustInHouse() const;
+	void cleanResources()const;
 	string housePath;
 	string houseFileName;
 	list<int>* algorithmScores;
@@ -71,8 +75,8 @@ private:
 	int _R;
 	int _C;
 	string* _matrix;
-	int _mDustInHouse;
-	pair <int, int> _mDockingLocation;
+	int _dustInHouse;
+	pair <int, int> _dockingLocation;
 	void setR(int R);
 	void setC(int C);
 	void setName(string name);

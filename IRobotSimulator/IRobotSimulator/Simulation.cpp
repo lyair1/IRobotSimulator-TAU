@@ -108,18 +108,18 @@ void Simulation::cleanResources(){
 	delete(mSensor);
 }
 
-bool Simulation::isSimulationRunning(){
+bool Simulation::isSimulationRunning() const{
 	return mIsRunning;
 }
-int Simulation::getNumberOfSteps(){
+int Simulation::getNumberOfSteps()const {
 	return mStepsCounter;
 }
 
-const AbstractSensor* Simulation::getSensor(){
+const AbstractSensor* Simulation::getSensor() const{
 	return mSensor;
 }
 
-int Simulation::getPositionInCompetition(){
+int Simulation::getPositionInCompetition() const{
 	return mPositionInCompetition;
 }
 
@@ -166,11 +166,10 @@ void Simulation::setSimulationScore(int winnerNumberOfSteps, int simulationSteps
 
 	return;
 }
-const House* Simulation::getHouse(){
+const House* Simulation::getHouse() const {
 	return mHouse;
 }
 
-const int Simulation::getSimulationScore()
-{
+const int Simulation::getSimulationScore() const {
 	return mScore;
 }

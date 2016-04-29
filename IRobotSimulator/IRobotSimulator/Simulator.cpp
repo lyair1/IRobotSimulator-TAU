@@ -40,7 +40,7 @@ void Simulator::printScores()
 	cout << getHeaderPrintLine();
 	cout << getSupparatorLine();
 	int i = 0;
-	for (list<string>::iterator it = mAlgorithmNames->begin(); it != mAlgorithmNames->end(); it++)
+	for (list<string>::iterator it = mAlgorithmNames->begin(); it != mAlgorithmNames->end(); ++it)
 	{
 		cout << getAlgoPrintLine(i, (*it));
 		cout << getSupparatorLine();
@@ -57,7 +57,7 @@ string Simulator::getHeaderPrintLine()
 	}
 	line += "|";
 
-	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); it++)
+	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
 	{
 		House* house = (*it);
 		string fileName = house->houseFileName;
@@ -103,11 +103,11 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 
 
 	int counter = 0;
-	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); it++)
+	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
 	{
 		int i = 0;
 		House* house = (*it);
-		for (list<int>::iterator algoIt = house->algorithmScores->begin(); algoIt != house->algorithmScores->end(); algoIt++)
+		for (list<int>::iterator algoIt = house->algorithmScores->begin(); algoIt != house->algorithmScores->end(); ++algoIt)
 		{
 			int score(*algoIt);
 			if (i == ind)
@@ -158,17 +158,17 @@ string Simulator::getSupparatorLine()
 	return line + "\n";
 }
 
-void Simulator::cleanResources()
+void Simulator::cleanResources(AlgorithmList* algo_list)
 {
 	// Clean Houses
-	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
+	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
 	{
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
 	}
 
 	// Clean algorithms
-	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
+	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
 	{
 		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
 	}
@@ -207,7 +207,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 			if (errMsg.length() > 0){
 				// House is illegal - delete
 				delete(house);
-				housesErrorMessages += errMsg;
+				mHousesErrorMessages += errMsg;
 			}
 			else{
 				// Add house to the list
@@ -225,7 +225,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 {
 #ifndef _WIN32
-	vector<AlgorithmLoader*> allAlgos;
+	list<AlgorithmLoader*> allAlgos;
 	fs::path targetDir(algorithms_path);
 	fs::directory_iterator it(targetDir), eod;
 #ifdef _WIN32
@@ -250,7 +250,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 
 	sort(allAlgos.begin(), allAlgos.end(), less_than_key());
 
-	if (allAlgos.size() == 0)
+	if (allAlgos.empty())
 	{
 		if (DEBUG)
 		{
@@ -274,12 +274,12 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		}
 		else
 		{
-			algorithmErrorMessages += algo->getErrorLine();
+			mAlgorithmErrorMessages += algo->getErrorLine();
 			delete algo;
 		}
 	}
 
-	if (algoLoaders->size() == 0)
+	if (algoLoaders.empty())
 	{
 		delete algoLoaders;
 		if (DEBUG)
@@ -292,7 +292,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 
 	AlgorithmList *algoList = new AlgorithmList();
 
-	for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); it++)
+	for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); ++it)
 	{
 		AlgorithmLoader *loader = (*it);
 		AbstractAlgorithm* algo = globalFactory[loader->fileName]();
@@ -341,12 +341,12 @@ void Simulator::executeAllAlgoOnAllHouses()
 	Simulation* pSimulation;
 	//initialize a list that holds information about all simulations on current house:
 	SimulationList* simulationListPerHouse;
-	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); listHouseIter++)
+	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
 	{
 		House* house = (*listHouseIter);
 		simulationListPerHouse = new SimulationList();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
-		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); listAlgorithmIter++)
+		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
 		{
 			pSimulation = new Simulation((*listAlgorithmIter), house, mConfiguration->getParametersMap());
 			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
@@ -426,7 +426,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 			(*iter3)->getHouse()->algorithmScores->push_back((*iter3)->getSimulationScore());
 		}
 
-		// Clean simulationListPerHouse (TODO in Ex 2: write the score into a score matrix before freeing it)
+		// Clean simulationListPerHouse
 		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
 			(*iter4)->cleanResources();
 			delete *iter4;

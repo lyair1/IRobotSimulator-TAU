@@ -20,7 +20,7 @@ using namespace std;
 class ConfigReader
 {
 public:
-  ConfigReader() { }
+	ConfigReader() : isLoaded(false){}
   ConfigReader(const string& iniPath)
   {
 	  isLoaded = this->loadFromFile(iniPath);
