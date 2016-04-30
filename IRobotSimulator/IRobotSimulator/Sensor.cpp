@@ -15,33 +15,26 @@ pair <int, int> Sensor::getSensorLocation() const{
 }
 
 void Sensor::moveSensor(Direction direction){
-	string dirStr;
 	switch (direction){
 	case Direction::East:
 		mSensorLocation.first++;
-		dirStr = "East";
 		break;
 	case Direction::West:
 		mSensorLocation.first--;
-		dirStr = "West";
 		break;
 	case Direction::South:
 		mSensorLocation.second++;
-		dirStr = "South";
 		break;
 	case Direction::North:
 		mSensorLocation.second--;
-		dirStr = "North";
 		break;
 	case Direction::Stay:
-		dirStr = "Stay";
 		break;
 	default:
-		dirStr = "";
 		cout << "Sensor::moveSensor: no such Direction exists! " << endl;
 	}
-	if (DEBUG)
+	if (DEBUG_LOW_LEVEL)
 	{
-		cout << "step to location: <row,col> = <" << mSensorLocation.second << ", " << mSensorLocation.first << "> (" << dirStr << ")" << endl;
+		cout << "step to location: <row,col> = <" << mSensorLocation.second << ", " << mSensorLocation.first << "> (" << getDirectionString(direction) << ")" << endl;
 	}
 }
