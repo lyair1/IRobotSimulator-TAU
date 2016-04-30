@@ -11,6 +11,7 @@
 #include "200945657_B_.h"
 #include "200945657_A_.h"
 
+
 namespace fs = ::boost::filesystem;
 using namespace std;
 
@@ -172,10 +173,8 @@ void Simulator::cleanResources()
 	{
 		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
 	}
-	delete mAlgorithmList;
 	
 	delete mAlgorithmNames;
-
 }
 
 int Simulator::countHousesInPath(string houses_path)
@@ -261,7 +260,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		return nullptr;
 	}
 
-	LoadersList *algoLoaders = new LoadersList();
+	algoLoaders = new LoadersList();
 
 	for (AlgorithmLoader* algo : allAlgos)
 	{
@@ -276,6 +275,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		else
 		{
 			mAlgorithmErrorMessages += algo->getErrorLine();
+			dlclose(algo->handle);
 			delete algo;
 		}
 	}

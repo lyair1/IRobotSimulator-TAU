@@ -9,6 +9,10 @@
 #include "Simulation.h"
 #include "configReader.h"
 #include "AlgorithmLoader.h"
+
+#ifndef _WIN32
+#include <dlfcn.h>
+#endif
 using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
@@ -28,10 +32,22 @@ public:
 		mAlgorithmErrorMessages("")
 	{
 		mConfiguration = configuration;
-		mAlgorithmList = new AlgorithmList();
 		mAlgorithmNames = new list<string>;
 	}
 	~Simulator(){
+		#ifndef _WIN32
+		for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); ++it)
+		{
+			AlgorithmLoader *loader = (*it);
+			if (loader->handle != NULL)
+			{
+				dlclose(loader->handle);
+			}
+			delete loader;
+		}
+
+		delete algoLoaders;
+		#endif
 	}
 	void runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList);
 	void cleanResources();
@@ -44,6 +60,7 @@ public:
 private:
 
 	//members:
+	LoadersList *algoLoaders;
 	HouseList *mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;

@@ -6,12 +6,12 @@
 
 class AlgorithmLoader
 {
-	void* handle = NULL;
 	bool isAlgoValid = false;
 	string algoFileName;
 	string algoSimpleName;
 	string errorMessage;
 public:
+	void* handle = NULL;
 	string filePath;
 	string fileName;
 	AlgorithmLoader() = delete;
