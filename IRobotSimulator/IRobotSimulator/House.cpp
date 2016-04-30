@@ -39,8 +39,10 @@ string House::fillHouseInfo(string filePath, string fileName)
 		return _housePath + ": line number 4 in house file shall be a positive number, found: " + to_string(_C) + "\n";
 	}
 
-	fin.ignore(); //skip newline and go the begining of matrix
+	//fin.ignore(); //skip newline and go the begining of matrix
+	
 	this->_matrix = new string[_R];
+	std::getline(fin, this->_matrix[0]);
 	for (int i = 0; i < _R; ++i)
 	{
 		// Check if stream is over before the rows count
@@ -50,6 +52,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 			{
 				_matrix[i] += " ";
 			}
+			continue;
 		}
 		std::getline(fin, this->_matrix[i]);
 
@@ -60,6 +63,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 			{
 				_matrix[i] += " ";
 			}
+			continue;
 		}
 
 		// Check if a row is shorter than expected
