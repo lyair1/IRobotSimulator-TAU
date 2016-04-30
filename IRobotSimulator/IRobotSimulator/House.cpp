@@ -242,3 +242,21 @@ void House::initDustInHouse(){
 int House::getDustInHouse() const{
 	return _dustInHouse;
 }
+
+string getDirectionString(Direction direction)
+{
+	switch (direction){
+	case Direction::East:
+		return "East";
+	case Direction::West:
+		return "West";
+	case Direction::North:
+		return "North";
+	case Direction::South:
+		return "South";
+	case Direction::Stay:
+		return "Stay";
+	default:
+		return "";
+	}
+}

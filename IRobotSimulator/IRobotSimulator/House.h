@@ -83,6 +83,7 @@ private:
 	void setMaxSteps(int maxSteps);
 	string initDockingLocation();
 	void initDustInHouse();
-};
 
+};
+string getDirectionString(Direction direction);
 #endif //HOUSE_H
