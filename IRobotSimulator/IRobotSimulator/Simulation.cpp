@@ -106,6 +106,7 @@ bool Simulation :: makeSimulationStep()
 }
 
 void Simulation::cleanResources(){
+	delete (mHouse);
 	delete(mSensor);
 }
 
