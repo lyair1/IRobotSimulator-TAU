@@ -5,11 +5,13 @@
 */
 #ifndef HOUSE_H
 #define HOUSE_H
-#define DEBUG 0
+#define DEBUG 1
+#define DEBUG_LOW_LEVEL 0
 #include <iostream>
 #include <string>
 #include <fstream>
 #include "SensorInformation.h"
+#include "Direction.h"
 #include <list>
 using namespace std;
 #define HOUSE_EXT ".house"
@@ -38,13 +40,35 @@ class House
 {
 public:
 
-	House() : _matrix(NULL),
+	House() : 
+		_name(""),
 		_maxSteps(0),
 		_R(0),
 		_C(0),
-		_dustInHouse(0)
+		_dustInHouse(0),
+		_dockingLocation(-1, -1),
+		_housePath(""),
+		_houseFileName(""),
+		_matrix(NULL)
+		
 	{
 		algorithmScores = new list<int>();
+	}
+
+	//copy constructor for house:
+	House(const House & otherHouse);
+
+	//copy assignment operator
+
+	House & operator = (const House & otherHouse)
+	{
+		if (DEBUG)
+		{
+			cout << "operator \"=\" for house" << endl;
+		}
+		House * house = new House();
+		house->fillHouseInfo(otherHouse.getHousePath(), otherHouse.getHouseFileName());
+		return *house;
 	}
 	~House(){
 		if (_matrix != NULL)	{
@@ -66,23 +90,25 @@ public:
 	pair <int, int> getDockingLocation() const;
 	int getDustInHouse() const;
 	void cleanResources()const;
-	string housePath;
-	string houseFileName;
 	list<int>* algorithmScores;
+	string getHouseFileName() const;
+	string getHousePath() const;
 private:
+	// members:
 	string _name;
 	int _maxSteps;
 	int _R;
 	int _C;
-	string* _matrix;
 	int _dustInHouse;
 	pair <int, int> _dockingLocation;
-	void setR(int R);
-	void setC(int C);
-	void setName(string name);
-	void setMaxSteps(int maxSteps);
+	string _housePath;
+	string _houseFileName;
+	string* _matrix;
+
+	//functions:
 	string initDockingLocation();
 	void initDustInHouse();
+	
 
 };
 string getDirectionString(Direction direction);
