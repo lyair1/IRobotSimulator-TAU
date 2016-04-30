@@ -8,6 +8,8 @@
 // setSensor is called once when the Algorithm is initialized 
 void AlgorithmBase::setSensor(const AbstractSensor& sensor)
 {
+	delete mMoves;
+	mMoves = new list <Direction>();
 	mSensor = &sensor;
 }
 
