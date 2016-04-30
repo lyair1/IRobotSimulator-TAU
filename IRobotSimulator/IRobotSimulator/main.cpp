@@ -162,7 +162,6 @@ int main(int argc, char* argv[])
 
 	simul.cleanResources();
 	
-	delete algo_list;
 	delete houses_list;
 	delete configReader;
 	delete algo_list;
