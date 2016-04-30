@@ -31,6 +31,7 @@ bool Simulation :: makeSimulationStep()
 			and is there a wall touching the robot to its east / west / north / south direction ?
 		*/
 		mSensor->moveSensor(stepInDirection);
+		mStepsHistory.push_back(stepInDirection);
 		mStepsCounter++;//step counter incremented even if battery was not spent and the step was "Stay".
 		if (mStepsCounter >= mMaxSteps)
 		{
@@ -49,7 +50,7 @@ bool Simulation :: makeSimulationStep()
 				mIsOutOfBattery = true;
 				if (DEBUG)
 				{
-					cout << " Simulation terminated due to exceeding BatteryCapacity !" << endl;
+					cout << "Simulation terminated due to exceeding BatteryCapacity !" << endl;
 				}
 			}
 		}
@@ -173,3 +174,21 @@ const House* Simulation::getHouse() const {
 const int Simulation::getSimulationScore() const {
 	return mScore;
 }
+
+void Simulation::printSimulationStepsHistory(){
+	cout << "House name: " << this->getHouse()->getName() << endl;
+	cout << "Algorithm name: " << typeid(this->mAlgorithm).name() << endl;
+	cout << "Simulation steps: " << this->mStepsCounter << endl;
+	cout << "Battery status: " << this->mBatteryLeft << endl;
+	cout << "Dirt Collected : " << this->mDirtCollected << " (out of " << this->mInitialDustSumInHouse << ")" << endl;
+	cout << "back in docking : " << this->mIsBackInDocking << endl;
+	cout << "crashed into a wall: " << this->mCrashedIntoWall << endl;
+
+	cout << "Steps History: ";
+	for (auto step : mStepsHistory)
+		cout << getDirectionString(step) << " ";
+	cout << endl << endl;
+	this->getHouse()->printHouse();
+
+}
+

@@ -158,7 +158,7 @@ string Simulator::getSupparatorLine()
 	return line + "\n";
 }
 
-void Simulator::cleanResources(AlgorithmList* algo_list)
+void Simulator::cleanResources()
 {
 	// Clean Houses
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
@@ -175,6 +175,7 @@ void Simulator::cleanResources(AlgorithmList* algo_list)
 	delete mAlgorithmList;
 	
 	delete mAlgorithmNames;
+
 }
 
 int Simulator::countHousesInPath(string houses_path)
@@ -426,8 +427,13 @@ void Simulator::executeAllAlgoOnAllHouses()
 			(*iter3)->getHouse()->algorithmScores->push_back((*iter3)->getSimulationScore());
 		}
 
+
 		// Clean simulationListPerHouse
 		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
+			if (DEBUG)
+			{
+				(*iter4)->printSimulationStepsHistory();
+			}
 			(*iter4)->cleanResources();
 			delete *iter4;
 		}

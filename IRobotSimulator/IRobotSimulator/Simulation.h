@@ -49,6 +49,7 @@ public:
 	const House* getHouse() const;
 	const int getSimulationScore() const;
 	void cleanResources();
+	void printSimulationStepsHistory();
 private:
 	long mStepsCounter;
 	int mScore;
@@ -70,5 +71,7 @@ private:
 	int mBatteryLeft;
 	int mMaxStepsAfterWinner;
 	bool mIsOutOfBattery;
+	list<Direction> mStepsHistory;
+	
 };
 #endif // SIMULATION_H
