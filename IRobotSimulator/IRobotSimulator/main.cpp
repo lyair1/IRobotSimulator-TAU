@@ -165,6 +165,7 @@ int main(int argc, char* argv[])
 	delete algo_list;
 	delete houses_list;
 	delete configReader;
+	delete algo_list;
 
 	// Only on windows
 	#if defined (_WIN32)

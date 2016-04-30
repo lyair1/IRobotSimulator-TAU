@@ -25,6 +25,7 @@ AlgorithmLoader::AlgorithmLoader(string algorithmPath_, string algorithmName_)
 
 	// getAbstractAlgorithm is the instance creator method
 	void* p = dlsym(handle, "getAbstractAlgorithm");
+	dlclose(handle);
 	instanceCreator function1 = reinterpret_cast<instanceCreator>(reinterpret_cast<long>(p));
 
 	if (function1 == nullptr) {
