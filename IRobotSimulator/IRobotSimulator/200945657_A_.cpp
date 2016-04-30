@@ -31,18 +31,58 @@ Direction _200945657_A::getNextStep(SensorInformation info)
 	{
 		mLastDirection = 0;
 	}
-
-	int moveDirection = mLastDirection;
-	chosenDirection = static_cast<Direction>((moveDirection*mMoves->size()*2) % 4);
+	if (mPrevLastDirection == -1)
+	{
+		mPrevLastDirection = 0;
+	} 
+	// robot changed direction
+	if (mLastDirection != mPrevLastDirection && mLastDirection != static_cast<int>(Direction::North))
+	{
+		chosenDirection = oppositeDirection(static_cast<Direction>(mPrevLastDirection));
+		mPrevLastDirection = static_cast<int>(chosenDirection);
+		mLastDirection = static_cast<int>(chosenDirection);
+	}
+	else{
+		chosenDirection = static_cast<Direction>(mLastDirection);
+	}
 	while (info.isWall[static_cast<int>(chosenDirection)])
 	{
 		//robot is stepping into a wall - choose a different direction!
-		moveDirection++;
-		chosenDirection = static_cast<Direction>(moveDirection % 4);
+		switch (chosenDirection){
+		case Direction::East:
+			chosenDirection = Direction::South;
+			if (info.isWall[static_cast<int>(chosenDirection)]){
+				chosenDirection = Direction::North;
+			}
+			break;
+		case Direction::West:
+ 			chosenDirection = Direction::South;
+			if (info.isWall[static_cast<int>(chosenDirection)]){
+				chosenDirection = Direction::North;
+			}
+			break;
+		case Direction::South:
+			chosenDirection = Direction::East;
+			if (info.isWall[static_cast<int>(chosenDirection)]){
+				chosenDirection = Direction::West;
+			}
+			break;
+		case Direction::North:
+			chosenDirection = Direction::East;
+			if (info.isWall[static_cast<int>(chosenDirection)]){
+				chosenDirection = Direction::West;
+			}
+			break;
+		case Direction::Stay:
+			chosenDirection = Direction::East;
+			break;
+		}
 	}
-	mMoves->push_front(chosenDirection);
 
+	mMoves->push_front(chosenDirection);
+	mPrevLastDirection = mLastDirection;
 	mLastDirection = (int)chosenDirection;
+
 	return chosenDirection;
 }
 

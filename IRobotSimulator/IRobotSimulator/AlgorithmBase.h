@@ -15,10 +15,12 @@ class AlgorithmBase : public AbstractAlgorithm
 {
 
 public:
-	AlgorithmBase():mAboutToFinish(false),
-					mLastDirection(-1),
-					mSensor(NULL),
-					mConfiguration(NULL)
+	AlgorithmBase():mSensor(NULL), 
+					mLocation(-1,-1),
+					mLastDirection(-1), 
+					mPrevLastDirection(-1), 
+					mConfiguration(NULL), 
+					mAboutToFinish(false)
 	{
 		mMoves = new list<Direction>();
 	}
@@ -50,10 +52,11 @@ protected:
 	const AbstractSensor* mSensor; // the only info the algorithm has about the house it's cleaning comes from the sensor itself.
 	//House * house; //algorithm does not have any given information about the house, but it can gather that information along the way
 	std::pair <int, int> mLocation;
-	list<Direction> *mMoves;
 	int mLastDirection;
+	int mPrevLastDirection;
 	map<string, int>* mConfiguration;
 	bool mAboutToFinish;
+	list<Direction> *mMoves;
 };
 
 #endif

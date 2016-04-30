@@ -47,6 +47,5 @@ AlgorithmLoader::~AlgorithmLoader()
 
 #else
 AlgorithmLoader::AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_)
-	:	isAlgoValid(true),
-		handle(NULL) {}
+	: isAlgoValid(true), handle(NULL) {}
 #endif
