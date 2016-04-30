@@ -177,8 +177,12 @@ const int Simulation::getSimulationScore() const {
 }
 
 void Simulation::printSimulationStepsHistory(){
+	cout << "************************************";
+	cout << "House file name: " << this->getHouse()->getHouseFileName();
+	cout << "***********************************" << endl;;
 	cout << "House name: " << this->getHouse()->getName() << endl;
 	cout << "Algorithm name: " << typeid(this->mAlgorithm).name() << endl;
+	cout << "Simulation score: " << this->getSimulationScore() << endl;
 	cout << "Simulation steps: " << this->mStepsCounter << endl;
 	cout << "Battery status: " << this->mBatteryLeft << endl;
 	cout << "Dirt Collected : " << this->mDirtCollected << " (out of " << this->mInitialDustSumInHouse << ")" << endl;
@@ -190,6 +194,9 @@ void Simulation::printSimulationStepsHistory(){
 		cout << getDirectionString(step) << " ";
 	cout << endl << endl;
 	this->getHouse()->printHouse();
+	cout << "**********************************";
+	cout << "end of : " << this->getHouse()->getHouseFileName();
+	cout << "**********************************" << endl << endl << endl;
 
 }
 

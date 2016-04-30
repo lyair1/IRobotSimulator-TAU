@@ -11,7 +11,6 @@
 #include "200945657_B_.h"
 #include "200945657_A_.h"
 
-
 namespace fs = ::boost::filesystem;
 using namespace std;
 
@@ -336,7 +335,6 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 	return algoList;
 #endif
 }
-
 string Simulator::getAlgorithmErrorMessages() const
 {
 	return mAlgorithmErrorMessages;
