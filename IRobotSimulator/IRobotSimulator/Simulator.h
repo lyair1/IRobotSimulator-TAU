@@ -34,17 +34,24 @@ public:
 	~Simulator(){
 	}
 	void runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList);
-	void cleanResources(AlgorithmList* algo_list);
+	void cleanResources();
 	int countHousesInPath(string houses_path);
 	HouseList* readAllHouses(string houses_path);
 	AlgorithmList *loadAllAlgorithms(string algorithms_path);
+	string getAlgorithmErrorMessages() const;
+	string getHousesErrorMessages() const;
+	
+private:
+
+	//members:
+	HouseList *mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
-private:
-	HouseList *mHouseList;
-	AlgorithmList  *mAlgorithmList;
 	ConfigReader* mConfiguration;
+	AlgorithmList  *mAlgorithmList;
 	list<string>* mAlgorithmNames;
+	
+	//functions:
 	void executeAllAlgoOnAllHouses();
 	void printScores();
 	string getSupparatorLine();
