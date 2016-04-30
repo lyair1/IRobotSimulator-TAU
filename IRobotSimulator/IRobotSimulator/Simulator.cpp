@@ -60,7 +60,7 @@ string Simulator::getHeaderPrintLine()
 	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
 	{
 		House* house = (*it);
-		string fileName = house->houseFileName;
+		string fileName = house->getHouseFileName();
 		if (fileName.length() > 10)
 		{
 			line += fileName.substr(0, 10);
@@ -68,7 +68,7 @@ string Simulator::getHeaderPrintLine()
 		else
 		{
 			line += fileName;
-			for (int j = 0; j < (int)(10 - house->houseFileName.length()); j++)
+			for (int j = 0; j < (int)(10 - house->getHouseFileName().length()); j++)
 			{
 				line += " ";
 			}
@@ -196,7 +196,7 @@ int Simulator::countHousesInPath(string houses_path)
 
 HouseList* Simulator::readAllHouses(string houses_path)
 {
-	HouseList *housesList = new HouseList();;
+	HouseList *housesList = new HouseList();
 	fs::path targetDir(houses_path);
 	fs::directory_iterator it(targetDir), eod;
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
@@ -226,7 +226,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 {
 #ifndef _WIN32
-	list<AlgorithmLoader*> allAlgos;
+	vector<AlgorithmLoader*> allAlgos;
 	fs::path targetDir(algorithms_path);
 	fs::directory_iterator it(targetDir), eod;
 #ifdef _WIN32
@@ -280,7 +280,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		}
 	}
 
-	if (algoLoaders.empty())
+	if (algoLoaders->empty())
 	{
 		delete algoLoaders;
 		if (DEBUG)
@@ -337,6 +337,16 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 #endif
 }
 
+string Simulator::getAlgorithmErrorMessages() const
+{
+	return mAlgorithmErrorMessages;
+}
+
+string Simulator::getHousesErrorMessages() const
+{
+	return mHousesErrorMessages;
+}
+
 void Simulator::executeAllAlgoOnAllHouses()
 {
 	Simulation* pSimulation;
@@ -344,12 +354,14 @@ void Simulator::executeAllAlgoOnAllHouses()
 	SimulationList* simulationListPerHouse;
 	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
 	{
-		House* house = (*listHouseIter);
+		House*  house = (*listHouseIter);
 		simulationListPerHouse = new SimulationList();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
-		for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
+		for (AlgorithmList::const_iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
 		{
-			pSimulation = new Simulation((*listAlgorithmIter), house, mConfiguration->getParametersMap());
+			House* tempHouse = new House();
+			tempHouse->fillHouseInfo(house->getHousePath(), house->getHouseFileName());
+			pSimulation = new Simulation((*listAlgorithmIter), tempHouse, mConfiguration->getParametersMap());
 			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
 			simulationListPerHouse->push_back(pSimulation);
 		}
@@ -421,10 +433,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 			winnerNumberOfSteps = simulationStepsCounter;
 		}
 
-		//all algorithms stopped - terminate simulation and calculate scores
+		//all algorithms stopped - terminate simulation on this house and calculate scores
 		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
 			(*iter3)->setSimulationScore(winnerNumberOfSteps, simulationStepsCounter);
-			(*iter3)->getHouse()->algorithmScores->push_back((*iter3)->getSimulationScore());
+			house->algorithmScores->push_back((*iter3)->getSimulationScore());
 		}
 
 
