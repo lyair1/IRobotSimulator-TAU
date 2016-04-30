@@ -9,6 +9,7 @@
 #include "configReader.h"
 #include "AbstractAlgorithm.h"
 #include "Sensor.h"
+#include <typeinfo>
 
 class Simulation
 {
