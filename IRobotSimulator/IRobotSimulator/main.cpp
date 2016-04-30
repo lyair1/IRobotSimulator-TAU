@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 	// Check if all houses are invalid
 	if (houses_list->empty())
 	{
-		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.mHousesErrorMessages;
+		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
 		std::cin.get();
 		exit(0);
 	}
@@ -134,9 +134,9 @@ int main(int argc, char* argv[])
 
 	if (algo_list == nullptr)
 	{
-		if (simul.mAlgorithmErrorMessages.length() > 0)
+		if (simul.getAlgorithmErrorMessages().length() > 0)
 		{
-			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.mAlgorithmErrorMessages;
+			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
 			std::cin.get();
 		}
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
 	// Check if all algorithms are invalid
 	if (houses_list->empty())
 	{
-		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.mAlgorithmErrorMessages;
+		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
 		std::cin.get();
 		exit(0);
 	}
@@ -155,12 +155,13 @@ int main(int argc, char* argv[])
 
 
 	// Print error list
-	if (simul.mHousesErrorMessages.length() > 0)
+	if (simul.getHousesErrorMessages().length() > 0)
 	{
-		std::cout << "\nErrors:\n" << simul.mHousesErrorMessages << simul.mAlgorithmErrorMessages;
+		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages();
 	}
 
-	simul.cleanResources(algo_list);
+	simul.cleanResources();
+	
 	delete houses_list;
 	delete configReader;
 
