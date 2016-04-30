@@ -27,12 +27,12 @@ string House::fillHouseInfo(string filePath, string fileName)
   this->setMaxSteps(maxSteps);
   int r,c;
   fin >> r;
-  if (r < 0)
+  if (r <= 0)
   {
 	  return housePath + ": line number 3 in house file shall be a positive number, found: " + to_string(r) + "\n";
   }
   fin >> c;
-  if (c < 0)
+  if (c <= 0)
   {
 	  return housePath + ": line number 4 in house file shall be a positive number, found: " + to_string(c) + "\n";
   }
