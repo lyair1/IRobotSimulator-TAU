@@ -20,7 +20,7 @@ bool Simulation :: makeSimulationStep()
 		if (mHouse->isDirtCollected(mSensor->getSensorLocation()))
 		{
 			mDirtCollected++;
-			if (DEBUG)
+			if (DEBUG_LOW_LEVEL)
 			{
 				mHouse->printHouse();
 			}			
