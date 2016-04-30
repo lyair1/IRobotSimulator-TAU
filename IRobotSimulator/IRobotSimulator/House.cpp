@@ -103,7 +103,7 @@ string House::isLegalHouse(){
 	{
 		for (int j = 1; j < _C-1; ++j)
 		{
-			if (_matrix[i][j] != 'D' && (_matrix[i][j] < '0' || _matrix[i][j] > '9'))
+			if (_matrix[i][j] != 'D' && _matrix[i][j] != 'W' && (_matrix[i][j] < '0' || _matrix[i][j] > '9'))
 			{
 				_matrix[i][j] = ' ';
 			}
