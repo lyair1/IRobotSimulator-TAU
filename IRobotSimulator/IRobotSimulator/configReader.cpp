@@ -10,7 +10,7 @@
     this->parameters.clear();
 	ifstream fin;
 	fin.open(iniPath.c_str(), ios::in);
-	if (!fin)
+	if (!fin || !fin.is_open())
 	{
 		return false;
 	}
