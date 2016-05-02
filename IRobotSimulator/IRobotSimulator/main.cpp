@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		}
 		// Inform the user of how to use the program:
 		std::cout << _usage;
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -73,11 +73,11 @@ int main(int argc, char* argv[])
 	{
 		if (DEBUG)
 		{
-			cout << "config file doesn't exist\n";
+			cout << "config file doesn't exist in path: " << config_file_path << endl;
 		}
 
 		std::cout << _usage;
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "config.ini exists in '" << config_file_path << "' but cannot be opened\n";
 		
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 		delete configReader;
 
 		std::cout << message;
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 			cout << "no houses in path \n";
 		}
 		std::cout << _usage;
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 	if (houses_list->empty())
 	{
 		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 		if (simul.getAlgorithmErrorMessages().length() > 0)
 		{
 			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-			std::cin.get();
+			//std::cin.get();
 		}
 
 		exit(0);
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 	if (houses_list->empty())
 	{
 		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-		std::cin.get();
+		//std::cin.get();
 		exit(0);
 	}
 
