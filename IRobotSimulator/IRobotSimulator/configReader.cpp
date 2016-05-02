@@ -74,7 +74,6 @@
 		 if(pos != parameters.end()){
 			 return pos->second;
 		 }
-		 cout << "Error in ConfigReader::getParameter, parameter " << parameter<<" was not found in configuration file"<<endl;
 		 //(all resources are released and program terminates) 
 		 return -1;
 
