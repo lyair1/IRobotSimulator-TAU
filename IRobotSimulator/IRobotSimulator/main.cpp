@@ -27,17 +27,6 @@ const string _usage = USAGE;
 
 int main(int argc, char* argv[])
 {
-	if (argc > 7){
-		if (DEBUG)
-		{
-			cout << "argc > 7";
-		}
-		// Inform the user of how to use the program:
-		std::cout << _usage;
-		//std::cin.get();
-		exit(0);
-	}
-
 	// Set default paramters:
 	string houses_path = _pathPrefix;
 	string algorithms_path = _pathPrefix;
