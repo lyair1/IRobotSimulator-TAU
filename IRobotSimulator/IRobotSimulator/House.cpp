@@ -24,19 +24,19 @@ string House::fillHouseInfo(string filePath, string fileName)
 	fin >> maxSteps;
 	if (maxSteps < 0)
 	{
-		return _houseFileName + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
+		return _houseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
 	}
 	_maxSteps = maxSteps; 
 
 	fin >> _R;
 	if (_R <= 0)
 	{
-		return _houseFileName + ": line number 3 in house file shall be a positive number, found: " + to_string(_R) + "\n";
+		return _houseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + to_string(_R) + "\n";
 	}
 	fin >> _C;
 	if (_C <= 0)
 	{
-		return _houseFileName + ": line number 4 in house file shall be a positive number, found: " + to_string(_C) + "\n";
+		return _houseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + to_string(_C) + "\n";
 	}
 
 	this->_matrix = new string[_R];
@@ -182,7 +182,7 @@ string House::initDockingLocation()
 			if (_matrix[row][col] == 'D') {
 				if (didFindDocking == true)
 				{
-					return _houseFileName + ": too many docking stations (more than one D in house)\n";
+					return _houseFileName + ".house" + ": too many docking stations (more than one D in house)\n";
 				}
 
 				didFindDocking = true;
@@ -197,7 +197,7 @@ string House::initDockingLocation()
 		return "";
 	}
 
-	return _houseFileName + ": missing docking station (no D in house)\n";
+	return _houseFileName + ".house" + ": missing docking station (no D in house)\n";
 }
 
 pair <int, int> House::getDockingLocation() const{
