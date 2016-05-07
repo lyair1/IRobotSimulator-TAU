@@ -21,7 +21,8 @@ public:
 		mBattreyConsumptionRate(0),
 		mCrashedIntoWall(false),
 		mPositionInCompetition(-1),
-		mIsRunning(true) // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
+		mIsRunning(true), // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
+		mIsAboutToFinish(false)
 	{
 		mAlgorithm = algorithm;
 		mHouse = house;
@@ -59,7 +60,7 @@ private:
 	bool mCrashedIntoWall;
 	int mPositionInCompetition;
 	bool mIsRunning;
-	
+	bool mIsAboutToFinish;
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	Sensor* mSensor;

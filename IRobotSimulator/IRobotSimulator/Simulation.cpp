@@ -33,6 +33,11 @@ bool Simulation :: makeSimulationStep()
 		mSensor->moveSensor(stepInDirection);
 		mStepsHistory.push_back(stepInDirection);
 		mStepsCounter++;//step counter incremented even if battery was not spent and the step was "Stay".
+		
+		if (mStepsCounter == mMaxSteps - mMaxStepsAfterWinner)
+		{
+			resetMaxStepsAccordingToWinner();
+		}
 		if (mStepsCounter >= mMaxSteps)
 		{
 			mIsRunning = false;
@@ -138,10 +143,19 @@ void Simulation::setPositionInCompetition(int actualPositionInCompetition){
 	
 	return;
 }
+
+//this function is called only when there's a winner 
+//or when there's no winner but the number of steps this simulation made is equal to MaxSteps-MaxStepsAfterWinner
 //formula is according to stepsLeft = min {maxStepsAfterWinner, maxSteps - stepsCounter }
 //this means that: mMaxSteps = minimum { mMaxSteps, stepsCounter + mMaxStepsAfterWinner }
 void Simulation::resetMaxStepsAccordingToWinner(){
 	mMaxSteps = mMaxSteps < (mStepsCounter + mMaxStepsAfterWinner) ? mMaxSteps : (mStepsCounter + mMaxStepsAfterWinner);
+	if (!mIsAboutToFinish)
+	{
+		mIsAboutToFinish = true;
+		int stepsTillFinishing = mMaxSteps - mStepsCounter;
+		mAlgorithm->aboutToFinish(stepsTillFinishing); // this function must only be called once!
+	}
 }
 
 void Simulation::setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter){
