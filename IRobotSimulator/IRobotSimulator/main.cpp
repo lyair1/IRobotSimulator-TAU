@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 	if (!isFileExists(config_file_path))
 	{
 		cout << _usage;
-		cout << "cannot find config.ini file in '" << config_file_path << "'" << endl;
+		cout << "cannot find config.ini file in '" << config_file_path.substr(2) << "'" << endl;
 		exit(0);
 	}
 
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 	// Check if all houses are invalid
 	if (houses_list->empty())
 	{
-		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
+		std::cout << "All houses files in target folder '" << houses_path.substr(2) << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
 		exit(0);
 	}
 
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 	{
 		if (simul.getAlgorithmErrorMessages().length() > 0)
 		{
-			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
+			cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
 		}
 
 		exit(0);
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 	// Check if all algorithms are invalid
 	if (houses_list->empty())
 	{
-		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
+		cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
 		exit(0);
 	}
 
