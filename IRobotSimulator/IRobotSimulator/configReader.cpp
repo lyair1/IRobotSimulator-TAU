@@ -5,21 +5,43 @@
 */
 #include "configReader.h"
 
-  bool ConfigReader::loadFromFile(const string& iniPath)
+  bool ConfigReader::loadFromFile(const string& iniPath, string & result)
   {
     this->parameters.clear();
 	ifstream fin;
 	fin.open(iniPath.c_str(), ios::in);
 	if (!fin || !fin.is_open())
 	{
-		return false;
+		std::cout << "config.ini exists in '" << iniPath << "' but cannot be opened\n";
+		exit(0);
 	}
-
+	int badParams = 0;
+	string badParamsStr = "";
+	bool firstBad = true;
     string line;
     while (getline(fin, line))
     {
-      this->processLine(line);
+		string parameter = this->processLine(line);
+		if (parameter != "")
+		{
+			badParams++;
+			if (firstBad)
+			{
+				firstBad = false;
+			}
+			else
+			{
+				badParamsStr.append(", ");
+			}
+			badParamsStr.append(parameter);
+		}
     }
+	if (badParams > 0)
+	{
+		result.clear();
+		result += "config.ini having bad values for " + to_string(badParams) + " parameter(s): " + badParamsStr + "\n";
+		return false;
+	}
 	
 	return true;
   }
@@ -57,26 +79,57 @@
     return str;
   }
 
-  void ConfigReader::processLine(const string& line)
+  string ConfigReader::processLine(const string& line)
   {
     vector<string> tokens = split(line, '=');
     if (tokens.size() != 2)
     {
-      return;
+		return ""; // this line is illegal, don't return the parameter name.
     }
-    this->parameters[trim(tokens[0])] = stoi(tokens[1]);
+	string parameterName = trim(tokens[0]); 
+	bool isGoodParam = false;
+	for (int i = 0; i < numParameters ; i++)
+	{
+		if (parameterName == PARAMETER_ARRAY[i])
+		{
+			isGoodParam = true;
+			break;
+		}
+	}
+	if (!isGoodParam)
+	{
+		return ""; // this parameter is not one of the legal parametes. don't return the parameter name.
+	}
+	string parameterValue = trim(tokens[1]);
+	istringstream in(parameterValue);
+	int parameterInt = -1;
+	if (in >> parameterInt && in.eof())
+	{
+		if (parameterInt >= 0)
+		{
+			this->parameters[parameterName] = parameterInt;
+			return ""; // this parameter is inserted into the map with no error.
+		}
+	}
+	//parameter is negative or is not a number
+	this->parameters[parameterName] = 0; //enter the parameter into the map anyway (beacuse it's not a missing parameter)
+	return parameterName;  // but return its string since it's a bad parameter.
   }
 
+  bool ConfigReader::isParameterExist(const string parameter){
+	  auto pos = parameters.find(parameter);
+	  if (pos == parameters.end()){
+		  return false;
+	  }
+	  return true;
+  }
 
-
-	int ConfigReader::getParameter(const string parameter){
-		 auto pos = this->parameters.find(parameter);
-		 if(pos != parameters.end()){
-			 return pos->second;
-		 }
-		 //(all resources are released and program terminates) 
+int ConfigReader::getParameter(const string parameter){
+	if (isParameterExist(parameter))
+		{
+			return this->parameters.find(parameter)->second;
+		}
 		 return -1;
-
 	}
 
 
@@ -85,39 +138,35 @@
 	}
 
 
-	bool ConfigReader ::isLegalConfigFile()
+	bool ConfigReader ::isAllParamteresExistInConfigFile()
 	{
-		if (getParameter(BATTERY_CONSUMPTION_RATE) == -1	||
-			getParameter(BATTERY_RECHARGE_RATE) == -1		||
-			getParameter(BATTERY_CAPACITY) == -1			||
-			getParameter(MAX_STEPS_AFTER_WINNER) == -1)
+		for (int i = 0; i < numParameters; i++)
 		{
-			return false;
+			if (!isParameterExist(PARAMETER_ARRAY[i]))
+			{
+				return false;
+			}
 		}
-
 		return true;
 	}
 
-	string ConfigReader::getMessageForIlegalConfigFile(){
+	string ConfigReader::getMessageForMissingParamsInConfigFile(){
 		int missingParams = 0;
 		string missingParamsStr = "";
-		bool first = true;
-		string paramsArray[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_RATE, BATTERY_CAPACITY, MAX_STEPS_AFTER_WINNER };
-
-		int size = 4;
-		for (int i = 0; i < size; i++)
+		bool firstMissing = true;
+		for (int i = 0; i < numParameters; i++)
 		{
-			string param = paramsArray[i];
-			if (getParameter(param) == -1)
+			string param = PARAMETER_ARRAY[i];
+			if (!isParameterExist(param))
 			{
 				missingParams++;
-				if (first)
+				if (firstMissing)
 				{
-					first = false;
+					firstMissing = false;
 				}
 				else
 				{
-					missingParamsStr.append(",");
+					missingParamsStr.append(", ");
 				}
 
 				missingParamsStr.append(param);
@@ -125,4 +174,10 @@
 		}
 		
 		return "config.ini missing " + to_string(missingParams) + " parameter(s): " + missingParamsStr + "\n";
+		
+	}
+
+	string ConfigReader::getMessageForBadParamsInConfigFile() const
+	{
+		return messgaeOfBadParams;
 	}

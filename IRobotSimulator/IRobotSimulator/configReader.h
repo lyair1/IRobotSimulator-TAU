@@ -16,23 +16,26 @@ using namespace std;
 #define BATTERY_RECHARGE_RATE "BatteryRechargeRate"
 #define BATTERY_CAPACITY "BatteryCapacity"
 #define MAX_STEPS_AFTER_WINNER "MaxStepsAfterWinner"
+const string PARAMETER_ARRAY[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_RATE, BATTERY_CAPACITY, MAX_STEPS_AFTER_WINNER };
+
 
 class ConfigReader
 {
 public:
-	ConfigReader() : isLoaded(false){}
+	ConfigReader() : isAllParamteresLegalInConfigFile(false), messgaeOfBadParams(""){}
   ConfigReader(const string& iniPath)
   {
-	  isLoaded = this->loadFromFile(iniPath);
+	  isAllParamteresLegalInConfigFile = this->loadFromFile(iniPath, messgaeOfBadParams);
   }
   int getParameter(const string parameter);
-  bool loadFromFile(const string& iniPath);
+  bool isParameterExist(const string parameter);
+  bool loadFromFile(const string& iniPath, string & result);
   string toString();
-  string getMessageForIlegalConfigFile();
+  string getMessageForMissingParamsInConfigFile();
   map<string, int>* getParametersMap();
-  bool isLegalConfigFile();
-  bool isLoaded;
-
+  bool isAllParamteresExistInConfigFile();
+  bool isAllParamteresLegalInConfigFile;
+  string getMessageForBadParamsInConfigFile() const;
 private:
 	/* map<string, int> parameters contains the following: 
 	-	MaxSteps:
@@ -57,10 +60,15 @@ private:
 		this is the rate at which the battery is charged.
 		Each time unit the robot is at the docking station, the current battery load increases by the amount RechargeRate.
 	*/
+  string messgaeOfBadParams;
   map<string, int> parameters;
   static std::vector<std::string> split(const std::string &s, char delim);
   static std::string trim(std::string& str);
-  void processLine(const string& line);
+  string processLine(const string& line);
+  const int numParameters = 4;
+  
+
+  
 };
 
 #endif
