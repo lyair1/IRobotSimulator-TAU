@@ -18,11 +18,14 @@ void outOfMemHandler();
 
 const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
+const string _defaultScoreFormulaFileName = "score_formula.so";
 const string _pathPrefix = "./";
 const string _seperator = "/";
 const string _paramConfig = "-config";
 const string _paramHouse = "-house_path";
 const string _paramAlgorithm = "-algorithm_path";
+const string _paramScoreFormula = "-score_formula";
+const string _paramThreads = "-threads";
 const string _usage = USAGE;
 
 int main(int argc, char* argv[])
@@ -31,7 +34,8 @@ int main(int argc, char* argv[])
 	string houses_path = _pathPrefix;
 	string algorithms_path = _pathPrefix;
 	string config_file_path = _pathPrefix + _defaultConfigFileName;
-
+	string score_formula_path = _pathPrefix + _defaultScoreFormulaFileName;
+	int num_threads = 1;
 	// Get parameters from arg
 	for (int i = 1; i < argc-1; i++){ //skip program name -> i=1
 		string arg = argv[i];
@@ -55,43 +59,64 @@ int main(int argc, char* argv[])
 
 			continue;
 		}
+
+		if (arg.compare(_paramScoreFormula) == 0) {
+			// We know the next argument *should* be the path:
+			score_formula_path = _pathPrefix + argv[i + 1] + _seperator;
+			// Show usage and return if score file doesn't exists in path
+			if (!isFileExists(score_formula_path))
+			{
+				cout << _usage;
+				cout << "cannot find score_formula.so file in '" << score_formula_path.substr(2) << "'" << endl;
+				exit(0);
+			}
+			continue;
+		}
+		if (arg.compare(_paramThreads) == 0) {
+			// We know the next argument *should* be an integer:
+			istringstream in(argv[i + 1]);
+			if (in >> num_threads && in.eof())
+			{
+				continue;
+			}
+			else
+			{
+				if (DEBUG)
+				{
+					cout << "number of threads should be an integer larger than 0!" << endl;
+				}
+				std::cout << _usage;
+				exit(0);
+			}
+		}
+
 	}
 
 	// Show usage and return if config file doesn't exists in path
 	if (!isFileExists(config_file_path))
 	{
-		if (DEBUG)
-		{
-			cout << "config file doesn't exist in path: " << config_file_path << endl;
-		}
-
-		std::cout << _usage;
-		//std::cin.get();
+		cout << _usage;
+		cout << "cannot find config.ini file in '" << config_file_path << "'" << endl;
 		exit(0);
 	}
 
 	// check if config file can be loaded and if values are missing
 	ConfigReader *configReader = new ConfigReader(config_file_path);
-	if (!configReader->isLoaded)
+	if (!configReader->isAllParamteresLegalInConfigFile)
 	{
-		std::cout << "config.ini exists in '" << config_file_path << "' but cannot be opened\n";
-		
-		//std::cin.get();
-		exit(0);
+		cout << configReader->getMessageForBadParamsInConfigFile();
 	}
-
-	if (!configReader->isLegalConfigFile())
+	if (!configReader->isAllParamteresExistInConfigFile())
 	{
-		string message = configReader->getMessageForIlegalConfigFile();
-
+		cout<< configReader->getMessageForMissingParamsInConfigFile();
+	}
+	if (!configReader->isAllParamteresLegalInConfigFile || !configReader->isAllParamteresExistInConfigFile())
+	{
 		delete configReader;
-
-		std::cout << message;
-		//std::cin.get();
 		exit(0);
 	}
 
-	//srand ((unsigned int)time(NULL)); // this is for the seed to be initialized only once, for the random algorithm (no random algorithms in EX2)
+
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
@@ -105,7 +130,6 @@ int main(int argc, char* argv[])
 			cout << "no houses in path \n";
 		}
 		std::cout << _usage;
-		//std::cin.get();
 		exit(0);
 	}
 
@@ -115,7 +139,6 @@ int main(int argc, char* argv[])
 	if (houses_list->empty())
 	{
 		std::cout << "All houses files in target folder '" << houses_path << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
-		//std::cin.get();
 		exit(0);
 	}
 
@@ -126,7 +149,6 @@ int main(int argc, char* argv[])
 		if (simul.getAlgorithmErrorMessages().length() > 0)
 		{
 			cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-			//std::cin.get();
 		}
 
 		exit(0);
@@ -136,7 +158,6 @@ int main(int argc, char* argv[])
 	if (houses_list->empty())
 	{
 		cout << "All algorithm files in target folder '" << algorithms_path << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-		//std::cin.get();
 		exit(0);
 	}
 
