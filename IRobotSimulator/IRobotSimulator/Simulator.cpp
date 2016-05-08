@@ -232,7 +232,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 #endif
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 	{
-		if (fs::is_regular_file(p) && p.extension() == ".so")
+		if (fs::is_regular_file(p) && p.extension() == ".so" && p.string().at(p.string().length()-4) == '_') // change to _.so
 		{
 			if (DEBUG)
 			{
