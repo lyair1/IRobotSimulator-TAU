@@ -9,6 +9,7 @@
 #include "Simulation.h"
 #include "configReader.h"
 #include "AlgorithmLoader.h"
+#include "score_formula.h"
 
 #ifndef _WIN32
 #include <dlfcn.h>
