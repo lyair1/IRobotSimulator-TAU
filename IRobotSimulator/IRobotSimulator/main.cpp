@@ -11,8 +11,9 @@
 #include <ctime>
 #include "Simulator.h"
 
-void createExampleHouse(const string filePath);
-void writeConfigFile(const string iniPath);
+
+void handleScoreSO(const string &score_formula_path);
+bool loadScoreSO(const string &score_formula_path);
 bool isFileExists(const string name);
 void outOfMemHandler();
 
@@ -62,14 +63,9 @@ int main(int argc, char* argv[])
 
 		if (arg.compare(_paramScoreFormula) == 0) {
 			// We know the next argument *should* be the path:
-			score_formula_path = _pathPrefix + argv[i + 1] + _seperator;
-			// Show usage and return if score file doesn't exists in path
-			if (!isFileExists(score_formula_path))
-			{
-				cout << _usage;
-				cout << "cannot find score_formula.so file in '" << score_formula_path.substr(2) << "'" << endl;
-				exit(0);
-			}
+			score_formula_path = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
+			handleScoreSO(score_formula_path);
+			
 			continue;
 		}
 		if (arg.compare(_paramThreads) == 0) {
@@ -176,85 +172,9 @@ int main(int argc, char* argv[])
 	delete configReader;
 	delete algo_list;
 
-	// Only on windows
-	#if defined (_WIN32)
-		system("pause");
-	#endif
-
 	return 0;
 }
 
-
-void createExampleHouse(const string filePath)
-{
-	if (DEBUG)
-	{
-		cout << "Creating default house file" << endl;
-	}
-  
-	ofstream fout(filePath + _defaultHosuseFileName);
-	fout << "Simple1" << endl;
-	fout << 100 << endl;
-
-/*
-  fout << 8 << endl;
-  fout << 10 << endl;
-  fout << "WWWWWWWWWW" << endl;
-  fout << "W22  DW59W" << endl;
-  fout << "W  W 1119W" << endl;
-  fout << "W WWW3WW W" << endl;
-  fout << "W6   3W  W" << endl;
-  fout << "W78W  W  W" << endl;
-  fout << "W99W  W  W" << endl;
-  fout << "WWWWWWWWWW" << endl;
-*/  
-
-  fout << 19 << endl;
-  fout << 80 << endl;
-  //                 1         2         3         4         5         6         7        
-  //       01234567890123456789012345678901234567890123456789012345678901234567890123456789
-  fout << "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl; // 0
-  fout << "W  99   D              1234321                                                 W" << endl; // 1
-  fout << "W  99      WWWWWWW     1234321                     W                       1   W" << endl; // 2
-  fout << "W              W                                   W   555                 2   W" << endl; // 3
-  fout << "W              W                                   W   555                 3   W" << endl; // 4
-  fout << "W              W           WWWWWWWWWWWWWWWWWWWWWWWWW                       4   W" << endl; // 5
-  fout << "W              W                                                           5   W" << endl; // 6
-  fout << "W              W                                                           6   W" << endl; // 7
-  fout << "W                          WWWWWWWWWWWWWWWWWWWWWW  WWWWWWW                 7   W" << endl; // 8
-  fout << "W         1         2         3         4         5W 999 W  6         7        W" << endl; // 9
-  fout << "W              W           444                     W 999 W                 9   W" << endl; // 10
-  fout << "W              W           444                     W 999 W                 8   W" << endl; // 11
-  fout << "W              W                                   W     W                 7   W" << endl; // 12
-  fout << "W              W                                   WW   WW                 6   W" << endl; // 13
-  fout << "W              W                                    W   W                  5   W" << endl; // 14
-  fout << "W              W                                                           4   W" << endl; // 15
-  fout << "W              W                                                           3   W" << endl; // 16
-  fout << "W              W                                                               W" << endl; // 17
-  fout << "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << endl; // 18
- 
-  fout.close();
-}
-
-void writeConfigFile(const string iniPath)
-{
-	//write info into configuration file:
-  ofstream fout(iniPath.c_str());
-  fout << "BatteryConsumptionRate  =    1" << endl;
-  fout << "MaxSteps   = 1200" << endl;
-  fout << "MaxStepsAfterWinner=200" << endl;
-  fout << "BatteryCapacity=400" << endl;
-  fout << "BatteryRechargeRate=20" << endl;
-  fout.close();
-	//print the information from the configuration file:
-  ifstream fin(iniPath.c_str());
-  string line;
-  cout << "Original config ini file: " << endl;
-  while (getline(fin, line))
-  {
-    cout << line << endl;
-  }
-}
 
 bool isFileExists(const string name) {
 	if (ifstream(name)){
@@ -270,4 +190,60 @@ void outOfMemHandler()
 {
 	std::cerr << "Unable to satisfy request for memory\n";
 	exit(1);
+}
+
+
+void handleScoreSO(const string &score_formula_path)
+{
+	// Show usage and return if score file doesn't exists in path
+	if (!isFileExists(score_formula_path))
+	{
+		cout << _usage;
+		cout << "cannot find score_formula.so file in '" << score_formula_path.substr(2) << "'" << endl;
+		exit(0);
+	}
+	ifstream fin;
+	fin.open(score_formula_path.c_str(), ios::in);
+	if (!fin || !fin.is_open())
+	{
+		std::cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid.so\n";
+		exit(0);
+	}
+	loadScoreSO(score_formula_path);
+
+}
+
+
+bool loadScoreSO(const string & score_formula_path)
+{
+	typedef int (*instanceCreator)();
+	// Opening the .so file:
+	#ifndef _WIN32
+	void *handle = dlopen(score_formula_path.c_str(), RTLD_NOW);
+	if (handle == NULL)
+	{
+		cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid .so" << endl;
+		return false;
+	}
+
+	// getScore is the instance creator method
+	void* p = dlsym(handle, "calc_score");
+	instanceCreator function1 = reinterpret_cast<instanceCreator>(reinterpret_cast<long>(p));
+	if (function1 == nullptr) {
+		cout << score_formula_path + ": valid .so file but no score_formula was registered after loading it";
+		return false;
+	}
+	
+	
+	cout << "nir"<< endl;
+	cout << function1();
+	//test:
+	//const map<string, int> score_params;
+	//int score_result = function1(score_params);
+	
+	return true;
+#else
+	
+	return true;
+#endif
 }
