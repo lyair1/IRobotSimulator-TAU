@@ -3,7 +3,7 @@ src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cp
 obj = $(src:.cpp=.o)
 
 # shared object source files and object files
-so_src = 200945657_A_.cpp 200945657_C_.cpp 200945657_B_.cpp
+so_src = 200945657_A_.cpp 200945657_C_.cpp 200945657_B_.cpp score_formula.cpp
 so_dep = AlgorithmBase.cpp
 s_obj = $(so_src:.cpp=.so)
 
