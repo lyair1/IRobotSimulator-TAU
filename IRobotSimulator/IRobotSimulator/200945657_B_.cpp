@@ -21,10 +21,18 @@ Direction _200945657_B::getNextStep(SensorInformation info)
 	Direction chosenDirection;
 	if (mAboutToFinish)
 	{
-		chosenDirection = mMoves->front();
-		mMoves->pop_front();
+		if (mMoves->size() > 0)
+		{
+			chosenDirection = mMoves->front();
+			mMoves->pop_front();
 
-		return oppositeDirection(chosenDirection);
+			return oppositeDirection(chosenDirection);
+		}
+		else
+		{
+			return Direction::Stay;
+		}
+		
 	}
 
 	if (mLastDirection == -1)
