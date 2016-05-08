@@ -78,13 +78,15 @@
     str.erase(str.find_last_not_of(' ')+1);         //surfixing spaces
     return str;
   }
-
+   //if this line is legal we return an empty string. 
+   // if this line has illegal parameter name or number of arguments we ignore it (return an empty string)
+   //if this line has a legal parameter name but illegal value we return the parameter name in order to add it to the bad parameters list
   string ConfigReader::processLine(const string& line)
   {
     vector<string> tokens = split(line, '=');
     if (tokens.size() != 2)
     {
-		return ""; // this line is illegal, don't return the parameter name.
+		return ""; // this line is illegal,  BUT don't return the parameter name.
     }
 	string parameterName = trim(tokens[0]); 
 	bool isGoodParam = false;
