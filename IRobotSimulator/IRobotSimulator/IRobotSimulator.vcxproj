@@ -86,6 +86,7 @@
     <ClInclude Include="Direction.h" />
     <ClInclude Include="AlgorithmRegister.h" />
     <ClInclude Include="House.h" />
+    <ClInclude Include="score_formula.h" />
     <ClInclude Include="Sensor.h" />
     <ClInclude Include="SensorInformation.h" />
     <ClInclude Include="Simulation.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="configReader.cpp" />
     <ClCompile Include="House.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="score_formula.cpp" />
     <ClCompile Include="Sensor.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Simulator.cpp" />
