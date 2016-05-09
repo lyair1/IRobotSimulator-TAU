@@ -74,8 +74,17 @@
 
    std::string ConfigReader::trim(std::string& str)
   {
+	  if (CONFIG_DEBUG)
+	  {
+		  cout << "string before trimming: \"" << str << "\"" << endl;
+	  }
+
     str.erase(0, str.find_first_not_of(' '));       //prefixing spaces
     str.erase(str.find_last_not_of(' ')+1);         //surfixing spaces
+	if (CONFIG_DEBUG)
+	{
+		cout << "string after trimming: \"" << str << "\"" << endl;
+	}
     return str;
   }
    //if this line is legal we return an empty string. 
@@ -86,6 +95,10 @@
     vector<string> tokens = split(line, '=');
     if (tokens.size() != 2)
     {
+		if (CONFIG_DEBUG)
+		{
+			cout << "number of tokens in line is not 2" << endl;
+		}
 		return ""; // this line is illegal,  BUT don't return the parameter name.
     }
 	string parameterName = trim(tokens[0]); 
@@ -100,18 +113,34 @@
 	}
 	if (!isGoodParam)
 	{
+		if (CONFIG_DEBUG)
+		{
+			cout << "the parameter"<< parameterName << "doesn't match any of the legal parameters for config file" << endl;
+		}
 		return ""; // this parameter is not one of the legal parametes. don't return the parameter name.
 	}
 	string parameterValue = trim(tokens[1]);
 	istringstream in(parameterValue);
 	int parameterInt = -1;
-	if (in >> parameterInt && in.eof())
+	if (in >> parameterInt)
 	{
+		if (CONFIG_DEBUG)
+		{
+			cout << "the parameter" << parameterName << "is an integer- good" << endl;
+		}
 		if (parameterInt >= 0)
 		{
+			if (CONFIG_DEBUG)
+			{
+				cout << "the parameter" << parameterName << "is positive- good" << endl;
+			}
 			this->parameters[parameterName] = parameterInt;
 			return ""; // this parameter is inserted into the map with no error.
 		}
+	}
+	if (CONFIG_DEBUG)
+	{
+		cout << "the parameter" << parameterName << "is either NAN or it is a negative number:" << parameterInt <<"."<< endl;
 	}
 	//parameter is negative or is not a number
 	this->parameters[parameterName] = 0; //enter the parameter into the map anyway (beacuse it's not a missing parameter)

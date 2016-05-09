@@ -17,7 +17,7 @@ using namespace std;
 #define BATTERY_CAPACITY "BatteryCapacity"
 #define MAX_STEPS_AFTER_WINNER "MaxStepsAfterWinner"
 const string PARAMETER_ARRAY[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_RATE, BATTERY_CAPACITY, MAX_STEPS_AFTER_WINNER };
-
+#define CONFIG_DEBUG 0
 
 class ConfigReader
 {
