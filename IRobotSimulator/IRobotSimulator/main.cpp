@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 	{
 		calculateScore = handleScoreSO(score_formula_path);
 	}
-	else
+	else //In case score_formula argument is not provided in the command line, the default score formula shall be used
 	{
 		calculateScore = calculateSimulationScore;
 	}
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 	// Print error list
 	if (simul.getHousesErrorMessages().length() > 0)
 	{
-		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages();
+		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages() << simul.getScoreErrorMessage();
 	}
 
 	simul.cleanResources();

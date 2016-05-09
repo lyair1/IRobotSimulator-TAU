@@ -33,7 +33,8 @@ public:
 	Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
 		mHouseList(NULL),
 		mHousesErrorMessages(""),
-		mAlgorithmErrorMessages("")
+		mAlgorithmErrorMessages(""),
+		mIsAnySimulationScoreBad(false)
 	{
 		mConfiguration = configuration;
 		mAlgorithmNames = new list<string>;
@@ -62,7 +63,7 @@ public:
 	AlgorithmList *loadAllAlgorithms(string algorithms_path);
 	string getAlgorithmErrorMessages() const;
 	string getHousesErrorMessages() const;
-	
+	string getScoreErrorMessage() const;
 private:
 
 	//members:
@@ -73,7 +74,8 @@ private:
 	ConfigReader* mConfiguration;
 	AlgorithmList  *mAlgorithmList;
 	list<string>* mAlgorithmNames;
-	
+	bool mIsAnySimulationScoreBad;
+
 	//functions:
 	void executeAllAlgoOnAllHouses();
 	void printScores();

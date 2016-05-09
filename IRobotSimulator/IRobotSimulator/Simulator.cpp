@@ -345,6 +345,19 @@ string Simulator::getHousesErrorMessages() const
 	return mHousesErrorMessages;
 }
 
+string Simulator::getScoreErrorMessage() const
+{
+	if (mIsAnySimulationScoreBad)
+	{
+		return "Score formula could not calculate some scores, see -1 in the results table \n";
+	}
+	else
+	{
+		return "";
+	}
+
+}
+
 void Simulator::executeAllAlgoOnAllHouses()
 {
 	Simulation* pSimulation;
@@ -447,6 +460,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 			};
 			(*iter3)->setSimulationScore(calculateScore(score_params));
 			house->algorithmScores->push_back((*iter3)->getSimulationScore());
+			if ((*iter3)->getSimulationScore() == -1)
+			{
+				mIsAnySimulationScoreBad = true;
+			}
 		}
 
 
