@@ -34,19 +34,40 @@ void Simulator::runSimulation(HouseList* houses_list, AlgorithmList* algorithmsL
 	printScores();
 }
 
+bool compareAvg(const pair< double, string > a, const pair< double, string > b)
+{
+	return a.first > b.first;
+}
+
 void Simulator::printScores()
 {
 	cout << getSupparatorLine();
 	cout << getHeaderPrintLine();
 	cout << getSupparatorLine();
 	int i = 0;
+	//sort algorithms by average: 
+	list <pair< double, string >> algorithmsByAvg;
 	for (list<string>::iterator it = mAlgorithmNames->begin(); it != mAlgorithmNames->end(); ++it)
 	{
-		cout << getAlgoPrintLine(i, (*it));
-		cout << getSupparatorLine();
+		double averageResult = 0;
+		string algorithmLine = getAlgoPrintLine(i, (*it), averageResult);
+		algorithmsByAvg.push_back(make_pair(averageResult, algorithmLine));
 		i++;
 	}
+	algorithmsByAvg.sort(compareAvg);
+
+	for (auto item : algorithmsByAvg)
+	{
+		cout << item.second;
+		cout << getSupparatorLine();
+	}
 }
+
+
+//bool compareLexical(const House* first, const House* second)
+//{
+//	return first->getHouseFileName() < second->getHouseFileName();
+//}
 
 string Simulator::getHeaderPrintLine()
 {
@@ -57,6 +78,27 @@ string Simulator::getHeaderPrintLine()
 	}
 	line += "|";
 
+	//if (DEBUG)
+	//{
+	//	cout << "BEFORE sorting by house name : " << endl;
+	//	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
+	//	{
+	//		cout << (*it)->getHouseFileName() << " ";
+	//	}
+	//	cout << endl;
+
+	//}
+	//mHouseList->sort(compareLexical);
+	//if (DEBUG)
+	//{
+	//	cout << "AFTER sorting by house name : " << endl;
+	//	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
+	//	{
+	//		cout << (*it)->getHouseFileName() << " ";
+	//	}
+	//	cout << endl;
+
+	//}
 	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
 	{
 		House* house = (*it);
@@ -87,7 +129,7 @@ string Simulator::getHeaderPrintLine()
 	return line + "\n";
 }
 
-string Simulator::getAlgoPrintLine(int ind, string algoName)
+string Simulator::getAlgoPrintLine(int ind, string algoName, double & averageResult)
 {
 	string line = "|";
 	for (int j = 0; j < 13; j++)
@@ -125,6 +167,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName)
 	}
 
 	double avg = counter / (double)mHouseList->size();
+	averageResult = avg;
 	string numStr = to_string(avg);
 	string numStr2Dec = "";
 	for (int j = 0; j < (int)numStr.length(); j++)

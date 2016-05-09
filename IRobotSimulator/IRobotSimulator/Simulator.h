@@ -80,7 +80,7 @@ private:
 	void executeAllAlgoOnAllHouses();
 	void printScores();
 	string getSupparatorLine();
-	string getAlgoPrintLine(int ind, string algoName);
+	string getAlgoPrintLine(int ind, string algoName, double & averageResult);
 	string getHeaderPrintLine();
 	scoreCreator calculateScore;
 	struct less_than_key
