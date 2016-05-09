@@ -44,7 +44,7 @@ extern "C" int calc_score(const map<string, int>& score_params)
 	}
 	catch(out_of_range & e)
 	{
-		if (DEBUG)
+		if (SCORE_DEBUG)
 		{
 			cout <<"calculateSimulationScore couldn't find one of the parameters of the score_params "<< e.what() << endl;
 		}

@@ -3,7 +3,7 @@
 using namespace std;
 #include <iostream>
 #include <map>
-#define DEBUG 0
+#define SCORE_DEBUG 0
 
 class score_formula
 {
