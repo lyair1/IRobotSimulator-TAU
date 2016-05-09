@@ -22,18 +22,23 @@ using namespace std;
 	typedef std::list<Simulation*> SimulationList;
 	typedef std::list<AlgorithmLoader*> LoadersList;
 	typedef std::list<list<string>*> StringMatrix;
+	typedef int(*scoreCreator)(const map<string, int>&);
 
+//this function  is not related to a certin instance of the class simulator(static?)
+int calculateSimulationScore(const map<string, int>& score_params);
 
 class Simulator
 {
 public:
-	Simulator(ConfigReader *configuration):
+	Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
 		mHouseList(NULL),
 		mHousesErrorMessages(""),
 		mAlgorithmErrorMessages("")
 	{
 		mConfiguration = configuration;
 		mAlgorithmNames = new list<string>;
+		calculateScore = _calculateScore;
+
 	}
 	~Simulator(){
 		#ifndef _WIN32
@@ -75,7 +80,7 @@ private:
 	string getSupparatorLine();
 	string getAlgoPrintLine(int ind, string algoName);
 	string getHeaderPrintLine();
-	
+	scoreCreator calculateScore;
 	struct less_than_key
 	{
 		inline bool operator() (const AlgorithmLoader *struct1, const AlgorithmLoader *struct2)

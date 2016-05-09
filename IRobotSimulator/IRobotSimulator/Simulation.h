@@ -11,6 +11,7 @@
 #include "Sensor.h"
 #include <typeinfo>
 
+
 class Simulation
 {
 public:
@@ -47,11 +48,22 @@ public:
 	int getPositionInCompetition() const;
 	void setPositionInCompetition(int actualPositionInCompetition);
 	void resetMaxStepsAccordingToWinner();
-	void setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter);
 	const House* getHouse() const;
 	const int getSimulationScore() const;
+	void setSimulationScore(int score) ;
 	void cleanResources();
 	void printSimulationStepsHistory();
+
+	
+	//inline functions:
+	bool getCrashedIntoWall() const{ return mCrashedIntoWall; } 
+	bool getIsOutOfBattery() const{ return mIsOutOfBattery; } 
+	int getStepsCounter() const{ return mStepsCounter; } 
+	int getInitialDustSumInHouse () const{ return mInitialDustSumInHouse; } 
+	int getDirtCollected() const{ return mDirtCollected; } 
+	bool getIsBackInDocking() const{ return mIsBackInDocking; } 
+
+	
 private:
 	long mStepsCounter;
 	int mScore;

@@ -158,36 +158,18 @@ void Simulation::resetMaxStepsAccordingToWinner(){
 	}
 }
 
-void Simulation::setSimulationScore(int winnerNumberOfSteps, int simulationStepsCounter){
-	if (mCrashedIntoWall){
-		mScore = 0;
 
-		return;
-	}
-	
-	int score = 2000;
-	score -= (mPositionInCompetition - 1) * 50;
-	if (mIsOutOfBattery)
-	{
-		score += (winnerNumberOfSteps - simulationStepsCounter) * 10;
-	}
-	else
-	{
-		score += (winnerNumberOfSteps - mStepsCounter) * 10;
-	}
-		
-	score -= (mInitialDustSumInHouse - mDirtCollected) * 3;
-	score += (mIsBackInDocking ? 50 : -200);
-	mScore = score < 0 ? 0 : score;
-
-	return;
-}
 const House* Simulation::getHouse() const {
 	return mHouse;
 }
 
 const int Simulation::getSimulationScore() const {
 	return mScore;
+}
+
+void Simulation::setSimulationScore(int score)
+{
+	mScore = score;
 }
 
 void Simulation::printSimulationStepsHistory(){
@@ -213,4 +195,5 @@ void Simulation::printSimulationStepsHistory(){
 	cout << "**********************************" << endl << endl << endl;
 
 }
+
 

@@ -12,10 +12,10 @@
 #include "Simulator.h"
 
 
-void handleScoreSO(const string &score_formula_path);
-bool loadScoreSO(const string &score_formula_path);
+scoreCreator handleScoreSO(const string &score_formula_path);
 bool isFileExists(const string name);
 void outOfMemHandler();
+
 
 const string _defaultConfigFileName = "config.ini";
 const string _defaultHosuseFileName = "default_generated_house.house";
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 	string houses_path = _pathPrefix;
 	string algorithms_path = _pathPrefix;
 	string config_file_path = _pathPrefix + _defaultConfigFileName;
-	string score_formula_path = _pathPrefix + _defaultScoreFormulaFileName;
+	string score_formula_path = "";
 	int num_threads = 1;
 	// Get parameters from arg
 	for (int i = 1; i < argc-1; i++){ //skip program name -> i=1
@@ -64,8 +64,7 @@ int main(int argc, char* argv[])
 		if (arg.compare(_paramScoreFormula) == 0) {
 			// We know the next argument *should* be the path:
 			score_formula_path = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
-			handleScoreSO(score_formula_path);
-			
+		
 			continue;
 		}
 		if (arg.compare(_paramThreads) == 0) {
@@ -111,12 +110,20 @@ int main(int argc, char* argv[])
 		delete configReader;
 		exit(0);
 	}
-
-
+	// The score formula is the second argument to be checked on startup (after config file).
+	scoreCreator calculateScore;
+	if (score_formula_path != "")  
+	{
+		calculateScore = handleScoreSO(score_formula_path);
+	}
+	else
+	{
+		calculateScore = calculateSimulationScore;
+	}
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
-	Simulator simul = Simulator(configReader);
+	Simulator simul = Simulator(configReader, calculateScore);
 
 	// Print usage and return if there are no houses in the path
 	if (simul.countHousesInPath(houses_path) == 0)
@@ -193,7 +200,7 @@ void outOfMemHandler()
 }
 
 
-void handleScoreSO(const string &score_formula_path)
+scoreCreator handleScoreSO(const string &score_formula_path)
 {
 	// Show usage and return if score file doesn't exists in path
 	if (!isFileExists(score_formula_path))
@@ -209,41 +216,28 @@ void handleScoreSO(const string &score_formula_path)
 		std::cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid.so\n";
 		exit(0);
 	}
-	loadScoreSO(score_formula_path);
-
-}
-
-
-bool loadScoreSO(const string & score_formula_path)
-{
-	typedef int (*instanceCreator)();
+	
+	
 	// Opening the .so file:
 	#ifndef _WIN32
 	void *handle = dlopen(score_formula_path.c_str(), RTLD_NOW);
 	if (handle == NULL)
 	{
 		cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid .so" << endl;
-		return false;
+		return NULL;
 	}
 
-	// getScore is the instance creator method
+	// calc_score is the instance creator method
 	void* p = dlsym(handle, "calc_score");
-	instanceCreator function1 = reinterpret_cast<instanceCreator>(reinterpret_cast<long>(p));
-	if (function1 == nullptr) {
-		cout << score_formula_path + ": valid .so file but no score_formula was registered after loading it";
-		return false;
+	scoreCreator calc_score = reinterpret_cast<scoreCreator>(reinterpret_cast<long>(p));
+	if (calc_score == nullptr) 
+	{
+		cout << "score_formula.so is a valid .so but it does not have a valid score formula" << endl;
+		return NULL;
 	}
-	
-	
-	cout << "nir"<< endl;
-	cout << function1();
-	//test:
-	//const map<string, int> score_params;
-	//int score_result = function1(score_params);
-	
-	return true;
-#else
-	
-	return true;
-#endif
+
+	return calc_score;
+	#endif
+	return &calculateSimulationScore;
+
 }
