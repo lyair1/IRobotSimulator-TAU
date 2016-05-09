@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
 
 	// Print error list
-	if (simul.getHousesErrorMessages().length() > 0)
+	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() >0 )
 	{
 		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages() << simul.getScoreErrorMessage();
 	}
