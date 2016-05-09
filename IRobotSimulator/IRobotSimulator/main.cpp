@@ -128,11 +128,12 @@ int main(int argc, char* argv[])
 	// Print usage and return if there are no houses in the path
 	if (simul.countHousesInPath(houses_path) == 0)
 	{
-		if (DEBUG)
-		{
-			cout << "no houses in path \n";
-		}
-		std::cout << _usage;
+		/*
+		in case the folder for the house files is bad for some reason or leads to a directory
+		with no house files, or is missing and there are no house files in the working directory:
+		*/
+		cout << _usage;
+		cout << "cannot find house files in '" << houses_path.substr(2) << "'" << endl;
 		exit(0);
 	}
 

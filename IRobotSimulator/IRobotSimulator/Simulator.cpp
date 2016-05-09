@@ -181,6 +181,11 @@ int Simulator::countHousesInPath(string houses_path)
 	int count = 0;
 	fs::path targetDir(houses_path);
 	fs::directory_iterator it(targetDir), eod;
+	if (!fs::exists(targetDir) || !fs::is_directory(targetDir) || fs::is_empty(targetDir))
+	{
+		return 0;
+	}
+
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 	{
 		if (fs::is_regular_file(p) && p.extension() == HOUSE_EXT)
@@ -188,7 +193,6 @@ int Simulator::countHousesInPath(string houses_path)
 			count++;
 		}
 	}
-
 	return count;
 }
 
@@ -226,6 +230,13 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 #ifndef _WIN32
 	vector<AlgorithmLoader*> allAlgos;
 	fs::path targetDir(algorithms_path);
+	//check if directory doesn't exist or path is not a directory or directory is empty
+	if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
+	{
+		cout << USAGE;
+		cout << "cannot find algorithm files in '" << algorithms_path << "'"<<endl; 
+		exit(0);
+	}
 	fs::directory_iterator it(targetDir), eod;
 #ifdef _WIN32
 	int i = 0;
@@ -251,12 +262,9 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 
 	if (allAlgos.empty())
 	{
-		if (DEBUG)
-		{
-			cout << "can't find algorithms files\n";
-		}
 		cout << USAGE;
-		return nullptr;
+		cout << "cannot find algorithm files in '" << algorithms_path << "'"<<endl; 
+		exit(0);
 	}
 
 	algoLoaders = new LoadersList();
