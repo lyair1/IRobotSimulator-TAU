@@ -22,7 +22,11 @@ void AlgorithmBase::setConfiguration(map<string, int> config)
 }
 
 // step is called by the simulation for each time unit 
-Direction AlgorithmBase::step(){
+
+/*	the algorithm MUST take into account the actual
+	steps that were taken, provided as a parameter to 'step', not relying on the recommended
+	steps returned from the calls to 'step' to be the actual steps taken*/
+Direction AlgorithmBase::step(Direction prevStep){
 	SensorInformation info = mSensor->sense();
 	//if there's still dust - stay in current location:
 	Direction chosenDirection = Direction::Stay;
@@ -33,7 +37,7 @@ Direction AlgorithmBase::step(){
 	//if there's no dust - move from current location:
 	else if (info.dirtLevel == 0)
 	{
-		chosenDirection = getNextStep(info);
+		chosenDirection = getNextStep(info, prevStep);
 	}
 	return chosenDirection;
 }
@@ -63,7 +67,7 @@ Direction AlgorithmBase::oppositeDirection(Direction direction_)
 }
 
 // Default implementation is a random choose between all of the non-wall options
-Direction AlgorithmBase::getNextStep(SensorInformation info)
+Direction AlgorithmBase::getNextStep(SensorInformation info, Direction prevStep)
 {
 	Direction chosenDirection;
 	if (mAboutToFinish)
@@ -80,7 +84,7 @@ Direction AlgorithmBase::getNextStep(SensorInformation info)
 		//robot is stepping into a wall - choose a different direction!
 		chosenDirection = (Direction)(rand() % 4);
 	}
-	mMoves->push_front(chosenDirection);
+	mMoves->push_front(prevStep);
 
 	return chosenDirection;
 }

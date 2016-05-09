@@ -16,7 +16,7 @@ void _200945657_A::cleanResources(){
 
 }
 
-Direction _200945657_A::getNextStep(SensorInformation info)
+Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 {
 	Direction chosenDirection;
 	if (mAboutToFinish)
@@ -86,8 +86,10 @@ Direction _200945657_A::getNextStep(SensorInformation info)
 			break;
 		}
 	}
-
-	mMoves->push_front(chosenDirection);
+	/*In some cases, the robot (the simulator in our case) decides not to step according to the
+	direction provided by the algorithm. Thus, for each step, the robot (the simulator in our case)
+	provides the algorithm the previous step’s direction that was actually taken*/
+	mMoves->push_front(prevStep); // we only save the step which actually happened!
 	mPrevLastDirection = mLastDirection;
 	mLastDirection = (int)chosenDirection;
 

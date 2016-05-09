@@ -35,10 +35,10 @@ public:
 	void setConfiguration(map<string, int> config) override;
 
 	// step is called by the simulation for each time unit 
-	Direction step() override;
+	Direction step(Direction prevStep) override;
 
 	// getNextStep is being called by step() after performing some default checks
-	virtual Direction getNextStep(SensorInformation info) = 0;
+	virtual Direction getNextStep(SensorInformation info, Direction prevStep) = 0;
 
 	// this method is called by the simulation either when there is a winner or 
 	// when steps == MaxSteps - MaxStepsAfterWinner 

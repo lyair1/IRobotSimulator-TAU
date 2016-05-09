@@ -39,7 +39,7 @@ public:
 
 	void cleanResources();
 
-	Direction getNextStep(SensorInformation info);
+	Direction getNextStep(SensorInformation info, Direction prevStep);
 private:
 };
 

@@ -9,7 +9,8 @@
 bool Simulation :: makeSimulationStep()
 {
 	SensorInformation info = mSensor->sense();
-	Direction stepInDirection = mAlgorithm->step();
+	Direction stepInDirection = mAlgorithm->step(mPrevSimulationStep);
+	
 	// in course forum it says if battery > 0 it's enough to make a step, even if BatteryLeft< mBattreyConsumptionRate
 	if ((stepInDirection == Direction::Stay ||
 		(stepInDirection != Direction::Stay && !info.isWall[(int)stepInDirection])) &&
@@ -30,7 +31,8 @@ bool Simulation :: makeSimulationStep()
 			what's the dust level at the current position of the robot,
 			and is there a wall touching the robot to its east / west / north / south direction ?
 		*/
-		mSensor->moveSensor(stepInDirection);
+		mSensor->moveSensor(stepInDirection); // simulation doesn't have to move in the direction that the algorithm suggested, but we do it for now.
+		mPrevSimulationStep = stepInDirection; // only update the prevStep after it was really done!
 		mStepsHistory.push_back(stepInDirection);
 		mStepsCounter++;//step counter incremented even if battery was not spent and the step was "Stay".
 		

@@ -16,7 +16,7 @@ void _200945657_B::cleanResources(){
 
 }
 
-Direction _200945657_B::getNextStep(SensorInformation info)
+Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 {
 	Direction chosenDirection;
 	if (mAboutToFinish)
@@ -91,7 +91,7 @@ Direction _200945657_B::getNextStep(SensorInformation info)
 }
 	}
 
-	mMoves->push_front(chosenDirection);
+	mMoves->push_front(prevStep);
 	mPrevLastDirection = mLastDirection;
 	mLastDirection = (int)chosenDirection;
 

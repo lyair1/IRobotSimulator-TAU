@@ -23,7 +23,8 @@ public:
 		mCrashedIntoWall(false),
 		mPositionInCompetition(-1),
 		mIsRunning(true), // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
-		mIsAboutToFinish(false)
+		mIsAboutToFinish(false),
+		mPrevSimulationStep(Direction::Stay)
 	{
 		mAlgorithm = algorithm;
 		mHouse = house;
@@ -73,6 +74,7 @@ private:
 	int mPositionInCompetition;
 	bool mIsRunning;
 	bool mIsAboutToFinish;
+	Direction mPrevSimulationStep;
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	Sensor* mSensor;
@@ -86,6 +88,7 @@ private:
 	int mMaxStepsAfterWinner;
 	bool mIsOutOfBattery;
 	list<Direction> mStepsHistory;
+	
 	
 };
 #endif // SIMULATION_H
