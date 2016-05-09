@@ -5,7 +5,7 @@
 	@author Nir Orman ID 201588902
 	@author Yair Levi ID 200945657
 	@version 1.0 30/1/16
-*/
+	*/
 #include <iostream>
 #include <string>
 #include <ctime>
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	string score_formula_path = "";
 	int num_threads = 1;
 	// Get parameters from arg
-	for (int i = 1; i < argc-1; i++){ //skip program name -> i=1
+	for (int i = 1; i < argc - 1; i++){ //skip program name -> i=1
 		string arg = argv[i];
 		if (arg.compare(_paramConfig) == 0) {
 			// We know the next argument *should* be the config file dir:
@@ -64,28 +64,29 @@ int main(int argc, char* argv[])
 		if (arg.compare(_paramScoreFormula) == 0) {
 			// We know the next argument *should* be the path:
 			score_formula_path = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
-		
+
 			continue;
 		}
 		if (arg.compare(_paramThreads) == 0) {
 			// We know the next argument *should* be an integer:
 			istringstream in(argv[i + 1]);
-			if (in >> num_threads && in.eof())
+			if (in >> num_threads && num_threads > 0)
 			{
 				continue;
 			}
 			else
 			{
+				num_threads = 1;
 				if (DEBUG)
 				{
-					cout << "number of threads should be an integer larger than 0!" << endl;
+					cout << "number of threads should be a positive integer! default is set to 1" << endl;
 				}
-				std::cout << _usage;
-				exit(0);
 			}
 		}
 
 	}
+
+
 
 	// Show usage and return if config file doesn't exists in path
 	if (!isFileExists(config_file_path))
@@ -103,7 +104,7 @@ int main(int argc, char* argv[])
 	}
 	if (!configReader->isAllParamteresExistInConfigFile())
 	{
-		cout<< configReader->getMessageForMissingParamsInConfigFile();
+		cout << configReader->getMessageForMissingParamsInConfigFile();
 	}
 	if (!configReader->isAllParamteresLegalInConfigFile || !configReader->isAllParamteresExistInConfigFile())
 	{
@@ -112,7 +113,7 @@ int main(int argc, char* argv[])
 	}
 	// The score formula is the second argument to be checked on startup (after config file).
 	scoreCreator calculateScore;
-	if (score_formula_path != "")  
+	if (score_formula_path != "")
 	{
 		calculateScore = handleScoreSO(score_formula_path);
 	}
@@ -169,13 +170,13 @@ int main(int argc, char* argv[])
 
 
 	// Print error list
-	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() >0 )
+	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() > 0)
 	{
 		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages() << simul.getScoreErrorMessage();
 	}
 
 	simul.cleanResources();
-	
+
 	delete houses_list;
 	delete configReader;
 	delete algo_list;
@@ -217,10 +218,10 @@ scoreCreator handleScoreSO(const string &score_formula_path)
 		std::cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid.so\n";
 		exit(0);
 	}
-	
-	
+
+
 	// Opening the .so file:
-	#ifndef _WIN32
+#ifndef _WIN32
 	void *handle = dlopen(score_formula_path.c_str(), RTLD_NOW);
 	if (handle == NULL)
 	{
@@ -238,7 +239,7 @@ scoreCreator handleScoreSO(const string &score_formula_path)
 	}
 
 	return calc_score;
-	#endif
+#endif
 	return &calculateSimulationScore;
 
 }
