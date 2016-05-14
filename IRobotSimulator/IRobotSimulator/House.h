@@ -13,7 +13,11 @@
 #include "SensorInformation.h"
 #include "Direction.h"
 #include <list>
+#include "AbstractAlgorithm.h"
 using namespace std;
+
+typedef std::list<AbstractAlgorithm*> AlgorithmList;
+
 #define HOUSE_EXT ".house"
 #define USAGE "Usage: simulator [-config <config path>] [-house_path <house path>] [-algorithm_path <algorithm path>] [-score_formula <score .so path>] [-threads <num threads>]\n"
 
@@ -93,6 +97,7 @@ public:
 	list<int>* algorithmScores;
 	string getHouseFileName() const;
 	string getHousePath() const;
+	AlgorithmList  *mAlgorithmList;
 private:
 	// members:
 	string _name;

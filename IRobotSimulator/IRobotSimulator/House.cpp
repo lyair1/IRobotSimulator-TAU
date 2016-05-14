@@ -149,6 +149,11 @@ int House::getC() const {
 
 void House::cleanResources() const{
 	//delete _matrix;
+	// Clean algorithms
+	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
+	{
+		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
+	}
 }
 
 

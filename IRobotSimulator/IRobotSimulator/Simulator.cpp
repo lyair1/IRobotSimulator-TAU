@@ -14,7 +14,7 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList)
+void Simulator::runSimulation(HouseList* houses_list)
 {
 	if (DEBUG)
 	{
@@ -24,9 +24,6 @@ void Simulator::runSimulation(HouseList* houses_list, AlgorithmList* algorithmsL
 	
 	// Set the houses list
 	mHouseList = houses_list;
-
-	//The simulator should dynamically load libraries for all the algorithms:
-	mAlgorithmList = algorithmsList;
 
 	//The simulator should execute every algorithm on every house:
 	executeAllAlgoOnAllHouses();
@@ -209,12 +206,6 @@ void Simulator::cleanResources()
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
 	}
-
-	// Clean algorithms
-	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
-	{
-		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
-	}
 	
 	delete mAlgorithmNames;
 }
@@ -268,7 +259,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 	return housesList;
 }
 
-AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
+AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstTime)
 {
 #ifndef _WIN32
 	vector<AlgorithmLoader*> allAlgos;
@@ -324,7 +315,10 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 		}
 		else
 		{
-			mAlgorithmErrorMessages += algo->getErrorLine();
+			if (firstTime)
+			{
+				mAlgorithmErrorMessages += algo->getErrorLine();	
+			}
 			dlclose(algo->handle);
 			delete algo;
 		}
@@ -347,7 +341,10 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 	{
 		AlgorithmLoader *loader = (*it);
 		AbstractAlgorithm* algo = globalFactory[loader->fileName]();
-		mAlgorithmNames->push_back(loader->fileName);
+		if (firstTime)
+		{
+			mAlgorithmNames->push_back(loader->fileName);	
+		}
 		algoList->push_back(algo);
 	}
 
@@ -364,21 +361,30 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path)
 
 	_200945657_A* algoNaive = new _200945657_A();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	mAlgorithmNames->push_back("algo1");
+	if (firstTime)
+	{
+		mAlgorithmNames->push_back("algo1");
+	}
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive);
 
 	_200945657_B* algoNaive2 = new _200945657_B();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	mAlgorithmNames->push_back("algo2");
+	if (firstTime)
+	{
+		mAlgorithmNames->push_back("algo2");
+	}
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive2);
 
 	_200945657_C* algoNaive3 = new _200945657_C();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	mAlgorithmNames->push_back("algo3");
+	if (firstTime)
+	{
+		mAlgorithmNames->push_back("algo3");
+	}
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive3);
@@ -419,7 +425,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 		House*  house = (*listHouseIter);
 		simulationListPerHouse = new SimulationList();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
-		for (AlgorithmList::const_iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
+		for (AlgorithmList::const_iterator listAlgorithmIter = house->mAlgorithmList->begin(); listAlgorithmIter != house->mAlgorithmList->end(); ++listAlgorithmIter)
 		{
 			House* tempHouse = new House();
 			tempHouse->fillHouseInfo(house->getHousePath(), house->getHouseFileName());

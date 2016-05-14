@@ -86,8 +86,6 @@ int main(int argc, char* argv[])
 
 	}
 
-
-
 	// Show usage and return if config file doesn't exists in path
 	if (!isFileExists(config_file_path))
 	{
@@ -147,16 +145,22 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	AlgorithmList* algo_list = simul.loadAllAlgorithms(algorithms_path);
-
-	if (algo_list == nullptr)
+	bool firstTime = true;
+	for (HouseList::iterator listHouseIter = houses_list->begin(); listHouseIter != houses_list->end(); ++listHouseIter)
 	{
-		if (simul.getAlgorithmErrorMessages().length() > 0)
-		{
-			cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-		}
+		House*  house = (*listHouseIter);
+		house->mAlgorithmList = simul.loadAllAlgorithms(algorithms_path, firstTime);
+		firstTime = false;
 
-		exit(0);
+		if (firstTime && house->mAlgorithmList == nullptr)
+		{
+			if (simul.getAlgorithmErrorMessages().length() > 0)
+			{
+				cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
+			}
+
+			exit(0);
+		}
 	}
 
 	// Check if all algorithms are invalid
@@ -166,8 +170,7 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	simul.runSimulation(houses_list, algo_list);
-
+	simul.runSimulation(houses_list);
 
 	// Print error list
 	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() > 0)
@@ -179,7 +182,11 @@ int main(int argc, char* argv[])
 
 	delete houses_list;
 	delete configReader;
-	delete algo_list;
+
+	// Only on windows
+	#if defined (_WIN32)
+	system("pause");
+	#endif
 
 	return 0;
 }

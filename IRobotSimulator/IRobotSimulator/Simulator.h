@@ -18,7 +18,6 @@ using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
 	typedef std::list<House*> HouseList;
-	typedef std::list<AbstractAlgorithm*> AlgorithmList;
 	typedef std::list<Simulation*> SimulationList;
 	typedef std::list<AlgorithmLoader*> LoadersList;
 	typedef std::list<list<string>*> StringMatrix;
@@ -56,11 +55,11 @@ public:
 		delete algoLoaders;
 		#endif
 	}
-	void runSimulation(HouseList* houses_list, AlgorithmList* algorithmsList);
+	void runSimulation(HouseList* houses_list);
 	void cleanResources();
 	int countHousesInPath(string houses_path);
 	HouseList* readAllHouses(string houses_path);
-	AlgorithmList *loadAllAlgorithms(string algorithms_path);
+	AlgorithmList *loadAllAlgorithms(string algorithms_path, bool firstTime);
 	string getAlgorithmErrorMessages() const;
 	string getHousesErrorMessages() const;
 	string getScoreErrorMessage() const;
@@ -72,7 +71,6 @@ private:
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
 	ConfigReader* mConfiguration;
-	AlgorithmList  *mAlgorithmList;
 	list<string>* mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
 
