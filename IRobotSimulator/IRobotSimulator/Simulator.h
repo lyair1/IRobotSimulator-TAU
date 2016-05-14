@@ -14,10 +14,12 @@
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif
+#include <atomic>
+#include <mutex>
 using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
-	typedef std::list<House*> HouseList;
+	typedef std::vector<House*> HouseList;
 	typedef std::list<Simulation*> SimulationList;
 	typedef std::list<AlgorithmLoader*> LoadersList;
 	typedef std::list<list<string>*> StringMatrix;
@@ -55,24 +57,28 @@ public:
 		delete algoLoaders;
 		#endif
 	}
-	void runSimulation(HouseList* houses_list);
+	void runSimulation(HouseList houses_list, size_t numThreads);
 	void cleanResources();
 	int countHousesInPath(string houses_path);
-	HouseList* readAllHouses(string houses_path);
+	HouseList readAllHouses(string houses_path);
 	AlgorithmList *loadAllAlgorithms(string algorithms_path, bool firstTime);
 	string getAlgorithmErrorMessages() const;
 	string getHousesErrorMessages() const;
 	string getScoreErrorMessage() const;
+	void runSimuationOnHouse();
 private:
 
 	//members:
 	LoadersList *algoLoaders;
-	HouseList *mHouseList;
+	HouseList mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
 	ConfigReader* mConfiguration;
 	list<string>* mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
+	size_t mNumThreads;
+	atomic_size_t houseIndex{0};
+	mutex print_lock;
 
 	//functions:
 	void executeAllAlgoOnAllHouses();

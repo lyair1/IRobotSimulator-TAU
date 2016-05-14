@@ -10,16 +10,19 @@
 #include "200945657_C_.h"
 #include "200945657_B_.h"
 #include "200945657_A_.h"
+#include <thread>
 
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-void Simulator::runSimulation(HouseList* houses_list)
+void Simulator::runSimulation(HouseList houses_list, size_t numThreads)
 {
+	mNumThreads = numThreads;
 	if (DEBUG)
 	{
 		cout << endl << endl << "Parameters read:" << endl;
 		cout << mConfiguration->toString() << endl;
+		cout << "Num of threads: " << mNumThreads << endl;
 	}
 	
 	// Set the houses list
@@ -96,7 +99,7 @@ string Simulator::getHeaderPrintLine()
 	//	cout << endl;
 
 	//}
-	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
+	for (HouseList::iterator it = mHouseList.begin(); it != mHouseList.end(); ++it)
 	{
 		House* house = (*it);
 		string fileName = house->getHouseFileName();
@@ -142,7 +145,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName, double & averageRes
 
 
 	int counter = 0;
-	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
+	for (HouseList::iterator it = mHouseList.begin(); it != mHouseList.end(); ++it)
 	{
 		int i = 0;
 		House* house = (*it);
@@ -163,7 +166,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName, double & averageRes
 		}
 	}
 
-	double avg = counter / (double)mHouseList->size();
+	double avg = counter / (double)mHouseList.size();
 	averageResult = avg;
 	string numStr = to_string(avg);
 	string numStr2Dec = "";
@@ -190,7 +193,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName, double & averageRes
 string Simulator::getSupparatorLine()
 {
 	string line = "";
-	for (int i = 0; i < (int)(15 + (mHouseList->size() + 1) * 11); i++)
+	for (int i = 0; i < (int)(15 + (mHouseList.size() + 1) * 11); i++)
 	{
 		line += "-";
 	}
@@ -201,7 +204,7 @@ string Simulator::getSupparatorLine()
 void Simulator::cleanResources()
 {
 	// Clean Houses
-	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
+	for (HouseList::iterator listHouseIter = mHouseList.begin(); listHouseIter != mHouseList.end(); ++listHouseIter)
 	{
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
@@ -230,9 +233,9 @@ int Simulator::countHousesInPath(string houses_path)
 	return count;
 }
 
-HouseList* Simulator::readAllHouses(string houses_path)
+HouseList Simulator::readAllHouses(string houses_path)
 {
-	HouseList *housesList = new HouseList();
+	HouseList housesList;
 	fs::path targetDir(houses_path);
 	fs::directory_iterator it(targetDir), eod;
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
@@ -251,7 +254,7 @@ HouseList* Simulator::readAllHouses(string houses_path)
 				if (DEBUG){
 					house->printHouse();
 				}
-				housesList->push_back(house);
+				housesList.push_back(house);
 			}
 		}
 	}
@@ -417,12 +420,34 @@ string Simulator::getScoreErrorMessage() const
 
 void Simulator::executeAllAlgoOnAllHouses()
 {
-	Simulation* pSimulation;
-	//initialize a list that holds information about all simulations on current house:
-	SimulationList* simulationListPerHouse;
-	for (HouseList::iterator listHouseIter = mHouseList->begin(); listHouseIter != mHouseList->end(); ++listHouseIter)
+	// ===> create the threads as vector of pointers to threads (unique_ptr)
+	vector<unique_ptr<thread>> threads(mNumThreads);
+	for (auto& thread_ptr : threads) {
+		// ===> actually create the threads and run them
+		thread_ptr = make_unique<thread>(&Simulator::runSimuationOnHouse, this); // create and run the thread
+	}
+
+	// ===> join all the threads to finish nicely (i.e. without crashing / terminating threads)
+	for (auto& thread_ptr : threads) {
+		thread_ptr->join();
+	}
+}
+
+void Simulator::runSimuationOnHouse()
+{
+	while (houseIndex < mHouseList.size())
 	{
-		House*  house = (*listHouseIter);
+		House*  house = mHouseList[houseIndex];
+		++houseIndex;
+		if (DEBUG)
+		{
+			lock_guard<mutex> lock(print_lock);
+			cout << "running from thread #" << this_thread::get_id() << endl;
+		}
+
+		Simulation* pSimulation;
+		//initialize a list that holds information about all simulations on current house:
+		SimulationList* simulationListPerHouse;
 		simulationListPerHouse = new SimulationList();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
 		for (AlgorithmList::const_iterator listAlgorithmIter = house->mAlgorithmList->begin(); listAlgorithmIter != house->mAlgorithmList->end(); ++listAlgorithmIter)
@@ -451,7 +476,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 		}
 		int simulationStepsCounter = 0;
 		while (isAnyAlgorithmStillRunning)// while none of the algorithms finished cleaning and back in docking
-		{ 
+		{
 			isAnyAlgorithmStillRunning = false;
 			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter)
 			{
@@ -460,7 +485,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 				{
 					isAnyAlgorithmStillRunning = true;
 					if (simul->makeSimulationStep())
-					{ 
+					{
 						if (isFirstWinner)// this is the first algorithm that finished running successfully!
 						{
 							isFirstWinner = false;
@@ -488,7 +513,7 @@ void Simulator::executeAllAlgoOnAllHouses()
 			{
 				simulationStepsCounter += 1;
 			}
-			
+
 			if (simulationStepsCounter >= maxSimulatorStepsPerHouse) // all simulations on the current house exceeded maxSteps
 			{
 				winnerNumberOfSteps = maxSimulatorStepsPerHouse;
@@ -503,17 +528,17 @@ void Simulator::executeAllAlgoOnAllHouses()
 
 		//all algorithms stopped - terminate simulation on this house and calculate scores
 		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
-			const map<string, int> score_params = 
-			{ 
-				{ "winnerNumberOfSteps",	winnerNumberOfSteps },
+			const map<string, int> score_params =
+			{
+				{ "winnerNumberOfSteps", winnerNumberOfSteps },
 				{ "simulationStepsCounter", simulationStepsCounter },
-				{ "crashedIntoWall",		(*iter3)->getCrashedIntoWall() },
-				{ "positionInCompetition",	(*iter3)->getPositionInCompetition() },
-				{ "isOutOfBattery",			(*iter3)->getIsOutOfBattery() },
-				{ "stepsCounter",			(*iter3)->getStepsCounter() },
-				{ "initialDustSumInHouse",	(*iter3)->getInitialDustSumInHouse() },
-				{ "dirtCollected",			(*iter3)->getDirtCollected() },
-				{ "isBackInDocking",		(*iter3)->getIsBackInDocking() }
+				{ "crashedIntoWall", (*iter3)->getCrashedIntoWall() },
+				{ "positionInCompetition", (*iter3)->getPositionInCompetition() },
+				{ "isOutOfBattery", (*iter3)->getIsOutOfBattery() },
+				{ "stepsCounter", (*iter3)->getStepsCounter() },
+				{ "initialDustSumInHouse", (*iter3)->getInitialDustSumInHouse() },
+				{ "dirtCollected", (*iter3)->getDirtCollected() },
+				{ "isBackInDocking", (*iter3)->getIsBackInDocking() }
 			};
 			(*iter3)->setSimulationScore(calculateScore(score_params));
 			house->algorithmScores->push_back((*iter3)->getSimulationScore());
@@ -522,7 +547,6 @@ void Simulator::executeAllAlgoOnAllHouses()
 				mIsAnySimulationScoreBad = true;
 			}
 		}
-
 
 		// Clean simulationListPerHouse
 		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
@@ -536,7 +560,6 @@ void Simulator::executeAllAlgoOnAllHouses()
 		delete simulationListPerHouse;
 	}
 }
-
 
 // this is not a member function of simulation class!!! 
 int calculateSimulationScore(const map<string, int>& score_params){

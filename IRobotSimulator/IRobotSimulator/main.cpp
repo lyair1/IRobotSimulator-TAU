@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	string algorithms_path = _pathPrefix;
 	string config_file_path = _pathPrefix + _defaultConfigFileName;
 	string score_formula_path = "";
-	int num_threads = 1;
+	size_t num_threads = 1;
 	// Get parameters from arg
 	for (int i = 1; i < argc - 1; i++){ //skip program name -> i=1
 		string arg = argv[i];
@@ -83,7 +83,6 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-
 	}
 
 	// Show usage and return if config file doesn't exists in path
@@ -137,16 +136,16 @@ int main(int argc, char* argv[])
 	}
 
 	// Print message and return if all houses in path are invalid
-	HouseList* houses_list = simul.readAllHouses(houses_path);
+	HouseList houses_list = simul.readAllHouses(houses_path);
 	// Check if all houses are invalid
-	if (houses_list->empty())
+	if (houses_list.empty())
 	{
 		std::cout << "All houses files in target folder '" << houses_path.substr(2) << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
 		exit(0);
 	}
 
 	bool firstTime = true;
-	for (HouseList::iterator listHouseIter = houses_list->begin(); listHouseIter != houses_list->end(); ++listHouseIter)
+	for (HouseList::iterator listHouseIter = houses_list.begin(); listHouseIter != houses_list.end(); ++listHouseIter)
 	{
 		House*  house = (*listHouseIter);
 		house->mAlgorithmList = simul.loadAllAlgorithms(algorithms_path, firstTime);
@@ -164,13 +163,13 @@ int main(int argc, char* argv[])
 	}
 
 	// Check if all algorithms are invalid
-	if (houses_list->empty())
+	if (houses_list.empty())
 	{
 		cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
 		exit(0);
 	}
 
-	simul.runSimulation(houses_list);
+	simul.runSimulation(houses_list, num_threads);
 
 	// Print error list
 	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() > 0)
@@ -180,7 +179,6 @@ int main(int argc, char* argv[])
 
 	simul.cleanResources();
 
-	delete houses_list;
 	delete configReader;
 
 	// Only on windows
