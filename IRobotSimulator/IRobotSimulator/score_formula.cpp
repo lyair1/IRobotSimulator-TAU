@@ -22,9 +22,8 @@ extern "C" int calc_score(const map<string, int>& score_params)
 {
 	int winnerNumberOfSteps;
 	int simulationStepsCounter;
-	bool crashedIntoWall;
 	int positionInCompetition;
-	bool isOutOfBattery;
+	int actualPositionInCompetition;
 	int stepsCounter;
 	int initialDustSumInHouse;
 	int dirtCollected;
@@ -32,15 +31,13 @@ extern "C" int calc_score(const map<string, int>& score_params)
 	try
 	{
 		// this is not a member function of simulation class!!! 
-		winnerNumberOfSteps = score_params.at("winnerNumberOfSteps");
-		simulationStepsCounter = score_params.at("simulationStepsCounter");
-		crashedIntoWall = (score_params.at("crashedIntoWall") != 0);
-		positionInCompetition = score_params.at("positionInCompetition");
-		isOutOfBattery = (score_params.at("isOutOfBattery") != 0);
-		stepsCounter = score_params.at("stepsCounter");
-		initialDustSumInHouse = score_params.at("initialDustSumInHouse");
-		dirtCollected = score_params.at("dirtCollected");
-		isBackInDocking = (score_params.at("isBackInDocking") != 0);
+		winnerNumberOfSteps = score_params.at("winner_num_steps");
+		simulationStepsCounter = score_params.at("simulation_steps");
+		actualPositionInCompetition = score_params.at("actual_position_in_competition");
+		stepsCounter = score_params.at("this_num_steps");
+		initialDustSumInHouse = score_params.at("sum_dirt_in_house");
+		dirtCollected = score_params.at("dirt_collected");
+		isBackInDocking = (score_params.at("is_back_in_docking") != 0);
 	}
 	catch(out_of_range & e)
 	{
@@ -50,22 +47,19 @@ extern "C" int calc_score(const map<string, int>& score_params)
 		}
 		return -1;
 	}
-
-	if (crashedIntoWall){
-		return 0;
+	if (initialDustSumInHouse == dirtCollected  && isBackInDocking)
+		{
+			positionInCompetition = actualPositionInCompetition < 4 ? actualPositionInCompetition : 4;
+			
+		}
+	else
+	{
+		positionInCompetition = 10;
 	}
 
 	int score = 2000;
 	score -= (positionInCompetition - 1) * 50;
-	if (isOutOfBattery)
-	{
-		score += (winnerNumberOfSteps - simulationStepsCounter) * 10;
-	}
-	else
-	{
-		score += (winnerNumberOfSteps - stepsCounter) * 10;
-	}
-
+	score += (winnerNumberOfSteps - stepsCounter) * 10;
 	score -= (initialDustSumInHouse - dirtCollected) * 3;
 	score += (isBackInDocking ? 50 : -200);
 	return score < 0 ? 0 : score;

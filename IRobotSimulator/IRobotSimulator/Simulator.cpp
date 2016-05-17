@@ -499,12 +499,14 @@ void Simulator::runSimuationOnHouse()
 							}
 						}
 						simul->setPositionInCompetition(actualPositionInCopmetition);
+						simul->setActualPositionInCompetition(actualPositionInCopmetition);
 						numberOfWinnersInPosition += 1;
 					}
 				}
 				else if (simul->getPositionInCompetition() == -1) // this algorithm finished running but not successfully
 				{
-					simul->setPositionInCompetition(-1);
+					simul->setActualPositionInCompetition(actualPositionInCopmetition);
+					simul->setPositionInCompetition(actualPositionInCopmetition);
 				}
 			}
 			actualPositionInCopmetition += numberOfWinnersInPosition;
@@ -528,19 +530,30 @@ void Simulator::runSimuationOnHouse()
 
 		//all algorithms stopped - terminate simulation on this house and calculate scores
 		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
-			const map<string, int> score_params =
+
+			if ((*iter3)->getCrashedIntoWall())
 			{
-				{ "winnerNumberOfSteps", winnerNumberOfSteps },
-				{ "simulationStepsCounter", simulationStepsCounter },
-				{ "crashedIntoWall", (*iter3)->getCrashedIntoWall() },
-				{ "positionInCompetition", (*iter3)->getPositionInCompetition() },
-				{ "isOutOfBattery", (*iter3)->getIsOutOfBattery() },
-				{ "stepsCounter", (*iter3)->getStepsCounter() },
-				{ "initialDustSumInHouse", (*iter3)->getInitialDustSumInHouse() },
-				{ "dirtCollected", (*iter3)->getDirtCollected() },
-				{ "isBackInDocking", (*iter3)->getIsBackInDocking() }
-			};
-			(*iter3)->setSimulationScore(calculateScore(score_params));
+				(*iter3)->setSimulationScore(0);
+			}
+			else
+			{
+				if ((*iter3)->getIsOutOfBattery())//if an algorithm is out of battery then it's this_num_steps will equal to simulation steps
+				{
+					(*iter3)->setStepsCounter(simulationStepsCounter);
+				}
+				const map<string, int> score_params =
+				{
+					{ "winner_num_steps", winnerNumberOfSteps },
+					{ "simulation_steps", simulationStepsCounter },
+					{ "actual_position_in_competition", (*iter3)->getActualPositionInCompetition() },
+					{ "this_num_steps", (*iter3)->getStepsCounter() },
+					{ "sum_dirt_in_house", (*iter3)->getInitialDustSumInHouse() },
+					{ "dirt_collected", (*iter3)->getDirtCollected() },
+					{ "is_back_in_docking", (*iter3)->getIsBackInDocking() }
+				};
+				(*iter3)->setSimulationScore(calculateScore(score_params));
+			}
+			
 			house->algorithmScores->push_back((*iter3)->getSimulationScore());
 			if ((*iter3)->getSimulationScore() == -1)
 			{
@@ -565,9 +578,8 @@ void Simulator::runSimuationOnHouse()
 int calculateSimulationScore(const map<string, int>& score_params){
 	int winnerNumberOfSteps;
 	int simulationStepsCounter;
-	bool crashedIntoWall;
 	int positionInCompetition;
-	bool isOutOfBattery;
+	int actualPositionInCompetition;
 	int stepsCounter;
 	int initialDustSumInHouse;
 	int dirtCollected;
@@ -575,40 +587,35 @@ int calculateSimulationScore(const map<string, int>& score_params){
 	try
 	{
 		// this is not a member function of simulation class!!! 
-		winnerNumberOfSteps = score_params.at("winnerNumberOfSteps");
-		simulationStepsCounter = score_params.at("simulationStepsCounter");
-		crashedIntoWall = (score_params.at("crashedIntoWall") != 0);
-		positionInCompetition = score_params.at("positionInCompetition");
-		isOutOfBattery = (score_params.at("isOutOfBattery") != 0);
-		stepsCounter = score_params.at("stepsCounter");
-		initialDustSumInHouse = score_params.at("initialDustSumInHouse");
-		dirtCollected = score_params.at("dirtCollected");
-		isBackInDocking = (score_params.at("isBackInDocking") != 0);
+		winnerNumberOfSteps = score_params.at("winner_num_steps");
+		simulationStepsCounter = score_params.at("simulation_steps");
+		actualPositionInCompetition = score_params.at("actual_position_in_competition");
+		stepsCounter = score_params.at("this_num_steps");
+		initialDustSumInHouse = score_params.at("sum_dirt_in_house");
+		dirtCollected = score_params.at("dirt_collected");
+		isBackInDocking = (score_params.at("is_back_in_docking") != 0);
 	}
 	catch (out_of_range & e)
 	{
-		if (DEBUG)
+		if (SCORE_DEBUG)
 		{
-			cout <<"calculateSimulationScore couldn't find one of the parameters of the score_params "<< e.what() << endl;
+			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << e.what() << endl;
 		}
 		return -1;
 	}
+	if (initialDustSumInHouse == dirtCollected  && isBackInDocking)
+	{
+		positionInCompetition = actualPositionInCompetition < 4 ? actualPositionInCompetition : 4;
 
-	if (crashedIntoWall){
-		return 0;
+	}
+	else
+	{
+		positionInCompetition = 10;
 	}
 
 	int score = 2000;
 	score -= (positionInCompetition - 1) * 50;
-	if (isOutOfBattery)
-	{
-		score += (winnerNumberOfSteps - simulationStepsCounter) * 10;
-	}
-	else
-	{
-		score += (winnerNumberOfSteps - stepsCounter) * 10;
-	}
-
+	score += (winnerNumberOfSteps - stepsCounter) * 10;
 	score -= (initialDustSumInHouse - dirtCollected) * 3;
 	score += (isBackInDocking ? 50 : -200);
 	return score < 0 ? 0 : score;

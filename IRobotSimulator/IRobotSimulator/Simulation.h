@@ -22,6 +22,7 @@ public:
 		mBattreyConsumptionRate(0),
 		mCrashedIntoWall(false),
 		mPositionInCompetition(-1),
+		mActualPositionInCompetition(-1),
 		mIsRunning(true), // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
 		mIsAboutToFinish(false),
 		mPrevSimulationStep(Direction::Stay)
@@ -47,7 +48,10 @@ public:
 	int getNumberOfSteps() const;
 	const AbstractSensor * getSensor() const;
 	int getPositionInCompetition() const;
+	int getActualPositionInCompetition() const;
 	void setPositionInCompetition(int actualPositionInCompetition);
+	void setActualPositionInCompetition(int actualPositionInCompetition);
+	void setStepsCounter(int stepsCounter);
 	void resetMaxStepsAccordingToWinner();
 	const House* getHouse() const;
 	const int getSimulationScore() const;
@@ -72,6 +76,7 @@ private:
 	int mBattreyConsumptionRate;
 	bool mCrashedIntoWall;
 	int mPositionInCompetition;
+	int mActualPositionInCompetition;
 	bool mIsRunning;
 	bool mIsAboutToFinish;
 	Direction mPrevSimulationStep;

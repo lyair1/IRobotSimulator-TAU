@@ -132,18 +132,28 @@ int Simulation::getPositionInCompetition() const{
 	return mPositionInCompetition;
 }
 
+int Simulation::getActualPositionInCompetition() const{
+	return mActualPositionInCompetition;
+}
+
 void Simulation::setPositionInCompetition(int actualPositionInCompetition){
-	if (actualPositionInCompetition == -1)
-	{
-		mPositionInCompetition = 10;
-		return;
-	}
 	if (mHouse->isCleanHouse() && mIsBackInDocking)
 	{
 		mPositionInCompetition = actualPositionInCompetition < 4 ? actualPositionInCompetition : 4;
+		return;
 	}
-	
+	mPositionInCompetition = 10;
 	return;
+}
+
+void Simulation::setActualPositionInCompetition(int actualPositionInCompetition)
+{
+	mActualPositionInCompetition = actualPositionInCompetition;
+}
+
+
+void Simulation::setStepsCounter(int stepsCounter){
+	mStepsCounter = stepsCounter;
 }
 
 //this function is called only when there's a winner 
