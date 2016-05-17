@@ -125,8 +125,20 @@ echo test 2 algorithms
 simulator  -house_path test/testEx1 -config test/testEx1 -algorithm_path test/AlgorithmTests/TwoAlgorithms
 echo
 echo
-echo test empty algorithm folder
-simulator  -house_path test/testEx1 -config test/testEx1 -algorithm_path test/AlgorithmTests
+echo test 1 algorithm
+simulator  -house_path test/testEx1 -config test/testEx1 -algorithm_path test/AlgorithmTests/OneAlgorithm
+echo
+echo
+echo test 0 algorithm = empty folder
+simulator  -house_path test/testEx1 -config test/testEx1 -algorithm_path test/AlgorithmTests/NoAlgorithms
+echo
+echo
+echo test algorithms folder doesnt exists
+simulator  -house_path test/testEx1 -config test/testEx1 -algorithm_path test/AlgorithmTests/ImaginaryFolder
+echo
+echo
+echo test if algorithms found in working directory
+simulator  -house_path test/testEx1 -config test/testEx1 
 echo
 echo
 echo
