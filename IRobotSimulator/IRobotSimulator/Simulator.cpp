@@ -11,6 +11,7 @@
 #include "200945657_B_.h"
 #include "200945657_A_.h"
 #include <thread>
+#include "MakeUnique.cpp"
 
 namespace fs = ::boost::filesystem;
 using namespace std;

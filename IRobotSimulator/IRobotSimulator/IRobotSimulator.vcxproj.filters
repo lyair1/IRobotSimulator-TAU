@@ -101,5 +101,8 @@
     <ClCompile Include="score_formula.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MakeUnique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

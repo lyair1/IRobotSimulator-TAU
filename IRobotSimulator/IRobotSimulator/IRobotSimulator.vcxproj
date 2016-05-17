@@ -59,7 +59,6 @@
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>-->
-
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -75,7 +74,6 @@
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -118,6 +116,7 @@
     <ClCompile Include="configReader.cpp" />
     <ClCompile Include="House.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MakeUnique.cpp" />
     <ClCompile Include="score_formula.cpp" />
     <ClCompile Include="Sensor.cpp" />
     <ClCompile Include="Simulation.cpp" />
