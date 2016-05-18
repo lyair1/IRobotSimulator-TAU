@@ -1,15 +1,27 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
+#define _ALGORITHM_DEBUG_ true
+
 #include <vector>
 #include <map>
 #include <limits.h>
+#include "Configuration.h"
+#include <set>
+class Path;
 using namespace std;
 
 #include "Direction.h"
 #include "AbstractAlgorithm.h"
 #include "House.h"
-#include "Sensor.h"
+#include "Point.h"
+#define DEFAULT_MATRIX_SIZE 25
+#define CHAR_WALL "W"
+#define CHAR_NOT_WALL "N"
+#define CHAR_DEFAULT "?"
+#define CHAR_DOCKING "D"
+#define CHAR_ROBOT "R"
+#define CHAR_CLEAN " "
 
 class AlgorithmBase : public AbstractAlgorithm
 {
@@ -19,10 +31,19 @@ public:
 					mLocation(-1,-1),
 					mLastDirection(-1), 
 					mPrevLastDirection(-1), 
-					mConfiguration(NULL), 
-					mAboutToFinish(false)
+					mConfiguration(0,0,0,0), 
+					mAboutToFinish(false),
+					mBatteryLeft(0),
+					mStepsTillFinish(-1),
+					mMatrixSize(DEFAULT_MATRIX_SIZE),
+					mDockingLocation(-1,-1)
 	{
+		mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 		mMoves = new list<Direction>();
+		mWallsSet.clear();
+		mNotWallSet.clear();
+		mDirtsMap.clear();
+		mCleanedSet.clear();
 	}
 	~AlgorithmBase()
 	{
@@ -48,15 +69,61 @@ public:
 	void cleanResources();
 
 	Direction oppositeDirection(Direction direction_);
+
 protected:
 	const AbstractSensor* mSensor; // the only info the algorithm has about the house it's cleaning comes from the sensor itself.
-	//House * house; //algorithm does not have any given information about the house, but it can gather that information along the way
-	std::pair <int, int> mLocation;
+	Point mLocation;
+	Point mDockingLocation;
 	int mLastDirection;
 	int mPrevLastDirection;
-	map<string, int>* mConfiguration;
+	Configuration mConfiguration;
 	bool mAboutToFinish;
 	list<Direction> *mMoves;
+	string* mMatrix;
+	int mBatteryLeft;
+	int mStepsTillFinish;
+	int mMatrixSize;
+	set<Point> mWallsSet;
+	set<Point> mNotWallSet;
+	set<Point> mCleanedSet;
+	map<Point, int> mDirtsMap;
+
+	void createHouseMatrix();
+	void printHouseMatrix();
+	void addWallToMatrix(Point p);
+	void addNotWallToMatrix(Point p);
+	void addCleanToMatrix(Point p);
+	void addDirtToMatrix(Point p, int dirt);
+	void addDockingToMatrix(Point p);
+	void addRobotToMatrix(Point p, int dirt);
+	Point getPointFromDirection(Point origin, Direction direction);
+
+	Path getShortestPathBetween2Points(Point p1, Point p2);
+	Path getShortestPathToDocking(Point p1);
+	Path connect2Paths(Path path1, Path path2);
+	
+	Point findLeftUpperCorner();
+	Point findLeftBottomCorner();
+	Point findRightUpperCorner();
+	Point findRightBottomCorner();
+	bool horLineBetweenPoints(Point p1, Point p2);
+	bool verrLineBetweenPoints(Point p1, Point p2);
+	bool isHouseMapped();
+	bool isHouseClean();
+	bool isUnknownPoint(Point p);
+	bool isWall(Point p);
+	bool isNotWall(Point p);
+	bool isDirt(Point p);
+	bool isCleaned(Point p);
+	void updateBattery();
+	void addInfoFromSensor();
+
+	// When in docking
+	Direction getStepFromDocking();
+
+	// When in position
+	//bool doesHaveEnoughBatteryToFinish();
+	Path findClosestNotWall();
 };
 
 #endif

@@ -98,9 +98,12 @@
     <ClInclude Include="AlgorithmBase.h" />
     <ClInclude Include="AlgorithmLoader.h" />
     <ClInclude Include="configReader.h" />
+    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="AlgorithmRegister.h" />
     <ClInclude Include="House.h" />
+    <ClInclude Include="Path.h" />
+    <ClInclude Include="Point.h" />
     <ClInclude Include="score_formula.h" />
     <ClInclude Include="Sensor.h" />
     <ClInclude Include="SensorInformation.h" />

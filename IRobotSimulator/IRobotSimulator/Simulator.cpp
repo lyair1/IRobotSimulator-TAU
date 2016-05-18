@@ -11,8 +11,9 @@
 #include "200945657_B_.h"
 #include "200945657_A_.h"
 #include <thread>
+#ifndef _WIN32
 #include "MakeUnique.cpp"
-
+#endif
 namespace fs = ::boost::filesystem;
 using namespace std;
 
@@ -373,25 +374,25 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstT
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
 	algoList->push_back(algoNaive);
 
-	_200945657_B* algoNaive2 = new _200945657_B();
-	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	if (firstTime)
-	{
-		mAlgorithmNames->push_back("algo2");
-	}
-	//don't set the sensor yet.
-	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	algoList->push_back(algoNaive2);
-
-	_200945657_C* algoNaive3 = new _200945657_C();
-	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	if (firstTime)
-	{
-		mAlgorithmNames->push_back("algo3");
-	}
-	//don't set the sensor yet.
-	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	algoList->push_back(algoNaive3);
+//	_200945657_B* algoNaive2 = new _200945657_B();
+//	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
+//	if (firstTime)
+//	{
+//		mAlgorithmNames->push_back("algo2");
+//	}
+//	//don't set the sensor yet.
+//	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
+//	algoList->push_back(algoNaive2);
+//
+//	_200945657_C* algoNaive3 = new _200945657_C();
+//	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
+//	if (firstTime)
+//	{
+//		mAlgorithmNames->push_back("algo3");
+//	}
+//	//don't set the sensor yet.
+//	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
+//	algoList->push_back(algoNaive3);
 
 	return algoList;
 #endif

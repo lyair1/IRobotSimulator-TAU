@@ -93,6 +93,12 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 	mPrevLastDirection = mLastDirection;
 	mLastDirection = (int)chosenDirection;
 
+	if (_ALGORITHM_DEBUG_)
+	{
+		createHouseMatrix();
+		printHouseMatrix();
+	}
+
 	return chosenDirection;
 }
 
