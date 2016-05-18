@@ -43,15 +43,8 @@ Direction AlgorithmBase::step(Direction prevStep){
 	SensorInformation info = mSensor->sense();
 	//if there's still dust - stay in current location:
 	Direction chosenDirection = Direction::Stay;
-	if (info.dirtLevel >= 1 && info.dirtLevel <= 9)
-	{
-		return chosenDirection;
-	}
-	//if there's no dust - move from current location:
-	else if (info.dirtLevel == 0)
-	{
-		chosenDirection = getNextStep(info, prevStep);
-	}
+	
+	chosenDirection = getNextStep(info, prevStep);
 
 	Point next_point = mLocation;
 	next_point.move(chosenDirection);
@@ -65,6 +58,8 @@ Direction AlgorithmBase::step(Direction prevStep){
 	{
 		addDirtToMatrix(mLocation, info.dirtLevel);
 	}
+
+	updateBattery();
 
 	return chosenDirection;
 }
@@ -217,14 +212,14 @@ Point AlgorithmBase::getPointFromDirection(Point origin, Direction direction)
 Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 {
 	queue<Point> Q;
-	map<Point,Point> parent;
+	map<Point, Point> parent;
 	Q.push(p1);
 	parent[p1] = p1;
 	while (!Q.empty())
 	{
 		Point point = Q.front();
 		Q.pop();
-		if (point == p2) 
+		if (point == p2)
 		{
 			break;
 		}
@@ -236,10 +231,8 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 		neighbors.push_back(Point(point._x, point._y + 1));
 		for (auto& neighbor : neighbors)
 		{
-			int row = neighbor._x;
-			int col = neighbor._y;
-			if (isWall(point) || !(isUnknownPoint(point)))
-				continue; // don't add neighbor to queue - outside of house's bounderis or is a wall or Unknown and might be wall.
+			if (isUnknownPoint(neighbor))
+				continue; // don't add neighbor to queue - outside of house's bounderis or is a wall
 			if (parent.find(neighbor) == parent.end()) //don't add neighbor to queue if it was already visited...
 			{
 				parent[neighbor] = point;
@@ -250,17 +243,17 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 
 	//reconstruct path from robot to docking
 	Point point = p2;
-	vector<Point> shortestPathToPoint;
-	shortestPathToPoint.clear();
+	vector<Point> shortestPath;
+	shortestPath.clear();
 	while (point != p1)
 	{
-		shortestPathToPoint.push_back(point);
+		shortestPath.push_back(point);
 		point = parent[point];
 	}
-	shortestPathToPoint.push_back(p1);
-	reverse(shortestPathToPoint.begin(), shortestPathToPoint.end());
+	shortestPath.push_back(p1);
+	std::reverse(shortestPath.begin(), shortestPath.end());
 
-	return Path(p1, p2, shortestPathToPoint, shortestPathToPoint.size());
+	return Path(p1, p2, shortestPath, shortestPath.size() - 1);
 }
 
 Path AlgorithmBase::getShortestPathToDocking(Point p1)
@@ -275,7 +268,7 @@ Path AlgorithmBase::connect2Paths(Path path1, Path path2)
 	AB.insert(AB.end(), path1.path.begin(), path1.path.end());
 	AB.insert(AB.end(), path2.path.begin(), path2.path.end());
 
-	return Path(path1.origin, path2.dest, AB, AB.size());
+	return Path(path1.origin, path2.dest, AB, AB.size()-1);
 }
 
 Point AlgorithmBase::findLeftUpperCorner()
@@ -395,8 +388,29 @@ bool AlgorithmBase::isHouseMapped()
 
 	Point leftUp = findLeftUpperCorner();
 	Point rightUp = findRightUpperCorner();
+
+	if (leftUp._x == rightUp._x)
+	{
+		return false;
+	}
+
 	Point leftBottom = findLeftBottomCorner();
+
+	if (leftUp._y == leftBottom._y)
+	{
+		return false;
+	}
 	Point rightBottom = findRightBottomCorner();
+
+	if (rightUp._y == rightBottom._y)
+	{
+		return false;
+	}
+
+	if (leftBottom._x == rightBottom._x)
+	{
+		return false;
+	}
 
 	return horLineBetweenPoints(leftBottom, rightBottom) 
 		&& horLineBetweenPoints(leftUp, rightUp) 
@@ -571,8 +585,24 @@ Direction AlgorithmBase::getStepFromDocking()
 	}
 	
 	//TODO find dirt>NotWall>Unknown and go to this direction
+	if (!isWall(wDirection))
+	{
+		return Direction::West;
+	}
+	if (!isWall(eDirection))
+	{
+		return Direction::East;
+	}
+	if (!isWall(nDirection))
+	{
+		return Direction::North;
+	}
+	if (!isWall(sDirection))
+	{
+		return Direction::South;
+	}
 
-	return Direction::West;
+	return Direction::Stay;
 }
 
 // Make sure there are Not walls before calling this function
@@ -590,6 +620,31 @@ Path AlgorithmBase::findClosestNotWall()
 	}
 
 	return path;
+}
+
+Direction AlgorithmBase::getDirectionFromPoint(Point origin, Point dest)
+{
+	if (getPointFromDirection(origin, Direction::North) == dest)
+	{
+		return Direction::North;
+	}
+
+	if (getPointFromDirection(origin, Direction::West) == dest)
+	{
+		return Direction::West;
+	}
+
+	if (getPointFromDirection(origin, Direction::East) == dest)
+	{
+		return Direction::East;
+	}
+
+	if (getPointFromDirection(origin, Direction::South) == dest)
+	{
+		return Direction::South;
+	}
+
+	return Direction::Stay;
 }
 
 // Default implementation is a random choose between all of the non-wall options
