@@ -94,13 +94,13 @@ Direction AlgorithmBase::oppositeDirection(Direction direction_)
 
 void AlgorithmBase::createHouseMatrix()
 {
-	int negMatrixSize = 0 - mMatrixSize;
+	int negMatrixSize = (-1)*mMatrixSize;
 	for (int i = negMatrixSize; i < mMatrixSize; i++)
 	{
 		mMatrix[i + mMatrixSize] = "";
 		for (int j = negMatrixSize; j < mMatrixSize; j++)
 		{
-			Point currP = Point(j, i);
+			Point currP = Point(mLocation._x + j, mLocation._y + i);
 			string pointChar = CHAR_DEFAULT;
 
 			if (isWall(currP))

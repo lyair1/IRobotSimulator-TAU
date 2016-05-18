@@ -15,7 +15,7 @@ using namespace std;
 #include "AbstractAlgorithm.h"
 #include "House.h"
 #include "Point.h"
-#define DEFAULT_MATRIX_SIZE 41
+#define DEFAULT_MATRIX_SIZE 10
 #define CHAR_WALL "W"
 #define CHAR_NOT_WALL "N"
 #define CHAR_DEFAULT "."
