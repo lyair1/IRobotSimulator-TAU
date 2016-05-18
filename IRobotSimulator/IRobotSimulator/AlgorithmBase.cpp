@@ -7,6 +7,7 @@
 #include "configReader.h"
 #include <queue>
 #include "Path.h"
+#include <stack>
 
 // setSensor is called once when the Algorithm is initialized 
 void AlgorithmBase::setSensor(const AbstractSensor& sensor)
@@ -23,6 +24,7 @@ void AlgorithmBase::setSensor(const AbstractSensor& sensor)
 	mNotWallSet.clear();
 	mCleanedSet.clear();
 	mDirtsMap.clear();
+	mMoatizationShortestPaths.clear();
 }
 
 // setConfiguration is called once when the Algorithm is initialized - see below 
@@ -44,12 +46,12 @@ Direction AlgorithmBase::step(Direction prevStep){
 	//if there's still dust - stay in current location:
 	Direction chosenDirection = Direction::Stay;
 	
+	mNotWallSet.erase(mLocation);
 	chosenDirection = getNextStep(info, prevStep);
 
 	Point next_point = mLocation;
 	next_point.move(chosenDirection);
 	addRobotToMatrix(next_point);
-	mNotWallSet.erase(mLocation);
 	if (info.dirtLevel == 0)
 	{
 		addCleanToMatrix(mLocation);
@@ -60,6 +62,12 @@ Direction AlgorithmBase::step(Direction prevStep){
 	}
 
 	updateBattery();
+
+	if (_ALGORITHM_DEBUG_)
+	{
+		createHouseMatrix();
+		printHouseMatrix();
+	}
 
 	return chosenDirection;
 }
@@ -165,7 +173,13 @@ void AlgorithmBase::addCleanToMatrix(Point p)
 void AlgorithmBase::addDirtToMatrix(Point p, int dirt)
 {
 	eraseFromAllSets(p);
+	mNotWallSet.insert(p); // adding it here so the robot will look for it when there are no other 'NotWalls'
 	mDirtsMap.insert({p,dirt});
+}
+
+void AlgorithmBase::addShortestPathToMoatization(Path path)
+{
+	mMoatizationShortestPaths[pair<Point,Point>(path.origin,path.dest)] = path;
 }
 
 void AlgorithmBase::addDockingToMatrix(Point p)
@@ -211,6 +225,13 @@ Point AlgorithmBase::getPointFromDirection(Point origin, Direction direction)
 
 Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 {
+	//return breadth_first(p1, p2);
+
+	if (isInMoatization(p1,p2))
+	{
+		return mMoatizationShortestPaths[pair<Point, Point>(p1, p2)];
+	}
+
 	queue<Point> Q;
 	map<Point, Point> parent;
 	Q.push(p1);
@@ -231,7 +252,7 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 		neighbors.push_back(Point(point._x, point._y + 1));
 		for (auto& neighbor : neighbors)
 		{
-			if (isUnknownPoint(neighbor))
+			if (isUnknownPoint(neighbor) || isWall(neighbor))
 				continue; // don't add neighbor to queue - outside of house's bounderis or is a wall
 			if (parent.find(neighbor) == parent.end()) //don't add neighbor to queue if it was already visited...
 			{
@@ -253,7 +274,10 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 	shortestPath.push_back(p1);
 	std::reverse(shortestPath.begin(), shortestPath.end());
 
-	return Path(p1, p2, shortestPath, shortestPath.size() - 1);
+	Path shortPath = Path(p1, p2, shortestPath, shortestPath.size() - 1);
+	addShortestPathToMoatization(shortPath);
+
+	return shortPath;
 }
 
 Path AlgorithmBase::getShortestPathToDocking(Point p1)
@@ -263,12 +287,18 @@ Path AlgorithmBase::getShortestPathToDocking(Point p1)
 
 Path AlgorithmBase::connect2Paths(Path path1, Path path2)
 {
-	vector<Point> AB;
+ 	vector<Point> AB;
 	AB.reserve(path1.path.size() + path2.path.size()); // preallocate memory
 	AB.insert(AB.end(), path1.path.begin(), path1.path.end());
 	AB.insert(AB.end(), path2.path.begin(), path2.path.end());
 
-	return Path(path1.origin, path2.dest, AB, AB.size()-1);
+	int size = AB.size() - 1;
+	if (path1.length > 60000 || path2.length > 60000)
+	{
+		size = 60000;
+	}
+
+	return Path(path1.origin, path2.dest, AB, size);
 }
 
 Point AlgorithmBase::findLeftUpperCorner()
@@ -377,45 +407,12 @@ bool AlgorithmBase::verrLineBetweenPoints(Point p1, Point p2)
 
 bool AlgorithmBase::isHouseMapped()
 {
-	// Smallest house:
-	// WWW
-	// WDW
-	// WWW
-	if (mWallsSet.size() < 8)
+	if (mNotWallSet.size() == 0 && mMoatizationShortestPaths.size() > 0) // if there is no more 'N' and we already started it means that the house is mapped
 	{
-		return false;
+		return true;
 	}
 
-	Point leftUp = findLeftUpperCorner();
-	Point rightUp = findRightUpperCorner();
-
-	if (leftUp._x == rightUp._x)
-	{
-		return false;
-	}
-
-	Point leftBottom = findLeftBottomCorner();
-
-	if (leftUp._y == leftBottom._y)
-	{
-		return false;
-	}
-	Point rightBottom = findRightBottomCorner();
-
-	if (rightUp._y == rightBottom._y)
-	{
-		return false;
-	}
-
-	if (leftBottom._x == rightBottom._x)
-	{
-		return false;
-	}
-
-	return horLineBetweenPoints(leftBottom, rightBottom) 
-		&& horLineBetweenPoints(leftUp, rightUp) 
-		&& verrLineBetweenPoints(leftUp, leftBottom) 
-		&& verrLineBetweenPoints(rightUp, rightBottom);
+	return false;
 }
 
 bool AlgorithmBase::isHouseClean()
@@ -425,21 +422,7 @@ bool AlgorithmBase::isHouseClean()
 		return false;
 	}
 
-	Point leftUp = findLeftUpperCorner();
-	Point rightBottom = findRightBottomCorner();
-
-	for (int i = leftUp._x; i < rightBottom._x; i++)
-	{
-		for (int j = leftUp._y; j < rightBottom._y; j++)
-		{
-			if (!isCleaned(Point(i,j)))
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+	return mDirtsMap.size() == 0 && mNotWallSet.size() == 0;
 }
 
 bool AlgorithmBase::isUnknownPoint(Point p)
@@ -460,6 +443,11 @@ bool AlgorithmBase::isNotWall(Point p)
 bool AlgorithmBase::isDirt(Point p)
 {
 	return (mDirtsMap.find(p) != mDirtsMap.end());
+}
+
+bool AlgorithmBase::isInMoatization(Point p1, Point p2)
+{
+	return (mMoatizationShortestPaths.find(pair<Point,Point>(p1,p2)) != mMoatizationShortestPaths.end());
 }
 
 bool AlgorithmBase::isCleaned(Point p)
@@ -539,6 +527,119 @@ void AlgorithmBase::addInfoFromSensor()
 	}
 }
 
+Path AlgorithmBase::breadth_first(Point origin, Point dest)
+{
+	stack<Point> Q;
+	Q.push(origin);
+	set<Point> pointsSet;
+	pointsSet.insert(origin);
+	return breadth_first_recursive(Q, dest, pointsSet);
+}
+
+Path AlgorithmBase::breadth_first_recursive(stack<Point> Q, Point dest, set<Point> pointsSet)
+{
+	Point n = Q.top();
+	Q.pop();
+
+	if (n == dest)
+	{
+		vector<Point> path;
+		path.push_back(n);
+		Path currPath = Path(n, n, path, 0);
+		addShortestPathToMoatization(currPath);
+		return currPath;
+	}
+
+	if (isInMoatization(n, dest))
+	{
+		Path currPath = mMoatizationShortestPaths[pair<Point, Point>(n, dest)];
+		return currPath;
+	}
+
+	Point p1 = Point(n._x - 1, n._y);
+	Point p2 = Point(n._x + 1, n._y);
+	Point p3 = Point(n._x, n._y + 1);
+	Point p4 = Point(n._x, n._y - 1);
+
+	vector<Point> path;
+	size_t maxSize_t = 65000;
+	Path currPath1 = Path(p1, p1,path, maxSize_t);
+	Path currPath2 = Path(p2, p2, path, maxSize_t);
+	Path currPath3 = Path(p3, p3, path, maxSize_t);
+	Path currPath4 = Path(p4, p4, path, maxSize_t);
+
+	bool hasPath1 = false;
+	bool hasPath2 = false;
+	bool hasPath3 = false;
+	bool hasPath4 = false;
+
+	if ((pointsSet.find(p1) == pointsSet.end()) && !isUnknownPoint(p1) && !isWall(p1))
+	{
+		pointsSet.insert(p1);
+		Q.push(p1);
+
+		vector<Point> path;
+		path.push_back(n);
+		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
+		currPath1 = connect2Paths(Path(n, n, path, 0), secondPath);
+		addShortestPathToMoatization(currPath1);
+		hasPath1 = true;
+	}
+
+	if ((pointsSet.find(p2) == pointsSet.end()) && !isUnknownPoint(p2) && !isWall(p2))
+	{
+		pointsSet.insert(p2);
+		Q.push(p2);
+
+		vector<Point> path;
+		path.push_back(n);
+		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
+		currPath2 = connect2Paths(Path(n, n, path, 0), secondPath);
+		addShortestPathToMoatization(currPath2);
+		hasPath2 = true;
+	}
+	if ((pointsSet.find(p3) == pointsSet.end()) && !isUnknownPoint(p3) && !isWall(p3))
+	{
+		pointsSet.insert(p3);
+		Q.push(p3);
+
+		vector<Point> path;
+		path.push_back(n);
+		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
+		currPath3 = connect2Paths(Path(n, n, path, 0), secondPath);
+		addShortestPathToMoatization(currPath3);
+		hasPath3 = true;
+	}
+	if ((pointsSet.find(p4) == pointsSet.end()) && !isUnknownPoint(p4) && !isWall(p4))
+	{
+		pointsSet.insert(p4);
+		Q.push(p4);
+
+		vector<Point> path;
+		path.push_back(n);
+		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
+		currPath4 = connect2Paths(Path(n, n, path, 0), secondPath);
+		addShortestPathToMoatization(currPath4);
+		hasPath4 = true;
+	}
+	
+	Path shortestPath = currPath1;
+	if (currPath2.length < shortestPath.length)
+	{
+		shortestPath = currPath2;
+	}
+	if (currPath3.length < shortestPath.length)
+	{
+		shortestPath = currPath3;
+	}
+	if (currPath4.length < shortestPath.length)
+	{
+		shortestPath = currPath4;
+	}
+
+	return shortestPath;
+}
+
 Direction AlgorithmBase::getStepFromDocking()
 {
 	Point wDirection = getPointFromDirection(mLocation, Direction::West);
@@ -613,9 +714,18 @@ Path AlgorithmBase::findClosestNotWall()
 	for (auto &p : mNotWallSet)
 	{
 		Path currPath = getShortestPathBetween2Points(mLocation, p);
-		if (path.length > currPath.length)
+		if (currPath.length == 0)
+		{
+			continue;
+		}
+		if (path.length > currPath.length || path.length == 0)
 		{
 			path = currPath;
+		}
+
+		if (currPath.length < 3)
+		{
+			return path;
 		}
 	}
 

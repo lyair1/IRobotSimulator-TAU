@@ -21,7 +21,7 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 {
 	Direction chosenDirection = Direction::North;
 	addInfoFromSensor();
-
+	cout << "Starting get next step!" << endl;
 	// If on docking
 	if (mLocation == mDockingLocation)
 	{
@@ -40,7 +40,12 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 		}
 		else
 		{
-			chosenDirection = getStepFromDocking();
+			//chosenDirection = getStepFromDocking();
+
+			// Looking for the not wall
+ 			cout << "Looking for not wall! docking" << endl;
+			Path pathToNotWall = findClosestNotWall();
+			chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
 		}
 	}
 	else
@@ -50,27 +55,34 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 		if (info.dirtLevel > 0 && mBatteryLeft > path.length)
 		{
 			// If on dirt
+			cout << "On Dirt!" << endl;
 			chosenDirection = Direction::Stay;
-		}else if (isHouseClean())
+		}
+		else if(mBatteryLeft <= path.length + 1)
 		{
-			// If all is clean
+			cout << "Going back to charge! Battery: " << mBatteryLeft << endl;
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
 		}
-		else if (mNotWallSet.size() > 0)
+		else if (isHouseClean())
 		{
+			// If all is clean
+			cout << "All is clean!" << endl;
+			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
+		}
+		else if (mNotWallSet.size() >= 0)
+		{
+			if (mNotWallSet.size() == 0) // in case there is no more not walls (and also dirt) go back to docking
+			{
+				addNotWallToMatrix(mDockingLocation);
+			}
 			// Looking for the not wall
+			cout << "Looking for not wall!" << endl;
 			Path pathToNotWall = findClosestNotWall();
 			chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
 		}
 	}
 
-	if (_ALGORITHM_DEBUG_)
-	{
-		createHouseMatrix();
-		printHouseMatrix();
-	}
-
-	return chosenDirection;
+	return chosenDirection; // Make sure we don't get here, we can hit the wall
 }
 
 #ifndef _WIN32

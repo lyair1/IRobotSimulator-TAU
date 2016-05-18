@@ -8,6 +8,8 @@
 #include <limits.h>
 #include "Configuration.h"
 #include <set>
+#include <queue>
+#include <stack>
 class Path;
 using namespace std;
 
@@ -15,6 +17,7 @@ using namespace std;
 #include "AbstractAlgorithm.h"
 #include "House.h"
 #include "Point.h"
+#include "Path.h"
 #define DEFAULT_MATRIX_SIZE 10
 #define CHAR_WALL "W"
 #define CHAR_NOT_WALL "N"
@@ -43,6 +46,7 @@ public:
 		mWallsSet.clear();
 		mNotWallSet.clear();
 		mDirtsMap.clear();
+		mMoatizationShortestPaths.clear();
 		mCleanedSet.clear();
 	}
 	~AlgorithmBase()
@@ -87,6 +91,7 @@ protected:
 	set<Point> mNotWallSet;
 	set<Point> mCleanedSet;
 	map<Point, int> mDirtsMap;
+	map<pair<Point, Point>, Path> mMoatizationShortestPaths;
 
 	void createHouseMatrix();
 	void printHouseMatrix();
@@ -94,6 +99,7 @@ protected:
 	void addNotWallToMatrix(Point p);
 	void addCleanToMatrix(Point p);
 	void addDirtToMatrix(Point p, int dirt);
+	void addShortestPathToMoatization(Path path);
 	void addDockingToMatrix(Point p);
 	void addRobotToMatrix(Point p);
 	void eraseFromAllSets(Point p);
@@ -115,9 +121,13 @@ protected:
 	bool isWall(Point p);
 	bool isNotWall(Point p);
 	bool isDirt(Point p);
+	bool isInMoatization(Point p1, Point p2);
 	bool isCleaned(Point p);
 	void updateBattery();
 	void addInfoFromSensor();
+
+	Path breadth_first(Point origin, Point dest);
+	Path breadth_first_recursive(stack<Point> Q, Point dest, set<Point> pointsSet);
 
 	// When in docking
 	Direction getStepFromDocking();
