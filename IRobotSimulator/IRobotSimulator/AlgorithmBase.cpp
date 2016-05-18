@@ -460,6 +460,10 @@ void AlgorithmBase::updateBattery()
 	if (mLocation == mDockingLocation)
 	{
 		mBatteryLeft += mConfiguration.BatteryRechargeRate;
+		if (mBatteryLeft > mConfiguration.BatteryCapacity)
+		{
+			mBatteryLeft = mConfiguration.BatteryCapacity;
+		}
 	}
 	else
 	{

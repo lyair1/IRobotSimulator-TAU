@@ -52,7 +52,7 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 	{
 		// In Position Somewhere
 		Path path = getShortestPathToDocking(mLocation);
-		if (info.dirtLevel > 0 && mBatteryLeft > path.length)
+		if (info.dirtLevel > 0 && mBatteryLeft > path.length + 1)
 		{
 			// If on dirt
 			cout << "On Dirt!" << endl;
