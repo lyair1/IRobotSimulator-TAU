@@ -30,10 +30,12 @@ void AlgorithmBase::setConfiguration(map<string, int> config)
 {
 	mConfiguration = Configuration(config[BATTERY_CONSUMPTION_RATE], config[MAX_STEPS_AFTER_WINNER], config[BATTERY_CAPACITY], config[BATTERY_RECHARGE_RATE]);
 	mBatteryLeft = mConfiguration.BatteryCapacity;
+
+	addRobotToMatrix(Point(0, 0));
+	addDockingToMatrix(Point(0, 0));
 }
 
 // step is called by the simulation for each time unit 
-
 /*	the algorithm MUST take into account the actual
 	steps that were taken, provided as a parameter to 'step', not relying on the recommended
 	steps returned from the calls to 'step' to be the actual steps taken*/
@@ -50,6 +52,20 @@ Direction AlgorithmBase::step(Direction prevStep){
 	{
 		chosenDirection = getNextStep(info, prevStep);
 	}
+
+	Point next_point = mLocation;
+	next_point.move(chosenDirection);
+	addRobotToMatrix(next_point);
+	mNotWallSet.erase(mLocation);
+	if (info.dirtLevel == 0)
+	{
+		addCleanToMatrix(mLocation);
+	}
+	else
+	{
+		addDirtToMatrix(mLocation, info.dirtLevel);
+	}
+
 	return chosenDirection;
 }
 
@@ -89,7 +105,7 @@ void AlgorithmBase::createHouseMatrix()
 		mMatrix[i + mMatrixSize] = "";
 		for (int j = negMatrixSize; j < mMatrixSize; j++)
 		{
-			Point currP = Point(i, j);
+			Point currP = Point(j, i);
 			string pointChar = CHAR_DEFAULT;
 
 			if (isWall(currP))
@@ -135,21 +151,25 @@ void AlgorithmBase::printHouseMatrix()
 
 void AlgorithmBase::addWallToMatrix(Point p)
 {
+	eraseFromAllSets(p);
 	mWallsSet.insert(p);
 }
 
 void AlgorithmBase::addNotWallToMatrix(Point p)
 {
+	eraseFromAllSets(p);
 	mNotWallSet.insert(p);
 }
 
 void AlgorithmBase::addCleanToMatrix(Point p)
 {
+	eraseFromAllSets(p);
 	mCleanedSet.insert(p);
 }
 
 void AlgorithmBase::addDirtToMatrix(Point p, int dirt)
 {
+	eraseFromAllSets(p);
 	mDirtsMap.insert({p,dirt});
 }
 
@@ -158,10 +178,32 @@ void AlgorithmBase::addDockingToMatrix(Point p)
 	mDockingLocation = p;
 }
 
-void AlgorithmBase::addRobotToMatrix(Point p, int dirt)
+void AlgorithmBase::addRobotToMatrix(Point p)
 {
 	mLocation = p;
-	addDirtToMatrix(p, dirt);
+}
+
+void AlgorithmBase::eraseFromAllSets(Point p)
+{
+	if (isDirt(p))
+	{
+		mDirtsMap.erase(p);
+	}
+
+	if (isWall(p))
+	{
+		mWallsSet.erase(p);
+	}
+
+	if (isNotWall(p))
+	{
+		mNotWallSet.erase(p);
+	}
+
+	if (isCleaned(p))
+	{
+		mCleanedSet.erase(p);
+	}
 }
 
 Point AlgorithmBase::getPointFromDirection(Point origin, Direction direction)
@@ -388,7 +430,7 @@ bool AlgorithmBase::isHouseClean()
 
 bool AlgorithmBase::isUnknownPoint(Point p)
 {
-	return !isNotWall(p) && !isWall(p) && !isDirt(p);
+	return !isNotWall(p) && !isWall(p) && !isDirt(p) && !isCleaned(p);
 }
 
 bool AlgorithmBase::isWall(Point p)
@@ -441,7 +483,7 @@ void AlgorithmBase::addInfoFromSensor()
 	{
 		addWallToMatrix(eDirection);
 	}
-	else
+	else if (isUnknownPoint(eDirection))
 	{
 		addNotWallToMatrix(eDirection);
 	}
@@ -450,7 +492,7 @@ void AlgorithmBase::addInfoFromSensor()
 	{
 		addWallToMatrix(wDirection);
 	}
-	else
+	else if (isUnknownPoint(wDirection))
 	{
 		addNotWallToMatrix(wDirection);
 	}
@@ -459,7 +501,7 @@ void AlgorithmBase::addInfoFromSensor()
 	{
 		addWallToMatrix(sDirection);
 	}
-	else
+	else if (isUnknownPoint(sDirection))
 	{
 		addNotWallToMatrix(sDirection);
 	}
@@ -468,7 +510,7 @@ void AlgorithmBase::addInfoFromSensor()
 	{
 		addWallToMatrix(nDirection);
 	}
-	else
+	else if (isUnknownPoint(nDirection))
 	{
 		addNotWallToMatrix(nDirection);
 	}

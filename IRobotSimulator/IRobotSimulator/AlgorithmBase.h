@@ -18,7 +18,7 @@ using namespace std;
 #define DEFAULT_MATRIX_SIZE 25
 #define CHAR_WALL "W"
 #define CHAR_NOT_WALL "N"
-#define CHAR_DEFAULT "?"
+#define CHAR_DEFAULT "."
 #define CHAR_DOCKING "D"
 #define CHAR_ROBOT "R"
 #define CHAR_CLEAN " "
@@ -95,7 +95,8 @@ protected:
 	void addCleanToMatrix(Point p);
 	void addDirtToMatrix(Point p, int dirt);
 	void addDockingToMatrix(Point p);
-	void addRobotToMatrix(Point p, int dirt);
+	void addRobotToMatrix(Point p);
+	void eraseFromAllSets(Point p);
 	Point getPointFromDirection(Point origin, Direction direction);
 
 	Path getShortestPathBetween2Points(Point p1, Point p2);
