@@ -63,10 +63,14 @@ Direction AlgorithmBase::step(Direction prevStep){
 
 	updateBattery();
 
+
 	if (_ALGORITHM_DEBUG_)
 	{
 		createHouseMatrix();
 		printHouseMatrix();
+//#if defined (_WIN32)
+//		system("pause");
+//#endif
 	}
 
 	return chosenDirection;
@@ -727,7 +731,7 @@ Path AlgorithmBase::findClosestNotWall()
 			path = currPath;
 		}
 
-		if (currPath.length < 3)
+		if (currPath.length == 1)
 		{
 			return path;
 		}
