@@ -15,7 +15,6 @@
 #include <dlfcn.h>
 #endif
 #include <atomic>
-#include <mutex>
 using namespace std;
 
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
@@ -26,17 +25,17 @@ using namespace std;
 	typedef int(*scoreCreator)(const map<string, int>&);
 
 //this function  is not related to a certin instance of the class simulator(static?)
-int calculateSimulationScore(const map<string, int>& score_params);
 
 class Simulator
 {
 public:
+	Simulator(){};
 	Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
-		mHouseList(NULL),
 		mHousesErrorMessages(""),
 		mAlgorithmErrorMessages(""),
 		mIsAnySimulationScoreBad(false)
 	{
+		mHouseList.clear();
 		mConfiguration = configuration;
 		mAlgorithmNames = new list<string>;
 		calculateScore = _calculateScore;
@@ -66,6 +65,7 @@ public:
 	string getHousesErrorMessages() const;
 	string getScoreErrorMessage() const;
 	void runSimuationOnHouse();
+	static int calculateSimulationScore(const map<string, int>& score_params);
 private:
 
 	//members:
@@ -78,7 +78,6 @@ private:
 	bool mIsAnySimulationScoreBad;
 	size_t mNumThreads;
 	atomic_size_t houseIndex{0};
-	mutex print_lock;
 
 	//functions:
 	void executeAllAlgoOnAllHouses();

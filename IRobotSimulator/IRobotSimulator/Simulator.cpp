@@ -443,7 +443,6 @@ void Simulator::runSimuationOnHouse()
 		++houseIndex;
 		if (DEBUG)
 		{
-			lock_guard<mutex> lock(print_lock);
 			cout << "running from thread #" << this_thread::get_id() << endl;
 		}
 
@@ -577,7 +576,7 @@ void Simulator::runSimuationOnHouse()
 }
 
 // this is not a member function of simulation class!!! 
-int calculateSimulationScore(const map<string, int>& score_params){
+int Simulator::calculateSimulationScore(const map<string, int>& score_params){
 	int winnerNumberOfSteps;
 	int simulationStepsCounter;
 	int positionInCompetition;
