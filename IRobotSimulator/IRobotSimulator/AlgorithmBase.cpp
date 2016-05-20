@@ -46,6 +46,9 @@ Direction AlgorithmBase::step(Direction prevStep){
 	//if there's still dust - stay in current location:
 	Direction chosenDirection = Direction::Stay;
 	
+	// Safe clean memoization
+	cleanMemoizationFromWrongPaths();
+	
 	mNotWallSet.erase(mLocation);
 	chosenDirection = getNextStep(info, prevStep);
 
@@ -68,9 +71,9 @@ Direction AlgorithmBase::step(Direction prevStep){
 	{
 		createHouseMatrix();
 		printHouseMatrix();
-//#if defined (_WIN32)
-//		system("pause");
-//#endif
+#if defined (_WIN32)
+		//system("pause");
+#endif
 	}
 
 	return chosenDirection;
@@ -119,13 +122,13 @@ void AlgorithmBase::createHouseMatrix()
 			{
 				pointChar = CHAR_WALL;
 			}
-			else if (isNotWall(currP))
-			{
-				pointChar = CHAR_NOT_WALL;
-			}
 			else if (isDirt(currP))
 			{
 				pointChar = to_string(mDirtsMap[currP]);
+			}
+			else if (isNotWall(currP))
+			{
+				pointChar = CHAR_NOT_WALL;
 			}
 			else if (isCleaned(currP))
 			{
@@ -184,6 +187,11 @@ void AlgorithmBase::addDirtToMatrix(Point p, int dirt)
 void AlgorithmBase::addShortestPathToMoatization(Path path)
 {
 	mMoatizationShortestPaths[pair<Point,Point>(path.origin,path.dest)] = path;
+
+	vector<Point> vector = path.path;
+	std::reverse(vector.begin(), vector.end());
+	mMoatizationShortestPaths[pair<Point, Point>(path.dest, path.origin)] = Path(path.dest,path.origin,vector,vector.size()-1);
+	
 }
 
 void AlgorithmBase::addDockingToMatrix(Point p)
@@ -273,6 +281,7 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 	while (point != p1)
 	{
 		shortestPath.push_back(point);
+//		addShortestPathToMoatization(Path(point, p2, shortestPath, shortestPath.size() -1));
 		point = parent[point];
 	}
 	shortestPath.push_back(p1);
@@ -532,6 +541,33 @@ void AlgorithmBase::addInfoFromSensor()
 	else
 	{
 		addDirtToMatrix(mLocation, info.dirtLevel);
+	}
+}
+
+void AlgorithmBase::cleanMemoizationFromWrongPaths()
+{
+	Point point = mLocation;
+	set<pair<Point, Point>> eraseSet;
+	for (auto &path : mMoatizationShortestPaths)
+	{
+		// Remove element if on a point that cross this path
+		vector<Point> vector = path.second.path;
+		if (find(vector.begin(), vector.end(), point) != vector.end()) {
+			eraseSet.insert(path.first);
+		}
+	}
+
+	for (auto &path : eraseSet)
+	{
+		mMoatizationShortestPaths.erase(path);
+	}
+}
+
+void AlgorithmBase::debugPrint(string str)
+{
+	if (_ALGORITHM_DEBUG_)
+	{
+		cout << str << endl;
 	}
 }
 

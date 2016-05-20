@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
-#define _ALGORITHM_DEBUG_ true
+#define _ALGORITHM_DEBUG_ 0
 
 #include <vector>
 #include <map>
@@ -125,6 +125,8 @@ protected:
 	bool isCleaned(Point p);
 	void updateBattery();
 	void addInfoFromSensor();
+	void cleanMemoizationFromWrongPaths();
+	void debugPrint(string str);
 
 	Path breadth_first(Point origin, Point dest);
 	Path breadth_first_recursive(stack<Point> Q, Point dest, set<Point> pointsSet);
