@@ -73,13 +73,14 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 		if (path.length < 3 && mBatteryLeft < mConfiguration.BatteryCapacity/2)
 		{
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
-		}else if (info.dirtLevel > 0 && mBatteryLeft > (int)path.length + 1)
+		}
+		else if (info.dirtLevel > 0 && mBatteryLeft >(int)path.length + 1 + (path.length*fakeStatistics / 100))
 		{
 			// If on dirt
 			debugPrint("On Dirt!");
 			chosenDirection = Direction::Stay;
 		}
-		else if(mBatteryLeft <= (int)path.length + 1)
+		else if(mBatteryLeft <= (int)path.length + 1 + (path.length*fakeStatistics/100))
 		{
 			debugPrint("Going back to charge! Battery: " + mBatteryLeft);
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);

@@ -10,6 +10,7 @@
 #include "MakeUnique.cpp"
 #endif
 
+
 // this method is called by the simulation either when there is a winner or 
 // when steps == MaxSteps - MaxStepsAfterWinner 
 // parameter stepsTillFinishing == MaxStepsAfterWinner 

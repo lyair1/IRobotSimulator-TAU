@@ -44,6 +44,14 @@ void AlgorithmBase::setConfiguration(map<string, int> config)
 	steps that were taken, provided as a parameter to 'step', not relying on the recommended
 	steps returned from the calls to 'step' to be the actual steps taken*/
 Direction AlgorithmBase::step(Direction prevStep){
+
+	if (myPrevStep != prevStep)
+	{
+		myPrevPoint.move(prevStep);
+		mLocation = myPrevPoint;
+		fakeStepsCount++;
+	}
+
 	SensorInformation info = mSensor->sense();
 	//if there's still dust - stay in current location:
 	Direction chosenDirection = Direction::Stay;
@@ -82,6 +90,13 @@ Direction AlgorithmBase::step(Direction prevStep){
 		lastDirection = chosenDirection;
 	}
 
+	myPrevPoint = mLocation;
+	myPrevStep = chosenDirection;
+
+	stepsCount++;
+	fakeStepsCount = 2;
+	fakeStatistics = fakeStepsCount*100 / stepsCount;
+	
 	return chosenDirection;
 }
 

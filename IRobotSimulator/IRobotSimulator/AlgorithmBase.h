@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
-#define _ALGORITHM_DEBUG_ 0
+#define _ALGORITHM_DEBUG_ 1
 
 #include <vector>
 #include <map>
@@ -39,7 +39,10 @@ public:
 		mMatrixSize(DEFAULT_MATRIX_SIZE),
 		lastShortestPath(Path()),
 		discoverNewNotWall(false),
-		lastDirection(Direction::South)
+		lastDirection(Direction::South),
+		myPrevStep(Direction::South),
+		myPrevPoint(0, 0),
+		fakeStatistics(10)
 	{
 		mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 		mMoves = new list<Direction>();
@@ -88,6 +91,11 @@ protected:
 	Path lastShortestPath;
 	bool discoverNewNotWall;
 	Direction lastDirection;
+	Direction myPrevStep;
+	Point myPrevPoint;
+	int stepsCount;
+	int fakeStepsCount;
+	int fakeStatistics;
 	string* mMatrix;
 	list<Direction> *mMoves;
 	set<Point> mWallsSet;
