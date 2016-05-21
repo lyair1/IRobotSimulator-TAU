@@ -8,6 +8,8 @@
 #include <queue>
 #include "Path.h"
 #include <stack>
+#include <vector>
+#include <algorithm>
 
 // setSensor is called once when the Algorithm is initialized 
 void AlgorithmBase::setSensor(const AbstractSensor& sensor)
@@ -152,7 +154,7 @@ void AlgorithmBase::createHouseMatrix()
 void AlgorithmBase::printHouseMatrix()
 {
 	cout << "**************************************************" << endl;
-	for (size_t j = 0; j < mMatrixSize*2; j++)
+	for (int j = 0; j < mMatrixSize*2; j++)
 	{
 		cout << mMatrix[j] << endl;
 	}
@@ -189,7 +191,7 @@ void AlgorithmBase::addShortestPathToMoatization(Path path)
 	mMoatizationShortestPaths[pair<Point,Point>(path.origin,path.dest)] = path;
 
 	vector<Point> vector = path.path;
-	std::reverse(vector.begin(), vector.end());
+	reverse(vector.begin(), vector.end());
 	mMoatizationShortestPaths[pair<Point, Point>(path.dest, path.origin)] = Path(path.dest,path.origin,vector,vector.size()-1);
 	
 }
@@ -285,7 +287,7 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 		point = parent[point];
 	}
 	shortestPath.push_back(p1);
-	std::reverse(shortestPath.begin(), shortestPath.end());
+	reverse(shortestPath.begin(), shortestPath.end());
 
 	Path shortPath = Path(p1, p2, shortestPath, shortestPath.size() - 1);
 	addShortestPathToMoatization(shortPath);
@@ -312,110 +314,6 @@ Path AlgorithmBase::connect2Paths(Path path1, Path path2)
 	}
 
 	return Path(path1.origin, path2.dest, AB, size);
-}
-
-Point AlgorithmBase::findLeftUpperCorner()
-{
-	Point point = *next(mWallsSet.begin(), 0);
-	for (auto p : mWallsSet) {
-		if (p._x < point._x && p._y < point._y)
-		{
-			point = p;
-		}
-	}
-
-	return point;
-}
-
-Point AlgorithmBase::findLeftBottomCorner()
-{
-	Point point = *next(mWallsSet.begin(), 0);
-	for (auto p : mWallsSet) {
-		if (p._x < point._x && p._y > point._y)
-		{
-			point = p;
-		}
-	}
-
-	return point;
-}
-
-Point AlgorithmBase::findRightUpperCorner()
-{
-	Point point = *next(mWallsSet.begin(), 0);
-	for (auto p : mWallsSet) {
-		if (p._x > point._x && p._y < point._y)
-		{
-			point = p;
-		}
-	}
-
-	return point;
-}
-
-Point AlgorithmBase::findRightBottomCorner()
-{
-	Point point = *next(mWallsSet.begin(), 0);
-	for (auto p : mWallsSet) {
-		if (p._x > point._x && p._y > point._y)
-		{
-			point = p;
-		}
-	}
-
-	return point;
-}
-
-bool AlgorithmBase::horLineBetweenPoints(Point p1, Point p2)
-{
-	if (p1._y != p2._y)
-	{
-		return false;
-	}
-
-	int x_start = p1._x;
-	int x_end = p2._x;
-	if (p2._x < p1._x)
-	{
-		x_start = p2._x;
-		x_end = p1._x;
-	}
-
-	for (int i = x_start; i < x_end; i++)
-	{
-		if (!isWall(Point(i, p1._y)))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool AlgorithmBase::verrLineBetweenPoints(Point p1, Point p2)
-{
-	if (p1._x != p2._x)
-	{
-		return false;
-	}
-
-	int y_start = p1._y;
-	int y_end = p2._y;
-	if (p2._y < p1._y)
-	{
-		y_start = p2._y;
-		y_end = p1._y;
-	}
-
-	for (int i = y_start; i < y_end; i++)
-	{
-		if (!isWall(Point(p1._x, i)))
-		{
-			return false;
-		}
-	}
-
-	return true;
 }
 
 bool AlgorithmBase::isHouseMapped()
@@ -569,119 +467,6 @@ void AlgorithmBase::debugPrint(string str)
 	{
 		cout << str << endl;
 	}
-}
-
-Path AlgorithmBase::breadth_first(Point origin, Point dest)
-{
-	stack<Point> Q;
-	Q.push(origin);
-	set<Point> pointsSet;
-	pointsSet.insert(origin);
-	return breadth_first_recursive(Q, dest, pointsSet);
-}
-
-Path AlgorithmBase::breadth_first_recursive(stack<Point> Q, Point dest, set<Point> pointsSet)
-{
-	Point n = Q.top();
-	Q.pop();
-
-	if (n == dest)
-	{
-		vector<Point> path;
-		path.push_back(n);
-		Path currPath = Path(n, n, path, 0);
-		addShortestPathToMoatization(currPath);
-		return currPath;
-	}
-
-	if (isInMoatization(n, dest))
-	{
-		Path currPath = mMoatizationShortestPaths[pair<Point, Point>(n, dest)];
-		return currPath;
-	}
-
-	Point p1 = Point(n._x - 1, n._y);
-	Point p2 = Point(n._x + 1, n._y);
-	Point p3 = Point(n._x, n._y + 1);
-	Point p4 = Point(n._x, n._y - 1);
-
-	vector<Point> path;
-	size_t maxSize_t = 65000;
-	Path currPath1 = Path(p1, p1,path, maxSize_t);
-	Path currPath2 = Path(p2, p2, path, maxSize_t);
-	Path currPath3 = Path(p3, p3, path, maxSize_t);
-	Path currPath4 = Path(p4, p4, path, maxSize_t);
-
-	bool hasPath1 = false;
-	bool hasPath2 = false;
-	bool hasPath3 = false;
-	bool hasPath4 = false;
-
-	if ((pointsSet.find(p1) == pointsSet.end()) && !isUnknownPoint(p1) && !isWall(p1))
-	{
-		pointsSet.insert(p1);
-		Q.push(p1);
-
-		vector<Point> path;
-		path.push_back(n);
-		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
-		currPath1 = connect2Paths(Path(n, n, path, 0), secondPath);
-		addShortestPathToMoatization(currPath1);
-		hasPath1 = true;
-	}
-
-	if ((pointsSet.find(p2) == pointsSet.end()) && !isUnknownPoint(p2) && !isWall(p2))
-	{
-		pointsSet.insert(p2);
-		Q.push(p2);
-
-		vector<Point> path;
-		path.push_back(n);
-		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
-		currPath2 = connect2Paths(Path(n, n, path, 0), secondPath);
-		addShortestPathToMoatization(currPath2);
-		hasPath2 = true;
-	}
-	if ((pointsSet.find(p3) == pointsSet.end()) && !isUnknownPoint(p3) && !isWall(p3))
-	{
-		pointsSet.insert(p3);
-		Q.push(p3);
-
-		vector<Point> path;
-		path.push_back(n);
-		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
-		currPath3 = connect2Paths(Path(n, n, path, 0), secondPath);
-		addShortestPathToMoatization(currPath3);
-		hasPath3 = true;
-	}
-	if ((pointsSet.find(p4) == pointsSet.end()) && !isUnknownPoint(p4) && !isWall(p4))
-	{
-		pointsSet.insert(p4);
-		Q.push(p4);
-
-		vector<Point> path;
-		path.push_back(n);
-		Path secondPath = breadth_first_recursive(Q, dest, pointsSet);
-		currPath4 = connect2Paths(Path(n, n, path, 0), secondPath);
-		addShortestPathToMoatization(currPath4);
-		hasPath4 = true;
-	}
-	
-	Path shortestPath = currPath1;
-	if (currPath2.length < shortestPath.length)
-	{
-		shortestPath = currPath2;
-	}
-	if (currPath3.length < shortestPath.length)
-	{
-		shortestPath = currPath3;
-	}
-	if (currPath4.length < shortestPath.length)
-	{
-		shortestPath = currPath4;
-	}
-
-	return shortestPath;
 }
 
 Direction AlgorithmBase::getStepFromDocking()

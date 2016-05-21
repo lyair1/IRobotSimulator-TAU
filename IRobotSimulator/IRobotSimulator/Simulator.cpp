@@ -600,7 +600,7 @@ int Simulator::calculateSimulationScore(const map<string, int>& score_params){
 	{
 		if (SCORE_DEBUG)
 		{
-			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << e.what() << endl;
+			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << e.what() << " with steps: " << simulationStepsCounter << endl;
 		}
 		return -1;
 	}

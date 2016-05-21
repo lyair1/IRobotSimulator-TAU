@@ -53,13 +53,13 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 	{
 		// In Position Somewhere
 		Path path = getShortestPathToDocking(mLocation);
-		if (info.dirtLevel > 0 && mBatteryLeft > path.length + 1)
+		if (info.dirtLevel > 0 && mBatteryLeft > (int)path.length + 1)
 		{
 			// If on dirt
 			debugPrint("On Dirt!");
 			chosenDirection = Direction::Stay;
 		}
-		else if(mBatteryLeft <= path.length + 1)
+		else if(mBatteryLeft <= (int)path.length + 1)
 		{
 			debugPrint("Going back to charge! Battery: " + mBatteryLeft);
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);

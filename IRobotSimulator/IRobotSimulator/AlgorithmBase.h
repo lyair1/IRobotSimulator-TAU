@@ -5,11 +5,8 @@
 
 #include <vector>
 #include <map>
-#include <limits.h>
 #include "Configuration.h"
 #include <set>
-#include <queue>
-#include <stack>
 class Path;
 using namespace std;
 
@@ -32,22 +29,22 @@ class AlgorithmBase : public AbstractAlgorithm
 public:
 	AlgorithmBase():mSensor(NULL), 
 					mLocation(-1,-1),
+					mDockingLocation(-1, -1),
 					mLastDirection(-1), 
 					mPrevLastDirection(-1), 
 					mConfiguration(0,0,0,0), 
 					mAboutToFinish(false),
 					mBatteryLeft(0),
 					mStepsTillFinish(-1),
-					mMatrixSize(DEFAULT_MATRIX_SIZE),
-					mDockingLocation(-1,-1)
+					mMatrixSize(DEFAULT_MATRIX_SIZE)
 	{
 		mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 		mMoves = new list<Direction>();
 		mWallsSet.clear();
 		mNotWallSet.clear();
+		mCleanedSet.clear();
 		mDirtsMap.clear();
 		mMoatizationShortestPaths.clear();
-		mCleanedSet.clear();
 	}
 	~AlgorithmBase()
 	{
@@ -82,11 +79,11 @@ protected:
 	int mPrevLastDirection;
 	Configuration mConfiguration;
 	bool mAboutToFinish;
-	list<Direction> *mMoves;
-	string* mMatrix;
 	int mBatteryLeft;
 	int mStepsTillFinish;
 	int mMatrixSize;
+	string* mMatrix;
+	list<Direction> *mMoves;
 	set<Point> mWallsSet;
 	set<Point> mNotWallSet;
 	set<Point> mCleanedSet;
@@ -109,12 +106,6 @@ protected:
 	Path getShortestPathToDocking(Point p1);
 	Path connect2Paths(Path path1, Path path2);
 	
-	Point findLeftUpperCorner();
-	Point findLeftBottomCorner();
-	Point findRightUpperCorner();
-	Point findRightBottomCorner();
-	bool horLineBetweenPoints(Point p1, Point p2);
-	bool verrLineBetweenPoints(Point p1, Point p2);
 	bool isHouseMapped();
 	bool isHouseClean();
 	bool isUnknownPoint(Point p);
@@ -127,9 +118,6 @@ protected:
 	void addInfoFromSensor();
 	void cleanMemoizationFromWrongPaths();
 	void debugPrint(string str);
-
-	Path breadth_first(Point origin, Point dest);
-	Path breadth_first_recursive(stack<Point> Q, Point dest, set<Point> pointsSet);
 
 	// When in docking
 	Direction getStepFromDocking();
