@@ -155,3 +155,4 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 IRobotSimulator/IRobotSimulator/default_generated_house.house
+IRobotSimulator/IRobotSimulator/IRobotSimulator.vcxproj.filters

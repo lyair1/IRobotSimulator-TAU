@@ -27,16 +27,19 @@ class AlgorithmBase : public AbstractAlgorithm
 {
 
 public:
-	AlgorithmBase():mSensor(NULL), 
-					mLocation(-1,-1),
-					mDockingLocation(-1, -1),
-					mLastDirection(-1), 
-					mPrevLastDirection(-1), 
-					mConfiguration(0,0,0,0), 
-					mAboutToFinish(false),
-					mBatteryLeft(0),
-					mStepsTillFinish(-1),
-					mMatrixSize(DEFAULT_MATRIX_SIZE)
+	AlgorithmBase() :mSensor(NULL),
+		mLocation(-1, -1),
+		mDockingLocation(-1, -1),
+		mLastDirection(-1),
+		mPrevLastDirection(-1),
+		mConfiguration(0, 0, 0, 0),
+		mAboutToFinish(false),
+		mBatteryLeft(0),
+		mStepsTillFinish(-1),
+		mMatrixSize(DEFAULT_MATRIX_SIZE),
+		lastShortestPath(Path()),
+		discoverNewNotWall(false),
+		lastDirection(Direction::South)
 	{
 		mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 		mMoves = new list<Direction>();
@@ -82,6 +85,9 @@ protected:
 	int mBatteryLeft;
 	int mStepsTillFinish;
 	int mMatrixSize;
+	Path lastShortestPath;
+	bool discoverNewNotWall;
+	Direction lastDirection;
 	string* mMatrix;
 	list<Direction> *mMoves;
 	set<Point> mWallsSet;
@@ -124,8 +130,12 @@ protected:
 
 	// When in position
 	//bool doesHaveEnoughBatteryToFinish();
-	Path findClosestNotWall();
+	Path findClosestNotWall(bool explorer);
 	Direction getDirectionFromPoint(Point origin, Point dest);
+
+	bool comparePoint(Point p1, Point p2);
+
+	int getPathScore(Path path);
 };
 
 #endif

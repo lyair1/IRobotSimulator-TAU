@@ -68,7 +68,6 @@ Direction AlgorithmBase::step(Direction prevStep){
 
 	updateBattery();
 
-
 	if (_ALGORITHM_DEBUG_)
 	{
 		createHouseMatrix();
@@ -76,6 +75,11 @@ Direction AlgorithmBase::step(Direction prevStep){
 #if defined (_WIN32)
 		//system("pause");
 #endif
+	}
+
+	if (chosenDirection != Direction::Stay)
+	{
+		lastDirection = chosenDirection;
 	}
 
 	return chosenDirection;
@@ -169,6 +173,7 @@ void AlgorithmBase::addWallToMatrix(Point p)
 
 void AlgorithmBase::addNotWallToMatrix(Point p)
 {
+	discoverNewNotWall = true;
 	eraseFromAllSets(p);
 	mNotWallSet.insert(p);
 }
@@ -264,6 +269,10 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 		neighbors.push_back(Point(point._x, point._y - 1));
 		neighbors.push_back(Point(point._x + 1, point._y));
 		neighbors.push_back(Point(point._x, point._y + 1));
+		
+		vector<Point> notWalls;
+		vector<Point> clean;
+
 		for (auto& neighbor : neighbors)
 		{
 			if (isUnknownPoint(neighbor) || isWall(neighbor))
@@ -271,8 +280,25 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 			if (parent.find(neighbor) == parent.end()) //don't add neighbor to queue if it was already visited...
 			{
 				parent[neighbor] = point;
-				Q.push(neighbor);
+				if (isNotWall(neighbor))
+				{
+					notWalls.push_back(neighbor);
+				}
+				else
+				{
+					clean.push_back(neighbor);
+				}
 			}
+		}
+
+		for (auto &p : clean)
+		{
+			Q.push(p);
+		}
+
+		for (auto &p : notWalls)
+		{
+			Q.push(p);
 		}
 	}
 
@@ -283,7 +309,7 @@ Path AlgorithmBase::getShortestPathBetween2Points(Point p1, Point p2)
 	while (point != p1)
 	{
 		shortestPath.push_back(point);
-//		addShortestPathToMoatization(Path(point, p2, shortestPath, shortestPath.size() -1));
+		addShortestPathToMoatization(Path(point, p2, shortestPath, shortestPath.size() -1));
 		point = parent[point];
 	}
 	shortestPath.push_back(p1);
@@ -389,6 +415,7 @@ void AlgorithmBase::updateBattery()
 
 void AlgorithmBase::addInfoFromSensor()
 {
+	discoverNewNotWall = false;
 	SensorInformation info = mSensor->sense();
 
 	Point eDirection = getPointFromDirection(mLocation, Direction::East);
@@ -450,9 +477,12 @@ void AlgorithmBase::cleanMemoizationFromWrongPaths()
 	{
 		// Remove element if on a point that cross this path
 		vector<Point> vector = path.second.path;
-		if (find(vector.begin(), vector.end(), point) != vector.end()) {
-			eraseSet.insert(path.first);
-		}
+		if (vector.size() > 1)
+		{
+			if (find(vector.begin() + 1, vector.end() - 1, point) != vector.end()) {
+				eraseSet.insert(path.first);
+			}
+		}	
 	}
 
 	for (auto &path : eraseSet)
@@ -536,28 +566,78 @@ Direction AlgorithmBase::getStepFromDocking()
 }
 
 // Make sure there are Not walls before calling this function
-Path AlgorithmBase::findClosestNotWall()
+Path AlgorithmBase::findClosestNotWall(bool explorer)
 {
-	Point point = *next(mNotWallSet.begin(), 0);
-	Path path = getShortestPathBetween2Points(mLocation, point);
-	for (auto &p : mNotWallSet)
+	if (!discoverNewNotWall && lastShortestPath.length > 0)
 	{
-		Path currPath = getShortestPathBetween2Points(mLocation, p);
-		if (currPath.length == 0)
+		// If because in STAY it's ok
+		if (lastShortestPath.origin != mLocation)
 		{
-			continue;
+			lastShortestPath.origin = lastShortestPath.path[1];
+			lastShortestPath.path.erase(lastShortestPath.path.begin());
+			lastShortestPath.length--;
 		}
-		if (path.length > currPath.length || path.length == 0)
+		
+		if (lastShortestPath.length > 0 && lastShortestPath.origin == mLocation)
 		{
-			path = currPath;
-		}
-
-		if (currPath.length == 1)
-		{
-			return path;
+			return lastShortestPath;
 		}
 	}
 
+	Path path = getShortestPathBetween2Points(mLocation, mLocation);// create zero path
+
+	Point lastDirectionPoint = getPointFromDirection(mLocation, lastDirection);
+	if (explorer && isNotWall(lastDirectionPoint)) // optimization to go on the same direction if possible.
+	{
+		Path p = getShortestPathBetween2Points(mLocation, lastDirectionPoint);
+		lastShortestPath = path;
+		return  p;
+	}
+
+	if (!mDirtsMap.empty())
+	{
+		for (auto &p : mDirtsMap)
+		{
+			Path currPath = getShortestPathBetween2Points(mLocation, p.first);
+			if (currPath.length == 0)
+			{
+				continue;
+			}
+			if (path.length > currPath.length || path.length == 0)
+			{
+				path = currPath;
+			}
+
+			if (currPath.length == 1)
+			{
+				lastShortestPath = path;
+				return path;
+			}
+		}
+	}
+	else
+	{
+		for (auto &p : mNotWallSet)
+		{
+			Path currPath = getShortestPathBetween2Points(mLocation, p);
+			if (currPath.length == 0)
+			{
+				continue;
+			}
+			if (path.length >= currPath.length || path.length == 0)
+			{
+				path = currPath;	
+			}
+
+			if (currPath.length == 1)
+			{
+				lastShortestPath = path;
+				return path;
+			}
+		}
+	}
+
+	lastShortestPath = path;
 	return path;
 }
 
@@ -584,6 +664,37 @@ Direction AlgorithmBase::getDirectionFromPoint(Point origin, Point dest)
 	}
 
 	return Direction::Stay;
+}
+
+bool AlgorithmBase::comparePoint(Point p1, Point p2)
+{
+	if (isNotWall(p1) && isNotWall(p2))
+	{
+		return true;
+	}
+
+	if (isNotWall(p1))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+int AlgorithmBase::getPathScore(Path path)
+{
+	int score = 0;
+	for (auto p : path.path)
+	{
+		if (isNotWall(p))
+		{
+			score++;
+		}
+	}
+
+	return score;
 }
 
 // Default implementation is a random choose between all of the non-wall options

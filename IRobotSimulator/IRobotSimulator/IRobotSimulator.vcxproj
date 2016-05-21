@@ -97,6 +97,7 @@
     <ClInclude Include="AbstractSensor.h" />
     <ClInclude Include="AlgorithmBase.h" />
     <ClInclude Include="AlgorithmLoader.h" />
+    <ClInclude Include="AlgorithmRegistration.h" />
     <ClInclude Include="configReader.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direction.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="200945657_C_.cpp" />
     <ClCompile Include="AlgorithmBase.cpp" />
     <ClCompile Include="AlgorithmLoader.cpp" />
+    <ClCompile Include="AlgorithmRegistration.cpp" />
     <ClCompile Include="configReader.cpp" />
     <ClCompile Include="House.cpp" />
     <ClCompile Include="main.cpp" />
