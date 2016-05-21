@@ -60,7 +60,7 @@ Direction _200945657_C::getNextStep(SensorInformation info, Direction prevStep)
 			}
 			else
 			{
-				Path pathToNotWall = findClosestNotWall(true, false);
+				Path pathToNotWall = findClosestNotWall(true, true, true);
 				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
 			}
 		}
@@ -99,7 +99,7 @@ Direction _200945657_C::getNextStep(SensorInformation info, Direction prevStep)
 			}
 			// Looking for the not wall
 			debugPrint("Looking for not wall!");
-			Path pathToNotWall = findClosestNotWall(true, false);
+			Path pathToNotWall = findClosestNotWall(true, true, true);
 
 			if (pathToNotWall.length + getShortestPathToDocking(pathToNotWall.dest).length > (size_t)mBatteryLeft)
 			{

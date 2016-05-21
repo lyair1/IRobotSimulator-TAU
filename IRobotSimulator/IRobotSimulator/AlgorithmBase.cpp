@@ -81,7 +81,7 @@ Direction AlgorithmBase::step(Direction prevStep){
 		createHouseMatrix();
 		printHouseMatrix();
 #if defined (_WIN32)
-		//system("pause");
+		system("pause");
 #endif
 	}
 
@@ -94,7 +94,6 @@ Direction AlgorithmBase::step(Direction prevStep){
 	myPrevStep = chosenDirection;
 
 	stepsCount++;
-	fakeStepsCount = 2;
 	fakeStatistics = fakeStepsCount*100 / stepsCount;
 	
 	return chosenDirection;
@@ -581,7 +580,7 @@ Direction AlgorithmBase::getStepFromDocking()
 }
 
 // Make sure there are Not walls before calling this function
-Path AlgorithmBase::findClosestNotWall(bool explorer, bool firstDirt)
+Path AlgorithmBase::findClosestNotWall(bool explorer, bool firstDirt, bool crawlWalls)
 {
 	if (!discoverNewNotWall && lastShortestPath.length > 0)
 	{
@@ -602,11 +601,52 @@ Path AlgorithmBase::findClosestNotWall(bool explorer, bool firstDirt)
 	Path path = getShortestPathBetween2Points(mLocation, mLocation);// create zero path
 
 	Point lastDirectionPoint = getPointFromDirection(mLocation, lastDirection);
-	if (explorer && isNotWall(lastDirectionPoint)) // optimization to go on the same direction if possible.
+	if (explorer) // optimization to go on the same direction if possible.
 	{
-		Path p = getShortestPathBetween2Points(mLocation, lastDirectionPoint);
-		lastShortestPath = path;
-		return  p;
+		if (crawlWalls)
+		{
+			Point prevPoint = getPointFromDirection(mLocation, oppositeDirection(lastDirection));
+
+			Point ePoint = getPointFromDirection(mLocation, Direction::East);
+			if (isWall(getPointFromDirection(prevPoint, Direction::East)) && isNotWall(ePoint))
+			{
+				Path p = getShortestPathBetween2Points(mLocation, ePoint);
+				lastShortestPath = path;
+				return  p;
+			}
+
+			Point sPoint = getPointFromDirection(mLocation, Direction::South);
+			if (isWall(getPointFromDirection(prevPoint, Direction::South)) && isNotWall(sPoint))
+			{
+				Path p = getShortestPathBetween2Points(mLocation, sPoint);
+				lastShortestPath = path;
+				return  p;
+			}
+
+			Point wPoint = getPointFromDirection(mLocation, Direction::West);
+			if (isWall(getPointFromDirection(prevPoint, Direction::West)) && isNotWall(wPoint))
+			{
+				Path p = getShortestPathBetween2Points(mLocation, wPoint);
+				lastShortestPath = path;
+				return  p;
+			}
+
+			Point nPoint = getPointFromDirection(mLocation, Direction::North);
+			if (isWall(getPointFromDirection(prevPoint, Direction::North)) && isNotWall(nPoint))
+			{
+				Path p = getShortestPathBetween2Points(mLocation, nPoint);
+				lastShortestPath = path;
+				return  p;
+			}
+		}
+
+		if (isNotWall(lastDirectionPoint))
+		{
+			Path p = getShortestPathBetween2Points(mLocation, lastDirectionPoint);
+			lastShortestPath = path;
+			
+			return  p;
+		}
 	}
 
 	if (!mDirtsMap.empty() && firstDirt)
