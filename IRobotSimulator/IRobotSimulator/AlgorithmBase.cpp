@@ -94,7 +94,6 @@ Direction AlgorithmBase::step(Direction prevStep){
 	myPrevStep = chosenDirection;
 
 	stepsCount++;
-	fakeStepsCount = 2;
 	fakeStatistics = fakeStepsCount*100 / stepsCount;
 	
 	return chosenDirection;
