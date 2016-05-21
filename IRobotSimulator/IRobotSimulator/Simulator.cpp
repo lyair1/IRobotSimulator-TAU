@@ -40,11 +40,11 @@ Simulator::Simulator(const Simulator& otherSimulator)
 	mAlgorithmNames = otherSimulator.mAlgorithmNames;
 	mIsAnySimulationScoreBad = otherSimulator.mIsAnySimulationScoreBad;
 	mNumThreads = otherSimulator.mNumThreads;
-	houseIndex = { 0 };
+	mHouseIndex = { 0 };
 	calculateScore = otherSimulator.calculateScore;
 }
 
-void Simulator::runSimulation(HouseList houses_list, size_t numThreads)
+void Simulator::runSimulation(HouseList houses_list, int numThreads)
 {
 	mNumThreads = numThreads;
 	if (DEBUG)
@@ -464,10 +464,10 @@ void Simulator::executeAllAlgoOnAllHouses()
 
 void Simulator::runSimuationOnHouse()
 {
-	while (houseIndex < mHouseList.size())
+	while (mHouseIndex < mHouseList.size())
 	{
-		House*  house = mHouseList[houseIndex];
-		++houseIndex;
+		House*  house = mHouseList[mHouseIndex];
+		++mHouseIndex;
 		if (DEBUG)
 		{
 			cout << "running from thread #" << this_thread::get_id() << endl;
@@ -627,7 +627,7 @@ int Simulator::calculateSimulationScore(const map<string, int>& score_params){
 	{
 		if (SCORE_DEBUG)
 		{
-			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << e.what() << " with steps: " << simulationStepsCounter << endl;
+			//cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << e.what() << " with steps: " << simulationStepsCounter << endl;
 		}
 		return -1;
 	}

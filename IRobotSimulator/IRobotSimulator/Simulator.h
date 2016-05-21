@@ -48,7 +48,7 @@ public:
 		delete algoLoaders;
 		#endif
 	}
-	void runSimulation(HouseList houses_list, size_t numThreads);
+	void runSimulation(HouseList houses_list, int numThreads);
 	void cleanResources();
 	int countHousesInPath(string houses_path);
 	HouseList readAllHouses(string houses_path);
@@ -68,8 +68,8 @@ private:
 	ConfigReader* mConfiguration;
 	list<string>* mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
-	size_t mNumThreads;
-	atomic_size_t houseIndex{0};
+	int mNumThreads;
+	atomic_size_t mHouseIndex{0};
 
 	//functions:
 	void executeAllAlgoOnAllHouses();

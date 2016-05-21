@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	string algorithms_path = _pathPrefix;
 	string config_file_path = _pathPrefix + _defaultConfigFileName;
 	string score_formula_path = "";
-	size_t num_threads = 1;
+	int num_threads = 1;
 	// Get parameters from arg
 	for (int i = 1; i < argc - 1; i++){ //skip program name -> i=1
 		string arg = argv[i];
