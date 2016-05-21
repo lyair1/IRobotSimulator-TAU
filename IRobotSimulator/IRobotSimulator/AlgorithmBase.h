@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
-#define _ALGORITHM_DEBUG_ 1
+#define _ALGORITHM_DEBUG_ 0
 
 #include <vector>
 #include <map>
@@ -138,7 +138,7 @@ protected:
 
 	// When in position
 	//bool doesHaveEnoughBatteryToFinish();
-	Path findClosestNotWall(bool explorer);
+	Path findClosestNotWall(bool explorer, bool firstDirt);
 	Direction getDirectionFromPoint(Point origin, Point dest);
 
 	bool comparePoint(Point p1, Point p2);

@@ -61,7 +61,7 @@ Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 			}
 			else
 			{
-				Path pathToNotWall = findClosestNotWall(false);
+				Path pathToNotWall = findClosestNotWall(false, true);
 				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
 			}
 		}
@@ -75,13 +75,13 @@ Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 		{
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
 		}
-		else if (info.dirtLevel > 0 && mBatteryLeft >(int)path.length + 1)
+		else if (info.dirtLevel > 0 && mBatteryLeft >(int)(path.length + 1 + (path.length*fakeStatistics / 100)))
 		{
 			// If on dirt
 			debugPrint("On Dirt!");
 			chosenDirection = Direction::Stay;
 		}
-		else if (mBatteryLeft <= (int)path.length + 1)
+		else if (mBatteryLeft <= (int)(path.length + 1 + (path.length*fakeStatistics / 100)))
 		{
 			debugPrint("Going back to charge! Battery: " + mBatteryLeft);
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
@@ -100,7 +100,7 @@ Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 			}
 			// Looking for the not wall
 			debugPrint("Looking for not wall!");
-			Path pathToNotWall = findClosestNotWall(false);
+			Path pathToNotWall = findClosestNotWall(false, true);
 
 			if (pathToNotWall.length + getShortestPathToDocking(pathToNotWall.dest).length > (size_t)mBatteryLeft)
 			{

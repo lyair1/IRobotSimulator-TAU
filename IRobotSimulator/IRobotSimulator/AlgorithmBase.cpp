@@ -581,7 +581,7 @@ Direction AlgorithmBase::getStepFromDocking()
 }
 
 // Make sure there are Not walls before calling this function
-Path AlgorithmBase::findClosestNotWall(bool explorer)
+Path AlgorithmBase::findClosestNotWall(bool explorer, bool firstDirt)
 {
 	if (!discoverNewNotWall && lastShortestPath.length > 0)
 	{
@@ -609,7 +609,7 @@ Path AlgorithmBase::findClosestNotWall(bool explorer)
 		return  p;
 	}
 
-	if (!mDirtsMap.empty())
+	if (!mDirtsMap.empty() && firstDirt)
 	{
 		for (auto &p : mDirtsMap)
 		{
