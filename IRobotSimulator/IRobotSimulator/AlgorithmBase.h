@@ -138,7 +138,7 @@ protected:
 
 	// When in position
 	//bool doesHaveEnoughBatteryToFinish();
-	Path findClosestNotWall(bool explorer, bool firstDirt);
+	Path findClosestNotWall(bool explorer, bool firstDirt, bool crawlWalls);
 	Direction getDirectionFromPoint(Point origin, Point dest);
 
 	bool comparePoint(Point p1, Point p2);
