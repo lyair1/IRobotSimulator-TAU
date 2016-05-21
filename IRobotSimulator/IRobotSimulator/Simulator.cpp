@@ -33,7 +33,7 @@ Simulator::Simulator(ConfigReader *configuration, scoreCreator _calculateScore) 
 //copy constructor
 Simulator::Simulator(const Simulator& otherSimulator)
 {
-	algoLoaders = otherSimulator.algoLoaders;
+	mAlgoLoaders = otherSimulator.mAlgoLoaders;
 	mHouseList = otherSimulator.mHouseList;
 	mHousesErrorMessages = otherSimulator.mHousesErrorMessages;
 	mAlgorithmErrorMessages = otherSimulator.mAlgorithmErrorMessages;
@@ -310,37 +310,37 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstT
 #endif
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 	{
-		if (fs::is_regular_file(p) && p.extension() == ".so" && p.string().at(p.string().length()-4) == '_') // change to _.so
+		if (fs::is_regular_file(p) && p.extension() == ".so" )
 		{
-			if (DEBUG)
+			if ( p.string().at(p.string().length()-4) == '_') // change to _.so
 			{
-				cout << "scan file: :" << p.string() << "\n";
+				if (DEBUG)
+				{
+					cout << "scan  _.so file :" << p.string() << "\n";
+				}
+#ifndef _WIN32
+				allAlgos.push_back(new AlgorithmLoader(p.string(), p.stem().string()));
+#else
+				allAlgos.push_back(new AlgorithmLoader(new AlgorithmNaive(), "ALGO" + i));
+				i++;
+#endif
 			}
-		#ifndef _WIN32
-			allAlgos.push_back(new AlgorithmLoader(p.string(), p.stem().string()));
-		#else
-			allAlgos.push_back(new AlgorithmLoader(new AlgorithmNaive(), "ALGO" + i));
-			i++;
-		#endif
+
 		}
 	}
-
 	sort(allAlgos.begin(), allAlgos.end(), less_than_key());
-
 	if (allAlgos.empty())
 	{
 		cout << USAGE;
 		cout << "cannot find algorithm files in '" << algorithms_path << "'"<<endl; 
 		exit(0);
 	}
-
-	algoLoaders = new LoadersList();
-
-	for (AlgorithmLoader* algo : allAlgos)
+	mAlgoLoaders = new LoadersList();
+	for (auto & algo : allAlgos)
 	{
 		if (algo->isValid())
 		{
-			algoLoaders->push_back(algo);
+			mAlgoLoaders->push_back(algo);
 			if (DEBUG)
 			{
 				cout << "Algorithm is valid\n";
@@ -350,16 +350,16 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstT
 		{
 			if (firstTime)
 			{
-				mAlgorithmErrorMessages += algo->getErrorLine();	
+				mAlgorithmErrorMessages += algo->getErrorLine();
 			}
 			dlclose(algo->handle);
 			delete algo;
 		}
 	}
 
-	if (algoLoaders->empty())
+	if (mAlgoLoaders->empty())
 	{
-		delete algoLoaders;
+		delete mAlgoLoaders;
 		if (DEBUG)
 		{
 			cout << "can't load any algorithm\n";
@@ -370,7 +370,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstT
 
 	AlgorithmList *algoList = new AlgorithmList();
 
-	for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); ++it)
+	for (LoadersList::iterator it = mAlgoLoaders->begin(); it != mAlgoLoaders->end(); ++it)
 	{
 		AlgorithmLoader *loader = (*it);
 		AbstractAlgorithm* algo = globalFactory[loader->fileName]();

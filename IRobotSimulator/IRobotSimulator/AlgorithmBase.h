@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
-#define _ALGORITHM_DEBUG_ 0
+#define _ALGORITHM_DEBUG_ 1
 
 #include <vector>
 #include <map>

@@ -35,7 +35,7 @@ public:
 	Simulator(ConfigReader *configuration, scoreCreator _calculateScore);
 	~Simulator(){
 		#ifndef _WIN32
-		for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); ++it)
+		for (LoadersList::iterator it = mAlgoLoaders->begin(); it != mAlgoLoaders->end(); ++it)
 		{
 			AlgorithmLoader *loader = (*it);
 			if (loader->handle != NULL)
@@ -45,7 +45,7 @@ public:
 			delete loader;
 		}
 
-		delete algoLoaders;
+		delete mAlgoLoaders;
 		#endif
 	}
 	void runSimulation(HouseList houses_list, int numThreads);
@@ -61,7 +61,7 @@ public:
 private:
 
 	//members:
-	LoadersList *algoLoaders;
+	LoadersList *mAlgoLoaders;
 	HouseList mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
