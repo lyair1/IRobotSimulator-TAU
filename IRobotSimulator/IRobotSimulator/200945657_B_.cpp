@@ -4,12 +4,22 @@
 @version 1.0 30/1/16
 */
 #include "200945657_B_.h"
+#include "Path.h"
+#include "AlgorithmRegistration.h"
+#ifndef _WIN32
+#include "MakeUnique.cpp"
+#endif
+
 
 // this method is called by the simulation either when there is a winner or 
 // when steps == MaxSteps - MaxStepsAfterWinner 
 // parameter stepsTillFinishing == MaxStepsAfterWinner 
 void _200945657_B::aboutToFinish(int stepsTillFinishing){
 	mAboutToFinish = true;
+	if (mBatteryLeft > stepsTillFinishing)
+	{
+		mBatteryLeft = stepsTillFinishing;
+	}
 }
 
 void _200945657_B::cleanResources(){
@@ -18,84 +28,92 @@ void _200945657_B::cleanResources(){
 
 Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 {
-	Direction chosenDirection;
-	if (mAboutToFinish)
+	Direction chosenDirection = Direction::North;
+	addInfoFromSensor();
+	debugPrint("Starting get next step! battery level: " + mBatteryLeft);
+	// If on docking
+	if (mLocation == mDockingLocation)
 	{
-		if (mMoves->size() > 0)
+		if (isHouseClean())
 		{
-			chosenDirection = mMoves->front();
-			mMoves->pop_front();
+			chosenDirection = Direction::Stay;
+		}
+		else if (isHouseMapped())
+		{
+			// TODO: check if has enough battery to finish:
 
-			return oppositeDirection(chosenDirection);
+		}
+		else if (mBatteryLeft < mConfiguration.BatteryCapacity)
+		{
+			debugPrint("Charging battery");
+			chosenDirection = Direction::Stay;
 		}
 		else
 		{
-			return Direction::Stay;
-		}
-		
-	}
+			//chosenDirection = getStepFromDocking();
 
-	if (mLastDirection == -1)
-	{
-		mLastDirection = 1;
+			// Looking for the not wall
+			debugPrint("Looking for not wall! docking");
+			Point p = mLocation;
+			if (isNotWall(getPointFromDirection(p, Direction::South))) // OPtimization
+			{
+				chosenDirection = Direction::South;
+			}
+			else
+			{
+				Path pathToNotWall = findClosestNotWall(false, true);
+				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
+			}
+		}
 	}
-	if (mPrevLastDirection == -1)
+	else
 	{
-		mPrevLastDirection = 1;
-	}
-	// robot changed direction
-	if (mLastDirection != mPrevLastDirection && mLastDirection != static_cast<int>(Direction::North))
-	{
-		chosenDirection = static_cast<Direction>(mPrevLastDirection);
-		if (info.isWall[static_cast<int>(chosenDirection)])
+		// In Position Somewhere
+		Path path = getShortestPathToDocking(mLocation);
+
+		if (path.length < 3 && mBatteryLeft < mConfiguration.BatteryCapacity / 2)
 		{
-			chosenDirection = oppositeDirection(static_cast<Direction>(mPrevLastDirection));
+			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
 		}
-		mPrevLastDirection = static_cast<int>(chosenDirection);
-		mLastDirection = static_cast<int>(chosenDirection);
-	}
-	else{
-		chosenDirection = static_cast<Direction>(mLastDirection);
-	}
-	while (info.isWall[static_cast<int>(chosenDirection)])
-	{
-		//robot is stepping into a wall - choose a different direction!
-		switch (chosenDirection){
-		case Direction::East:
-			chosenDirection = Direction::South;
-			if (info.isWall[static_cast<int>(chosenDirection)]){
-				chosenDirection = Direction::North;
+		else if (info.dirtLevel > 0 && mBatteryLeft >(int)(path.length + 1 + (path.length*fakeStatistics / 100)))
+		{
+			// If on dirt
+			debugPrint("On Dirt!");
+			chosenDirection = Direction::Stay;
+		}
+		else if (mBatteryLeft <= (int)(path.length + 1 + (path.length*fakeStatistics / 100)))
+		{
+			debugPrint("Going back to charge! Battery: " + mBatteryLeft);
+			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
+		}
+		else if (isHouseClean())
+		{
+			// If all is clean
+			debugPrint("All is clean!");
+			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
+		}
+		else if (mNotWallSet.size() >= 0)
+		{
+			if (mNotWallSet.size() == 0) // in case there is no more not walls (and also dirt) go back to docking
+			{
+				addNotWallToMatrix(mDockingLocation);
 			}
-			break;
-		case Direction::West:
-			chosenDirection = Direction::South;
-			if (info.isWall[static_cast<int>(chosenDirection)]){
-				chosenDirection = Direction::North;
+			// Looking for the not wall
+			debugPrint("Looking for not wall!");
+			Path pathToNotWall = findClosestNotWall(false, true);
+
+			if (pathToNotWall.length + getShortestPathToDocking(pathToNotWall.dest).length > (size_t)mBatteryLeft)
+			{
+				chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
 			}
-			break;
-		case Direction::South:
-			chosenDirection = Direction::East;
-			if (info.isWall[static_cast<int>(chosenDirection)]){
-				chosenDirection = Direction::West;
+			else
+			{
+				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
 			}
-			break;
-		case Direction::North:
-			chosenDirection = Direction::East;
-			if (info.isWall[static_cast<int>(chosenDirection)]){
-				chosenDirection = Direction::West;
-			}
-			break;
-		case Direction::Stay:
-			chosenDirection = Direction::East;
-			break;
-}
+		}
 	}
 
-	mMoves->push_front(prevStep);
-	mPrevLastDirection = mLastDirection;
-	mLastDirection = (int)chosenDirection;
-
-	return chosenDirection;
+	return chosenDirection; // Make sure we don't get here, we can hit the wall
 }
 
 #ifndef _WIN32
@@ -103,4 +121,8 @@ extern "C" AbstractAlgorithm* getAbstractAlgorithm()
 {
 	return new _200945657_B();
 }
+#endif
+
+#ifndef _WIN32
+REGISTER_ALGORITHM(_200945657_B)
 #endif

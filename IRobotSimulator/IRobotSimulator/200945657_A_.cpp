@@ -5,12 +5,20 @@
 */
 #include "200945657_A_.h"
 #include "Path.h"
+#include "AlgorithmRegistration.h"
+#ifndef _WIN32
+#include "MakeUnique.cpp"
+#endif
 
 // this method is called by the simulation either when there is a winner or 
 // when steps == MaxSteps - MaxStepsAfterWinner 
 // parameter stepsTillFinishing == MaxStepsAfterWinner 
 void _200945657_A::aboutToFinish(int stepsTillFinishing){
 	mAboutToFinish = true;
+	if (mBatteryLeft > stepsTillFinishing)
+	{
+		mBatteryLeft = stepsTillFinishing;
+	}
 }
 
 void _200945657_A::cleanResources(){
@@ -36,7 +44,7 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 		}
 		else if (mBatteryLeft < mConfiguration.BatteryCapacity)
 		{
-			cout << "Charging battery" << endl;
+			debugPrint("Charging battery");
 			chosenDirection = Direction::Stay;
 		}
 		else
@@ -45,21 +53,34 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 
 			// Looking for the not wall
 			debugPrint("Looking for not wall! docking");
-			Path pathToNotWall = findClosestNotWall();
-			chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
+			Point p = mLocation;
+			if (isNotWall(getPointFromDirection(p, Direction::South))) // OPtimization
+			{
+				chosenDirection = Direction::South;
+			}
+			else
+			{
+				Path pathToNotWall = findClosestNotWall(true, true);
+				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
+			}
 		}
 	}
 	else
 	{
 		// In Position Somewhere
 		Path path = getShortestPathToDocking(mLocation);
-		if (info.dirtLevel > 0 && mBatteryLeft > (int)path.length + 1)
+
+		if (path.length < 3 && mBatteryLeft < mConfiguration.BatteryCapacity/2)
+		{
+			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
+		}
+		else if (info.dirtLevel > 0 && mBatteryLeft >(int)(path.length + 1 + (path.length*fakeStatistics / 100)))
 		{
 			// If on dirt
 			debugPrint("On Dirt!");
 			chosenDirection = Direction::Stay;
 		}
-		else if(mBatteryLeft <= (int)path.length + 1)
+		else if(mBatteryLeft <= (int)(path.length + 1 + (path.length*fakeStatistics/100)))
 		{
 			debugPrint("Going back to charge! Battery: " + mBatteryLeft);
 			chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
@@ -78,8 +99,15 @@ Direction _200945657_A::getNextStep(SensorInformation info, Direction prevStep)
 			}
 			// Looking for the not wall
 			debugPrint("Looking for not wall!");
-			Path pathToNotWall = findClosestNotWall();
-			chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
+			Path pathToNotWall = findClosestNotWall(true, true);
+		
+			if (pathToNotWall.length + getShortestPathToDocking(pathToNotWall.dest).length > (size_t)mBatteryLeft)
+			{
+				chosenDirection = getDirectionFromPoint(mLocation, path.path[1]);
+			}else
+			{
+				chosenDirection = getDirectionFromPoint(mLocation, pathToNotWall.path[1]);
+			}			
 		}
 	}
 
@@ -91,4 +119,8 @@ extern "C" AbstractAlgorithm* getAbstractAlgorithm()
 {
 	return new _200945657_A();
 }
+#endif
+
+#ifndef _WIN32
+REGISTER_ALGORITHM(_200945657_A)
 #endif
