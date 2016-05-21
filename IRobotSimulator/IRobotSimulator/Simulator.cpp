@@ -20,7 +20,8 @@ using namespace std;
 Simulator::Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
 	mHousesErrorMessages(""),
 	mAlgorithmErrorMessages(""),
-	mIsAnySimulationScoreBad(false)
+	mIsAnySimulationScoreBad(false),
+	mNumThreads(1)
 {
 	mHouseList.clear();
 	mConfiguration = configuration;

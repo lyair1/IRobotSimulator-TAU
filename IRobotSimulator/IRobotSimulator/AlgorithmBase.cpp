@@ -81,7 +81,7 @@ Direction AlgorithmBase::step(Direction prevStep){
 		createHouseMatrix();
 		printHouseMatrix();
 #if defined (_WIN32)
-		system("pause");
+		//system("pause");
 #endif
 	}
 
@@ -172,6 +172,11 @@ void AlgorithmBase::createHouseMatrix()
 void AlgorithmBase::printHouseMatrix()
 {
 	cout << "**************************************************" << endl;
+#if defined (_WIN32)
+	system("CLS");
+#else
+	cout << "\033[2J\033[1;1H";
+#endif
 	for (int j = 0; j < mMatrixSize*2; j++)
 	{
 		cout << mMatrix[j] << endl;
