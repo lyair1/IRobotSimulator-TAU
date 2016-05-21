@@ -15,6 +15,10 @@
 // parameter stepsTillFinishing == MaxStepsAfterWinner 
 void _200945657_B::aboutToFinish(int stepsTillFinishing){
 	mAboutToFinish = true;
+	if (mBatteryLeft > stepsTillFinishing)
+	{
+		mBatteryLeft = stepsTillFinishing;
+	}
 }
 
 void _200945657_B::cleanResources(){
