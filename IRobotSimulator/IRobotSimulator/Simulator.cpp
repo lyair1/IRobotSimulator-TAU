@@ -17,6 +17,33 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
+Simulator::Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
+	mHousesErrorMessages(""),
+	mAlgorithmErrorMessages(""),
+	mIsAnySimulationScoreBad(false)
+{
+	mHouseList.clear();
+	mConfiguration = configuration;
+	mAlgorithmNames = new list<string>;
+	calculateScore = _calculateScore;
+
+}
+
+//copy constructor
+Simulator::Simulator(const Simulator& otherSimulator)
+{
+	algoLoaders = otherSimulator.algoLoaders;
+	mHouseList = otherSimulator.mHouseList;
+	mHousesErrorMessages = otherSimulator.mHousesErrorMessages;
+	mAlgorithmErrorMessages = otherSimulator.mAlgorithmErrorMessages;
+	mConfiguration = otherSimulator.mConfiguration;
+	mAlgorithmNames = otherSimulator.mAlgorithmNames;
+	mIsAnySimulationScoreBad = otherSimulator.mIsAnySimulationScoreBad;
+	mNumThreads = otherSimulator.mNumThreads;
+	houseIndex = { 0 };
+	calculateScore = otherSimulator.calculateScore;
+}
+
 void Simulator::runSimulation(HouseList houses_list, size_t numThreads)
 {
 	mNumThreads = numThreads;

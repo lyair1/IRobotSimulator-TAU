@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
-	auto simul = Simulator(configReader, calculateScore);
+	Simulator simul = Simulator(configReader, calculateScore);
 
 	// Print usage and return if there are no houses in the path
 	if (simul.countHousesInPath(houses_path) == 0)

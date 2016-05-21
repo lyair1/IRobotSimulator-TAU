@@ -29,18 +29,10 @@ using namespace std;
 class Simulator
 {
 public:
-	Simulator(){};
-	Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
-		mHousesErrorMessages(""),
-		mAlgorithmErrorMessages(""),
-		mIsAnySimulationScoreBad(false)
-	{
-		mHouseList.clear();
-		mConfiguration = configuration;
-		mAlgorithmNames = new list<string>;
-		calculateScore = _calculateScore;
-
-	}
+	
+	Simulator(const Simulator& otherSimulator);
+	Simulator& operator=(const Simulator&) = delete;
+	Simulator(ConfigReader *configuration, scoreCreator _calculateScore);
 	~Simulator(){
 		#ifndef _WIN32
 		for (LoadersList::iterator it = algoLoaders->begin(); it != algoLoaders->end(); ++it)
