@@ -7,9 +7,9 @@
 class AlgorithmLoader
 {
 	bool isAlgoValid = false;
-	string algoFileName;
-	string algoSimpleName;
-	string errorMessage;
+	string mAlgoFileName;
+	string mAlgoSimpleName;
+	string mErrorMessage;
 public:
 	void* handle = NULL;
 	string filePath;
@@ -23,9 +23,9 @@ public:
 	~AlgorithmLoader() {}
 #endif
 	bool isValid() const { return isAlgoValid; }
-	string getFileName() const { return algoFileName; }
-	string GetAlgorithmName() const { return algoSimpleName; }
-	string getErrorLine() const { return errorMessage; }
+	string getFileName() const { return mAlgoFileName; }
+	string GetAlgorithmName() const { return mAlgoSimpleName; }
+	string getErrorLine() const { return mErrorMessage; }
 };
 
 

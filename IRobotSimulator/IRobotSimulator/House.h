@@ -45,15 +45,15 @@ class House
 public:
 
 	House() : 
-		_name(""),
-		_maxSteps(0),
-		_R(0),
-		_C(0),
-		_dustInHouse(0),
-		_dockingLocation(-1, -1),
-		_housePath(""),
-		_houseFileName(""),
-		_matrix(NULL)
+		mHouseName(""),
+		mMaxSteps(0),
+		mHouseRow(0),
+		mHouseCol(0),
+		mDustInHouse(0),
+		mDockingLocation(-1, -1),
+		mHousePath(""),
+		mHouseFileName(""),
+		mHouseMatrix(NULL)
 		
 	{
 		algorithmScores = new list<int>();
@@ -75,15 +75,13 @@ public:
 		return *house;
 	}
 	~House(){
-		if (_matrix != NULL)	{
-			delete[] _matrix;
+		if (mHouseMatrix != NULL)	{
+			delete[] mHouseMatrix;
 		}
 		delete algorithmScores;
 	}
 	string getName()const;
 	int getMaxSteps()const;
-	int getR() const;
-	int getC()const;
 	SensorInformation getLocationInfo(std::pair<const int, const int> location)const;
 	string isLegalHouse();
 	void printHouse()const;
@@ -100,15 +98,15 @@ public:
 	AlgorithmList  *mAlgorithmList;
 private:
 	// members:
-	string _name;
-	int _maxSteps;
-	int _R;
-	int _C;
-	int _dustInHouse;
-	pair <int, int> _dockingLocation;
-	string _housePath;
-	string _houseFileName;
-	string* _matrix;
+	string mHouseName;
+	int mMaxSteps;
+	int mHouseRow;
+	int mHouseCol;
+	int mDustInHouse;
+	pair <int, int> mDockingLocation;
+	string mHousePath;
+	string mHouseFileName;
+	string* mHouseMatrix;
 
 	//functions:
 	string initDockingLocation();

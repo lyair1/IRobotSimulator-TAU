@@ -14,62 +14,62 @@ string House::fillHouseInfo(string filePath, string fileName)
 	{
 		cout << "Reading house from file path: " << filePath << " into class House" << endl;
 	}
-	_housePath = filePath;
-	_houseFileName = fileName;
+	mHousePath = filePath;
+	mHouseFileName = fileName;
 	ifstream fin(filePath);
 	string name;
 	getline(fin, name);
-	_name = name;
+	mHouseName = name;
 	int maxSteps;
 	fin >> maxSteps;
 	if (maxSteps < 0)
 	{
-		return _houseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
+		return mHouseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
 	}
-	_maxSteps = maxSteps; 
+	mMaxSteps = maxSteps; 
 
-	fin >> _R;
-	if (_R <= 0)
+	fin >> mHouseRow;
+	if (mHouseRow <= 0)
 	{
-		return _houseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + to_string(_R) + "\n";
+		return mHouseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + to_string(mHouseRow) + "\n";
 	}
-	fin >> _C;
-	if (_C <= 0)
+	fin >> mHouseCol;
+	if (mHouseCol <= 0)
 	{
-		return _houseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + to_string(_C) + "\n";
+		return mHouseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + to_string(mHouseCol) + "\n";
 	}
 
-	this->_matrix = new string[_R];
-	std::getline(fin, this->_matrix[0]);
-	for (int i = 0; i < _R; ++i)
+	this->mHouseMatrix = new string[mHouseRow];
+	std::getline(fin, this->mHouseMatrix[0]);
+	for (int i = 0; i < mHouseRow; ++i)
 	{
 		// Check if stream is over before the rows count
 		if (fin.eof())
 		{
-			for (int j = 0; j < _C; ++j)
+			for (int j = 0; j < mHouseCol; ++j)
 			{
-				_matrix[i] += " ";
+				mHouseMatrix[i] += " ";
 			}
 
 			continue;
 		}
-		std::getline(fin, this->_matrix[i]);
+		std::getline(fin, this->mHouseMatrix[i]);
 
 		// Check if stream isn't over but this is an empty line
-		if (_matrix[i].length() == 0)
+		if (mHouseMatrix[i].length() == 0)
 		{
-			for (int j = 0; j < _C; ++j)
+			for (int j = 0; j < mHouseCol; ++j)
 			{
-				_matrix[i] += " ";
+				mHouseMatrix[i] += " ";
 			}
 
 			continue;
 		}
 
 		// Check if a row is shorter than expected
-		while ((int)_matrix[i].length() < _C)
+		while ((int)mHouseMatrix[i].length() < mHouseCol)
 		{
-			_matrix[i] += " ";
+			mHouseMatrix[i] += " ";
 		}
 	}
 
@@ -83,7 +83,7 @@ House::House(const House & otherHouse)
 	{
 		cout << "copy constructor for house" << endl;
 	}
-	fillHouseInfo(otherHouse._housePath, otherHouse._houseFileName);
+	fillHouseInfo(otherHouse.mHousePath, otherHouse.mHouseFileName);
 }
 
 
@@ -92,11 +92,11 @@ void House::printHouse() const
 	cout << "Printing house from instance into standard output" << endl;
 	cout << "House name: " << getName() << endl;
 	cout << "House maxSteps: " << getMaxSteps() << endl;
-	for (int i = 0; i < _R; ++i)
+	for (int i = 0; i < mHouseRow; ++i)
 	{
-		for (int j = 0; j < _C; ++j)
+		for (int j = 0; j < mHouseCol; ++j)
 		{
-			cout << _matrix[i][j];
+			cout << mHouseMatrix[i][j];
 		}
 		cout << endl;
 	}
@@ -105,23 +105,23 @@ void House::printHouse() const
 //TODO: complete this with fill rows and cols if matrix is not in size C*R
 string House::isLegalHouse(){
 	// Make sure that that house surounded by walls
-	for (int i = 0; i < _R; ++i){
-		_matrix[i][0] = 'W';
-		_matrix[i][_C - 1] = 'W';
+	for (int i = 0; i < mHouseRow; ++i){
+		mHouseMatrix[i][0] = 'W';
+		mHouseMatrix[i][mHouseCol - 1] = 'W';
 	}
-	for (int i = 0; i < _C; ++i){
-		_matrix[_R - 1][i] = 'W';
-		_matrix[0][i] = 'W';
+	for (int i = 0; i < mHouseCol; ++i){
+		mHouseMatrix[mHouseRow - 1][i] = 'W';
+		mHouseMatrix[0][i] = 'W';
 	}
 
 	// Overwrite any unknown chars to ' '
-	for (int i = 1; i < _R - 1; ++i)
+	for (int i = 1; i < mHouseRow - 1; ++i)
 	{
-		for (int j = 1; j < _C - 1; ++j)
+		for (int j = 1; j < mHouseCol - 1; ++j)
 		{
-			if (_matrix[i][j] != 'D' && _matrix[i][j] != 'W' && (_matrix[i][j] < '0' || _matrix[i][j] > '9'))
+			if (mHouseMatrix[i][j] != 'D' && mHouseMatrix[i][j] != 'W' && (mHouseMatrix[i][j] < '0' || mHouseMatrix[i][j] > '9'))
 			{
-				_matrix[i][j] = ' ';
+				mHouseMatrix[i][j] = ' ';
 			}
 		}
 	}
@@ -132,23 +132,15 @@ string House::isLegalHouse(){
 }
 
 string House::getName() const {
-	return _name;
+	return mHouseName;
 }
 
 int House::getMaxSteps() const {
-	return _maxSteps;
-}
-
-int House::getR() const {
-	return _R;
-}
-
-int House::getC() const {
-	return _C;
+	return mMaxSteps;
 }
 
 void House::cleanResources() const{
-	//delete _matrix;
+	//delete mHouseMatrix;
 	// Clean algorithms
 	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
 	{
@@ -160,20 +152,20 @@ void House::cleanResources() const{
 // 
 SensorInformation House::getLocationInfo(std::pair<const int, const int> location) const {
 	SensorInformation locationInfo;
-	if (_matrix[location.second][location.first] >= '1' &&
-		_matrix[location.second][location.first] <= '9')
+	if (mHouseMatrix[location.second][location.first] >= '1' &&
+		mHouseMatrix[location.second][location.first] <= '9')
 	{
-		locationInfo.dirtLevel = _matrix[location.second][location.first] - '0'; // convert char to int
+		locationInfo.dirtLevel = mHouseMatrix[location.second][location.first] - '0'; // convert char to int
 	}
 	else //char which is neither 'D'/' '/'W'/'0'-'9' is considered as ' '. 
 	{
 		locationInfo.dirtLevel = 0;
 	}
 
-	locationInfo.isWall[0] = _matrix[location.second][location.first + 1] == 'W' ? true : false;
-	locationInfo.isWall[1] = _matrix[location.second][location.first - 1] == 'W' ? true : false;
-	locationInfo.isWall[2] = _matrix[location.second + 1][location.first] == 'W' ? true : false;
-	locationInfo.isWall[3] = _matrix[location.second - 1][location.first] == 'W' ? true : false;
+	locationInfo.isWall[0] = mHouseMatrix[location.second][location.first + 1] == 'W' ? true : false;
+	locationInfo.isWall[1] = mHouseMatrix[location.second][location.first - 1] == 'W' ? true : false;
+	locationInfo.isWall[2] = mHouseMatrix[location.second + 1][location.first] == 'W' ? true : false;
+	locationInfo.isWall[3] = mHouseMatrix[location.second - 1][location.first] == 'W' ? true : false;
 	return locationInfo;
 }
 
@@ -182,17 +174,17 @@ SensorInformation House::getLocationInfo(std::pair<const int, const int> locatio
 string House::initDockingLocation()
 {
 	bool didFindDocking = false;
-	for (int row = 0; row < _R; ++row) {
-		for (int col = 0; col < _C; ++col) {
-			if (_matrix[row][col] == 'D') {
+	for (int row = 0; row < mHouseRow; ++row) {
+		for (int col = 0; col < mHouseCol; ++col) {
+			if (mHouseMatrix[row][col] == 'D') {
 				if (didFindDocking == true)
 				{
-					return _houseFileName + ".house" + ": too many docking stations (more than one D in house)\n";
+					return mHouseFileName + ".house" + ": too many docking stations (more than one D in house)\n";
 				}
 
 				didFindDocking = true;
-				_dockingLocation.first = col;
-				_dockingLocation.second = row; // col == X, row == Y
+				mDockingLocation.first = col;
+				mDockingLocation.second = row; // col == X, row == Y
 			}
 		}
 	}
@@ -202,20 +194,20 @@ string House::initDockingLocation()
 		return "";
 	}
 
-	return _houseFileName + ".house" + ": missing docking station (no D in house)\n";
+	return mHouseFileName + ".house" + ": missing docking station (no D in house)\n";
 }
 
 pair <int, int> House::getDockingLocation() const{
-	return _dockingLocation;
+	return mDockingLocation;
 }
 
 bool House::isDirtCollected(pair<int, int> location){
 	//clean the dust if it exists:
-	if (_matrix[location.second][location.first] >= '1' &&
-		_matrix[location.second][location.first] <= '9')
+	if (mHouseMatrix[location.second][location.first] >= '1' &&
+		mHouseMatrix[location.second][location.first] <= '9')
 	{
-		_matrix[location.second][location.first] --;
-		_dustInHouse--;
+		mHouseMatrix[location.second][location.first] --;
+		mDustInHouse--;
 
 		return true;
 	}
@@ -223,30 +215,30 @@ bool House::isDirtCollected(pair<int, int> location){
 }
 
 char House::getLocationValue(pair<int, int> location) const{
-	return _matrix[location.second][location.first];
+	return mHouseMatrix[location.second][location.first];
 }
 
 bool House::isCleanHouse() const{
-	return (_dustInHouse == 0);
+	return (mDustInHouse == 0);
 }
 
 void House::initDustInHouse(){
-	_dustInHouse = 0;
-	for (int row = 0; row < _R; ++row)
+	mDustInHouse = 0;
+	for (int row = 0; row < mHouseRow; ++row)
 	{
-		for (int col = 0; col < _C; ++col)
+		for (int col = 0; col < mHouseCol; ++col)
 		{
-			if (_matrix[row][col] >= '1' &&
-				_matrix[row][col] <= '9')
+			if (mHouseMatrix[row][col] >= '1' &&
+				mHouseMatrix[row][col] <= '9')
 			{
-				_dustInHouse += (_matrix[row][col] - '0');
+				mDustInHouse += (mHouseMatrix[row][col] - '0');
 			}
 		}
 	}
 }
 
 int House::getDustInHouse() const{
-	return _dustInHouse;
+	return mDustInHouse;
 }
 
 string getDirectionString(Direction direction)
@@ -270,9 +262,9 @@ string getDirectionString(Direction direction)
 
 string House::getHouseFileName() const
 {
-	return _houseFileName;
+	return mHouseFileName;
 }
 string House::getHousePath() const
 {
-	return _housePath;
+	return mHousePath;
 }

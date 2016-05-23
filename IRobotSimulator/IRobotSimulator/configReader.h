@@ -22,7 +22,12 @@ const string PARAMETER_ARRAY[4] = { BATTERY_CONSUMPTION_RATE, BATTERY_RECHARGE_R
 class ConfigReader
 {
 public:
-	ConfigReader() : isAllParamteresLegalInConfigFile(false), messgaeOfBadParams(""){}
+	ConfigReader() : 
+		isAllParamteresLegalInConfigFile(false),
+		messgaeOfBadParams("")
+	{
+
+	}
   ConfigReader(const string& iniPath)
   {
 	  isAllParamteresLegalInConfigFile = this->loadFromFile(iniPath, messgaeOfBadParams);

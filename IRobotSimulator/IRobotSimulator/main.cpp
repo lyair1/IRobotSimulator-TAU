@@ -12,13 +12,12 @@
 #include "Simulator.h"
 
 
-scoreCreator handleScoreSO(const string &score_formula_path);
+
 bool isFileExists(const string name);
 void outOfMemHandler();
 
 
 const string _defaultConfigFileName = "config.ini";
-const string _defaultHosuseFileName = "default_generated_house.house";
 const string _defaultScoreFormulaFileName = "score_formula.so";
 const string _pathPrefix = "./";
 const string _seperator = "/";
@@ -32,38 +31,38 @@ const string _usage = USAGE;
 int main(int argc, char* argv[])
 {
 	// Set default paramters:
-	string houses_path = _pathPrefix;
-	string algorithms_path = _pathPrefix;
-	string config_file_path = _pathPrefix + _defaultConfigFileName;
-	string score_formula_path = "";
+	string housesPath = _pathPrefix;
+	string algorithmsPath = _pathPrefix;
+	string configFilePath = _pathPrefix + _defaultConfigFileName;
+	string scoreFormulaPath = "";
 	int num_threads = 1;
 	// Get parameters from arg
 	for (int i = 1; i < argc - 1; i++){ //skip program name -> i=1
 		string arg = argv[i];
 		if (arg.compare(_paramConfig) == 0) {
 			// We know the next argument *should* be the config file dir:
-			config_file_path = _pathPrefix + argv[i + 1] + _seperator + _defaultConfigFileName;
+			configFilePath = _pathPrefix + argv[i + 1] + _seperator + _defaultConfigFileName;
 
 			continue;
 		}
 
 		if (arg.compare(_paramHouse) == 0) {
 			// We know the next argument *should* be the path:
-			houses_path = _pathPrefix + argv[i + 1] + _seperator;
+			housesPath = _pathPrefix + argv[i + 1] + _seperator;
 
 			continue;
 		}
 
 		if (arg.compare(_paramAlgorithm) == 0) {
 			// We know the next argument *should* be the path:
-			algorithms_path = _pathPrefix + argv[i + 1] + _seperator;
+			algorithmsPath = _pathPrefix + argv[i + 1] + _seperator;
 
 			continue;
 		}
 
 		if (arg.compare(_paramScoreFormula) == 0) {
 			// We know the next argument *should* be the path:
-			score_formula_path = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
+			scoreFormulaPath = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
 
 			continue;
 		}
@@ -72,10 +71,11 @@ int main(int argc, char* argv[])
 			istringstream in(argv[i + 1]);
 			if (in >> num_threads && num_threads > 0)
 			{
-				continue;
+				continue; // it's an integer larger than 0, read next parameters
 			}
 			else
-			{
+			{/*If this parameter is missing or is not a valid number (e.g. negative or zero)
+			 the number of threads would be 1, without any error message.*/
 				num_threads = 1;
 				if (DEBUG)
 				{
@@ -86,105 +86,23 @@ int main(int argc, char* argv[])
 	}
 
 	// Show usage and return if config file doesn't exists in path
-	if (!isFileExists(config_file_path))
+	if (!isFileExists(configFilePath))
 	{
 		cout << _usage;
-		cout << "cannot find config.ini file in '" << config_file_path.substr(2) << "'" << endl;
+		cout << "cannot find config.ini file in '" << configFilePath.substr(2) << "'" << endl;
 		exit(0);
 	}
-
-	// check if config file can be loaded and if values are missing
-	ConfigReader *configReader = new ConfigReader(config_file_path);
-	if (!configReader->isAllParamteresLegalInConfigFile)
+	if (!isFileExists(scoreFormulaPath))
 	{
-		cout << configReader->getMessageForBadParamsInConfigFile();
-	}
-	if (!configReader->isAllParamteresExistInConfigFile())
-	{
-		cout << configReader->getMessageForMissingParamsInConfigFile();
-	}
-	if (!configReader->isAllParamteresLegalInConfigFile || !configReader->isAllParamteresExistInConfigFile())
-	{
-		delete configReader;
+		cout << _usage;// Show usage and return if score file doesn't exists in path
+		cout << "cannot find score_formula.so file in '" << scoreFormulaPath.substr(2) << "'" << endl;
 		exit(0);
-	}
-	// The score formula is the second argument to be checked on startup (after config file).
-	scoreCreator calculateScore;
-	if (score_formula_path != "")
-	{
-		calculateScore = handleScoreSO(score_formula_path);
-	}
-	else //In case score_formula argument is not provided in the command line, the default score formula shall be used
-	{
-		calculateScore = Simulator::calculateSimulationScore;
 	}
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
 
-	Simulator simul = Simulator(configReader, calculateScore);
-
-	// Print usage and return if there are no houses in the path
-	if (simul.countHousesInPath(houses_path) == 0)
-	{
-		/*
-		in case the folder for the house files is bad for some reason or leads to a directory
-		with no house files, or is missing and there are no house files in the working directory:
-		*/
-		cout << _usage;
-		cout << "cannot find house files in '" << houses_path.substr(2) << "'" << endl;
-		exit(0);
-	}
-
-	// Print message and return if all houses in path are invalid
-	HouseList houses_list = simul.readAllHouses(houses_path);
-	// Check if all houses are invalid
-	if (houses_list.empty())
-	{
-		std::cout << "All houses files in target folder '" << houses_path.substr(2) << "' cannot be opened or are invalid:\n" << simul.getHousesErrorMessages();
-		exit(0);
-	}
-
-	bool firstTime = true;
-	for (HouseList::iterator listHouseIter = houses_list.begin(); listHouseIter != houses_list.end(); ++listHouseIter)
-	{
-		House*  house = (*listHouseIter);
-		house->mAlgorithmList = simul.loadAllAlgorithms(algorithms_path, firstTime);
-		firstTime = false;
-
-		if (firstTime && house->mAlgorithmList == nullptr)
-		{
-			if (simul.getAlgorithmErrorMessages().length() > 0)
-			{
-				cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-			}
-
-			exit(0);
-		}
-	}
-
-	// Check if all algorithms are invalid
-	if (houses_list.empty())
-	{
-		cout << "All algorithm files in target folder '" << algorithms_path.substr(2) << "' cannot be opened or are invalid: \n" << simul.getAlgorithmErrorMessages();
-		exit(0);
-	}
-
-	simul.runSimulation(houses_list, num_threads);
-
-	// Print error list
-	if (simul.getHousesErrorMessages().length() > 0 || simul.getAlgorithmErrorMessages().length() > 0 || simul.getScoreErrorMessage().length() > 0)
-	{
-		std::cout << "\nErrors:\n" << simul.getHousesErrorMessages() << simul.getAlgorithmErrorMessages() << simul.getScoreErrorMessage();
-	}
-
-	simul.cleanResources();
-
-	delete configReader;
-
-	// Only on windows
-	#if defined (_WIN32)
-	system("pause");
-	#endif
+	Simulator simul = Simulator(scoreFormulaPath, num_threads, housesPath, algorithmsPath, configFilePath);
+	simul.initSimulator();
 
 	return 0;
 }
@@ -204,47 +122,4 @@ void outOfMemHandler()
 {
 	std::cerr << "Unable to satisfy request for memory\n";
 	exit(1);
-}
-
-
-scoreCreator handleScoreSO(const string &score_formula_path)
-{
-	// Show usage and return if score file doesn't exists in path
-	if (!isFileExists(score_formula_path))
-	{
-		cout << _usage;
-		cout << "cannot find score_formula.so file in '" << score_formula_path.substr(2) << "'" << endl;
-		exit(0);
-	}
-	ifstream fin;
-	fin.open(score_formula_path.c_str(), ios::in);
-	if (!fin || !fin.is_open())
-	{
-		std::cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid.so\n";
-		exit(0);
-	}
-
-
-	// Opening the .so file:
-#ifndef _WIN32
-	void *handle = dlopen(score_formula_path.c_str(), RTLD_NOW);
-	if (handle == NULL)
-	{
-		cout << "score_formula.so exists in '" << score_formula_path.substr(2) << "' but cannot be opened or is not a valid .so" << endl;
-		return NULL;
-	}
-
-	// calc_score is the instance creator method
-	void* p = dlsym(handle, "calc_score");
-	scoreCreator calc_score = reinterpret_cast<scoreCreator>(reinterpret_cast<long>(p));
-	if (calc_score == nullptr) 
-	{
-		cout << "score_formula.so is a valid .so but it does not have a valid score formula" << endl;
-		return NULL;
-	}
-
-	return calc_score;
-#endif
-	return &Simulator::calculateSimulationScore;
-
 }

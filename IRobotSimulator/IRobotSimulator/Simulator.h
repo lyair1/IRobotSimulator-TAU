@@ -32,35 +32,17 @@ public:
 	
 	Simulator(const Simulator& otherSimulator);
 	Simulator& operator=(const Simulator&) = delete;
-	Simulator(ConfigReader *configuration, scoreCreator _calculateScore);
-	~Simulator(){
-		#ifndef _WIN32
-		for (LoadersList::iterator it = mAlgoLoaders->begin(); it != mAlgoLoaders->end(); ++it)
-		{
-			AlgorithmLoader *loader = (*it);
-			if (loader->handle != NULL)
-			{
-				dlclose(loader->handle);
-			}
-			delete loader;
-		}
+	Simulator(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath);
+	~Simulator();
+	void initSimulator();
 
-		delete mAlgoLoaders;
-		#endif
-	}
-	void runSimulation(HouseList houses_list, int numThreads);
-	void cleanResources();
-	int countHousesInPath(string houses_path);
-	HouseList readAllHouses(string houses_path);
-	AlgorithmList *loadAllAlgorithms(string algorithms_path, bool firstTime);
-	string getAlgorithmErrorMessages() const;
-	string getHousesErrorMessages() const;
-	string getScoreErrorMessage() const;
-	void runSimuationOnHouse();
-	static int calculateSimulationScore(const map<string, int>& score_params);
 private:
 
 	//members:
+	string mHousesPath;
+	string mAlgorithmsPath;
+	string mConfigFilePath;
+	string mScoreFormulaPath;
 	LoadersList *mAlgoLoaders;
 	HouseList mHouseList;
 	string mHousesErrorMessages;
@@ -69,15 +51,32 @@ private:
 	list<string>* mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
 	int mNumThreads;
+	int mNumberOfHouses;
 	atomic_size_t mHouseIndex{0};
+	scoreCreator mCalculateScore;
 
 	//functions:
+	void runSimulation();
+	void runSimuationOnHouse();
+	int countHousesInPath();
+	HouseList readAllHouses();
+	AlgorithmList *loadAllAlgorithms(bool firstTime);
 	void executeAllAlgoOnAllHouses();
 	void printScores();
+
 	string getSupparatorLine();
 	string getAlgoPrintLine(int ind, string algoName, double & averageResult);
 	string getHeaderPrintLine();
-	scoreCreator calculateScore;
+	
+	string getAlgorithmErrorMessages() const;
+	string getHousesErrorMessages() const;
+	string getScoreErrorMessage() const;
+
+	void handleConfigFileErrors();
+	void handleScore();
+
+	void cleanResources();
+	static int calculateSimulationScore(const map<string, int>& score_params);
 	struct less_than_key
 	{
 		inline bool operator() (const AlgorithmLoader *struct1, const AlgorithmLoader *struct2)

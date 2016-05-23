@@ -17,46 +17,171 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-Simulator::Simulator(ConfigReader *configuration, scoreCreator _calculateScore) :
+Simulator::Simulator(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath) :
+	mHousesPath(housesPath),
+	mAlgorithmsPath(algorithmsPath),
+	mConfigFilePath(configFilePath),
+	mScoreFormulaPath(scoreFormulaPath),
+	mAlgoLoaders(NULL),
 	mHousesErrorMessages(""),
 	mAlgorithmErrorMessages(""),
+	mConfiguration(NULL),
 	mIsAnySimulationScoreBad(false),
-	mNumThreads(1)
+	mNumThreads(numThreads),
+	mNumberOfHouses(0)
 {
 	mHouseList.clear();
-	mConfiguration = configuration;
 	mAlgorithmNames = new list<string>;
-	calculateScore = _calculateScore;
+	mCalculateScore = NULL;
 
 }
 
 //copy constructor
 Simulator::Simulator(const Simulator& otherSimulator)
 {
+	mHousesPath = otherSimulator.mHousesPath;
+	mAlgorithmsPath = otherSimulator.mAlgorithmsPath;
+	mConfigFilePath = otherSimulator.mConfigFilePath;
+	mScoreFormulaPath = otherSimulator.mScoreFormulaPath;
 	mAlgoLoaders = otherSimulator.mAlgoLoaders;
-	mHouseList = otherSimulator.mHouseList;
 	mHousesErrorMessages = otherSimulator.mHousesErrorMessages;
 	mAlgorithmErrorMessages = otherSimulator.mAlgorithmErrorMessages;
 	mConfiguration = otherSimulator.mConfiguration;
-	mAlgorithmNames = otherSimulator.mAlgorithmNames;
 	mIsAnySimulationScoreBad = otherSimulator.mIsAnySimulationScoreBad;
 	mNumThreads = otherSimulator.mNumThreads;
+	mNumberOfHouses = otherSimulator.mNumberOfHouses;
 	mHouseIndex = { 0 };
-	calculateScore = otherSimulator.calculateScore;
+	mHouseList = otherSimulator.mHouseList;
+	mAlgorithmNames = otherSimulator.mAlgorithmNames;
+	mCalculateScore = otherSimulator.mCalculateScore;
 }
 
-void Simulator::runSimulation(HouseList houses_list, int numThreads)
+Simulator::~Simulator(){
+#ifndef _WIN32
+	for (LoadersList::iterator it = mAlgoLoaders->begin(); it != mAlgoLoaders->end(); ++it)
+	{
+		AlgorithmLoader *loader = (*it);
+		if (loader->handle != NULL)
+		{
+			dlclose(loader->handle);
+		}
+		delete loader;
+	}
+
+	delete mAlgoLoaders;
+#endif
+}
+
+void Simulator::initSimulator()
 {
-	mNumThreads = numThreads;
+	mConfiguration = new ConfigReader(mConfigFilePath);
+	handleConfigFileErrors();// check if config file can be loaded and if values are missing
+	handleScore(); // The score formula is the second argument to be checked on startup (after config file).
+	mNumberOfHouses = countHousesInPath();
+	/*in case the folder for the house files is bad for some reason or leads to a directory
+		with no house files, or is missing and there are no house files in the working directory :
+	*/
+	if (mNumberOfHouses == 0)
+	{
+		cout << USAGE;
+		cout << "cannot find house files in '" << mHousesPath.substr(2) << "'" << endl;
+		exit(0);// Print message and return if all houses in path are invalid
+	}
+	mHouseList = readAllHouses();
+	// Check if all houses are invalid
+	if (mHouseList.empty())
+	{
+		std::cout << "All houses files in target folder '" << mHousesPath.substr(2) << "' cannot be opened or are invalid:\n" << getHousesErrorMessages();
+		exit(0);
+	}
+	bool firstTime = true;
+	for (HouseList::iterator listHouseIter = mHouseList.begin(); listHouseIter != mHouseList.end(); ++listHouseIter)
+	{
+		House*  house = (*listHouseIter);
+		house->mAlgorithmList = loadAllAlgorithms(firstTime);
+		firstTime = false;
+		if (firstTime && house->mAlgorithmList == nullptr)
+		{
+			cout << "All algorithm files in target folder '" << mAlgorithmsPath.substr(2) << "' cannot be opened or are invalid: \n" << getAlgorithmErrorMessages();
+			exit(0);
+		}
+	}
+	runSimulation();
+	// Print error list
+	if (getHousesErrorMessages().length() > 0 || getAlgorithmErrorMessages().length() > 0 || getScoreErrorMessage().length() > 0)
+	{
+		cout << "\nErrors:\n" << getHousesErrorMessages() << getAlgorithmErrorMessages() << getScoreErrorMessage();
+	}
+	cleanResources();
+
+}
+
+void Simulator::handleConfigFileErrors()
+{
+	if (!mConfiguration->isAllParamteresLegalInConfigFile)
+	{
+		cout << mConfiguration->getMessageForBadParamsInConfigFile();
+	}
+	if (!mConfiguration->isAllParamteresExistInConfigFile())
+	{
+		cout << mConfiguration->getMessageForMissingParamsInConfigFile();
+	}
+	if (!mConfiguration->isAllParamteresLegalInConfigFile || !mConfiguration->isAllParamteresExistInConfigFile())
+	{
+		delete mConfiguration;
+		exit(0);
+	}
+}
+
+void Simulator::handleScore()
+{
+	if (mScoreFormulaPath == "")//In case score_formula argument is not provided in the command line, the default score formula shall be used
+	{
+		mCalculateScore = Simulator::calculateSimulationScore;
+		return;
+	}
+	//In case score_formula argument is not provided in the command line, the default score formula shall be used
+	
+
+	ifstream fin;
+	fin.open(mScoreFormulaPath.c_str(), ios::in);
+	if (!fin || !fin.is_open())
+	{
+		std::cout << "score_formula.so exists in '" << mScoreFormulaPath.substr(2) << "' but cannot be opened or is not a valid.so\n";
+		exit(0);
+	}
+#ifndef _WIN32
+	void *handle = dlopen(mScoreFormulaPath.c_str(), RTLD_NOW);// Opening the .so file:
+	if (handle == NULL)
+	{
+		cout << "score_formula.so exists in '" << mScoreFormulaPath.substr(2) << "' but cannot be opened or is not a valid .so" << endl;
+		return NULL;
+	}
+
+	// calc_score is the instance creator method
+	void* p = dlsym(handle, "calc_score");
+	scoreCreator calc_score = reinterpret_cast<scoreCreator>(reinterpret_cast<long>(p));
+	if (calc_score == nullptr)
+	{
+		cout << "score_formula.so is a valid .so but it does not have a valid score formula" << endl;
+		return NULL;
+	}
+	mCalculateScore = calc_score;
+	return ;
+#endif
+	mCalculateScore = Simulator::calculateSimulationScore; 
+	return;
+}
+
+void Simulator::runSimulation()
+{
+	
 	if (DEBUG)
 	{
 		cout << endl << endl << "Parameters read:" << endl;
 		cout << mConfiguration->toString() << endl;
 		cout << "Num of threads: " << mNumThreads << endl;
 	}
-	
-	// Set the houses list
-	mHouseList = houses_list;
 
 	//The simulator should execute every algorithm on every house:
 	executeAllAlgoOnAllHouses();
@@ -239,14 +364,23 @@ void Simulator::cleanResources()
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
 	}
+	if (mAlgorithmNames != NULL)
+	{
+		delete mAlgorithmNames;
+		mAlgorithmNames = NULL;
+	}
+	if (mConfiguration != NULL)
+	{
+		delete mConfiguration;
+		mConfiguration = NULL;
+	}
 	
-	delete mAlgorithmNames;
 }
 
-int Simulator::countHousesInPath(string houses_path)
+int Simulator::countHousesInPath()
 {
 	int count = 0;
-	fs::path targetDir(houses_path);
+	fs::path targetDir(mHousesPath);
 	fs::directory_iterator it(targetDir), eod;
 	if (!fs::exists(targetDir) || !fs::is_directory(targetDir) || fs::is_empty(targetDir))
 	{
@@ -263,10 +397,10 @@ int Simulator::countHousesInPath(string houses_path)
 	return count;
 }
 
-HouseList Simulator::readAllHouses(string houses_path)
+HouseList Simulator::readAllHouses()
 {
 	HouseList housesList;
-	fs::path targetDir(houses_path);
+	fs::path targetDir(mHousesPath);
 	fs::directory_iterator it(targetDir), eod;
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 	{
@@ -292,16 +426,16 @@ HouseList Simulator::readAllHouses(string houses_path)
 	return housesList;
 }
 
-AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstTime)
+AlgorithmList *Simulator:: loadAllAlgorithms(bool firstTime)
 {
 #ifndef _WIN32
 	vector<AlgorithmLoader*> allAlgos;
-	fs::path targetDir(algorithms_path);
+	fs::path targetDir(mAlgorithmsPath);
 	//check if directory doesn't exist or path is not a directory or directory is empty
 	if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
 	{
 		cout << USAGE;
-		cout << "cannot find algorithm files in '" << algorithms_path << "'"<<endl; 
+		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
 		exit(0);
 	}
 	fs::directory_iterator it(targetDir), eod;
@@ -332,7 +466,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(string algorithms_path, bool firstT
 	if (allAlgos.empty())
 	{
 		cout << USAGE;
-		cout << "cannot find algorithm files in '" << algorithms_path << "'"<<endl; 
+		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
 		exit(0);
 	}
 	mAlgoLoaders = new LoadersList();
@@ -450,15 +584,17 @@ string Simulator::getScoreErrorMessage() const
 
 void Simulator::executeAllAlgoOnAllHouses()
 {
-	// ===> create the threads as vector of pointers to threads (unique_ptr)
-	vector<unique_ptr<thread>> threads(mNumThreads);
-	for (auto& thread_ptr : threads) {
-		// ===> actually create the threads and run them
-		thread_ptr = make_unique<thread>(&Simulator::runSimuationOnHouse, this); // create and run the thread
+	
+	int actualThreads = mNumberOfHouses < mNumThreads ? mNumberOfHouses : mNumThreads;
+	vector<unique_ptr<thread>> threads(actualThreads); // create the threads as vector of pointers to threads (unique_ptr)
+	for (auto& thread_ptr: threads)
+	{
+		thread_ptr = make_unique<thread>(&Simulator::runSimuationOnHouse, this); // actually create the threads and run them
 	}
 
-	// ===> join all the threads to finish nicely (i.e. without crashing / terminating threads)
-	for (auto& thread_ptr : threads) {
+	// join all the threads to finish nicely (i.e. without crashing / terminating threads)
+	for (auto& thread_ptr : threads)
+	{
 		thread_ptr->join();
 	}
 }
@@ -580,7 +716,7 @@ void Simulator::runSimuationOnHouse()
 					{ "dirt_collected", (*iter3)->getDirtCollected() },
 					{ "is_back_in_docking", (*iter3)->getIsBackInDocking() }
 				};
-				(*iter3)->setSimulationScore(calculateScore(score_params));
+				(*iter3)->setSimulationScore(mCalculateScore(score_params));
 			}
 			
 			house->algorithmScores->push_back((*iter3)->getSimulationScore());

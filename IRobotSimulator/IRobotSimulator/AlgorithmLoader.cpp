@@ -19,7 +19,7 @@ AlgorithmLoader::AlgorithmLoader(string algorithmPath_, string algorithmName_)
 	handle = dlopen(algorithmPath_.c_str(), RTLD_NOW);
 	if (handle == NULL)
 	{
-		errorMessage = algoFileName + ": file cannot be loaded or is not a valid .so";
+		mErrorMessage = algoFileName + ": file cannot be loaded or is not a valid .so";
 		return;
 	}
 
@@ -27,7 +27,7 @@ AlgorithmLoader::AlgorithmLoader(string algorithmPath_, string algorithmName_)
 	void* p = dlsym(handle, "getAbstractAlgorithm");
 	instanceCreator function1 = reinterpret_cast<instanceCreator>(reinterpret_cast<long>(p));
 	if (function1 == nullptr) {
-		errorMessage = algoFileName + ": valid .so file but no algorithm was registered after loading it";
+		mErrorMessage = algoFileName + ": valid .so file but no algorithm was registered after loading it";
 		return;
 	}
 
