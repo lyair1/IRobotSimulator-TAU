@@ -42,10 +42,11 @@ public:
 	list <std::string> mAlgorithmNames;
 	list <std::function<unique_ptr<AbstractAlgorithm>()>> mAlgorithmFactories;
 	list < void* > mHandleList;
-
-	string mErrorMessage;
+	
+	
 	
 	//functions: 
+	string getAlgorithmErrorMessage();
 	void registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory);
 	void setNameForLastAlgorithm(const std::string& algorithmName);
 	bool loadAlgorithm(const string & algorithmPath_, const string& algorithmName_);
@@ -57,6 +58,7 @@ public:
 		return mAlgorithmFactories.size();
 	}
 private:
+	string mErrorMessage;
 	bool mEnableRegistration;
 	static AlgorithmLoader instance;
 	

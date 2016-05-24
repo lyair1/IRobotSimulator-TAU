@@ -92,10 +92,10 @@ int main(int argc, char* argv[])
 		cout << "cannot find config.ini file in '" << configFilePath.substr(2) << "'" << endl;
 		exit(0);
 	}
-	if (!isFileExists(scoreFormulaPath))
+	if (scoreFormulaPath != "" && !isFileExists(scoreFormulaPath))
 	{
 		cout << _usage;// Show usage and return if score file doesn't exists in path
-		cout << "cannot find score_formula.so file in '" << scoreFormulaPath.substr(2) << "'" << endl;
+		cout << "cannot find score_formula.so file in '" << scoreFormulaPath << "'" << endl;
 		exit(0);
 	}
 	//set the new_handler for handling cases where "new" failed to allocate memory

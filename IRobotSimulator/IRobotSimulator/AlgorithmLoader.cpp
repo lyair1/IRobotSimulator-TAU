@@ -7,13 +7,14 @@
 
 // create the static field
 
-void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
-{
-	mAlgorithmFactories.push_back(algorithmFactory);
-}
+
 #ifndef _WIN32
 
 AlgorithmLoader AlgorithmLoader::instance;
+void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
+{
+	instance.mAlgorithmFactories.push_back(algorithmFactory);
+}
 AlgorithmLoader::AlgorithmLoader(): mEnableRegistration(false)
 {
 }
@@ -65,6 +66,10 @@ const list<std::string>& AlgorithmLoader::getAlgorithmNames() const
 {
 	return mAlgorithmNames;
 }
+string AlgorithmLoader::getAlgorithmErrorMessage()
+{
+	return mErrorMessage;
+}
 #else
 AlgorithmLoader::AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_)
  {
@@ -72,5 +77,9 @@ AlgorithmLoader::AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_
 AlgorithmLoader::~AlgorithmLoader()
 {
 
+}
+void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
+{
+	mAlgorithmFactories.push_back(algorithmFactory);
 }
 #endif

@@ -452,7 +452,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(bool firstTime)
 	{
 		cout << "retrun algorithm list\n";
 	}
-
+	mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
 	return algoList;
 
 #else
