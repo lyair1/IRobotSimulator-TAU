@@ -105,7 +105,6 @@
     <ClInclude Include="configReader.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direction.h" />
-    <ClInclude Include="AlgorithmRegister.h" />
     <ClInclude Include="House.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="Point.h" />

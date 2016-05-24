@@ -100,9 +100,7 @@ int main(int argc, char* argv[])
 	}
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
-
-	Simulator simul = Simulator(scoreFormulaPath, num_threads, housesPath, algorithmsPath, configFilePath);
-	simul.initSimulator();
+	Simulator::getInstance(scoreFormulaPath, num_threads, housesPath, algorithmsPath, configFilePath).initSimulator();
 
 	return 0;
 }

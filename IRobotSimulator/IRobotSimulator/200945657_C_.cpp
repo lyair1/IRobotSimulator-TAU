@@ -116,12 +116,5 @@ Direction _200945657_C::getNextStep(SensorInformation info, Direction prevStep)
 }
 
 #ifndef _WIN32
-extern "C" AbstractAlgorithm* getAbstractAlgorithm()
-{
-	return new _200945657_C();
-}
-#endif
-
-#ifndef _WIN32
 REGISTER_ALGORITHM(_200945657_C)
 #endif

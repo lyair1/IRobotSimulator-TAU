@@ -10,9 +10,12 @@
 #include "configReader.h"
 #include "AlgorithmLoader.h"
 #include "score_formula.h"
+#include <functional>
+
 
 #ifndef _WIN32
 #include <dlfcn.h>
+
 #endif
 #include <atomic>
 using namespace std;
@@ -30,12 +33,18 @@ class Simulator
 {
 public:
 	
-	Simulator(const Simulator& otherSimulator);
-	Simulator& operator=(const Simulator&) = delete;
+	Simulator(Simulator const &) = delete;			// don't implement - it's a singleton!
+	void operator = (Simulator const &) = delete;	// don't implement - it's a singleton!
 	Simulator(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath);
 	~Simulator();
 	void initSimulator();
-
+	static Simulator& getInstance(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath)
+	{ 
+		static Simulator simulator(scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath);
+		return simulator;
+	}
+	void registerAlgorithm(unique_ptr<AbstractAlgorithm> abstAlgo);
+	list <unique_ptr<AbstractAlgorithm>> mAlgorithms;
 private:
 
 	//members:
@@ -43,7 +52,6 @@ private:
 	string mAlgorithmsPath;
 	string mConfigFilePath;
 	string mScoreFormulaPath;
-	LoadersList *mAlgoLoaders;
 	HouseList mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
@@ -54,6 +62,7 @@ private:
 	int mNumberOfHouses;
 	atomic_size_t mHouseIndex{0};
 	scoreCreator mCalculateScore;
+	
 
 	//functions:
 	void runSimulation();
@@ -77,13 +86,6 @@ private:
 
 	void cleanResources();
 	static int calculateSimulationScore(const map<string, int>& score_params);
-	struct less_than_key
-	{
-		inline bool operator() (const AlgorithmLoader *struct1, const AlgorithmLoader *struct2)
-		{
-			return (struct1->fileName < struct2->fileName);
-		}
-	};
 };
 
 #endif //SIMULATOR_H

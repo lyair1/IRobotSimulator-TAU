@@ -116,12 +116,6 @@ Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 	return chosenDirection; // Make sure we don't get here, we can hit the wall
 }
 
-#ifndef _WIN32
-extern "C" AbstractAlgorithm* getAbstractAlgorithm()
-{
-	return new _200945657_B();
-}
-#endif
 
 #ifndef _WIN32
 REGISTER_ALGORITHM(_200945657_B)
