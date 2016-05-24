@@ -6,6 +6,7 @@
 #include <memory>
 #include <list>
 #include <cassert>
+#include "Direction.h"
 #include "AbstractAlgorithm.h"
 #ifndef _WIN32
 #include "MakeUnique.cpp"

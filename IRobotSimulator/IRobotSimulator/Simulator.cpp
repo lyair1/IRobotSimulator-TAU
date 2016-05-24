@@ -12,6 +12,7 @@
 #include "200945657_A_.h"
 #include <thread>
 
+
 namespace fs = ::boost::filesystem;
 using namespace std;
 
@@ -703,6 +704,7 @@ int Simulator::calculateSimulationScore(const map<string, int>& score_params){
 		if (SCORE_DEBUG)
 		{
 			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params "<<e.what() << endl;
+			cout << "use simulationStepsCounter" << simulationStepsCounter << endl;;
 		}
 		return -1;
 	}

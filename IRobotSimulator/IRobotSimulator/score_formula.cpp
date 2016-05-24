@@ -44,6 +44,7 @@ extern "C" int calc_score(const map<string, int>& score_params)
 		if (SCORE_DEBUG)
 		{
 			cout <<"calculateSimulationScore couldn't find one of the parameters of the score_params "<< endl;
+			cout << "use simulationStepsCounter" << simulationStepsCounter << endl;;
 		}
 		return -1;
 	}

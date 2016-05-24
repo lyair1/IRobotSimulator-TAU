@@ -43,7 +43,6 @@ public:
 		static Simulator simulator(scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath);
 		return simulator;
 	}
-	void registerAlgorithm(unique_ptr<AbstractAlgorithm> abstAlgo);
 	list <unique_ptr<AbstractAlgorithm>> mAlgorithms;
 private:
 
