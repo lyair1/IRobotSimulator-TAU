@@ -56,7 +56,8 @@ private:
 	string mAlgorithmErrorMessages;
 	string mSimulationErrorMessages;
 	ConfigReader* mConfiguration;
-	list<std::string> mAlgorithmNames;
+	list<string> mAlgorithmNames;
+	list<string> mHouseNames;
 	bool mIsAnySimulationScoreBad;
 	int mNumThreads;
 	int mNumberOfHouses;
