@@ -341,12 +341,14 @@ int Simulator::countHousesInPath()
 {
 	int count = 0;
 	fs::path targetDir(mHousesPath);
-	fs::directory_iterator it(targetDir), eod;
+
 	if (!fs::exists(targetDir) || !fs::is_directory(targetDir) || fs::is_empty(targetDir))
 	{
-		return 0;
+		cout << USAGE;
+		cout << "cannot find house files in '" << mHousesPath.substr(2) << "'" << endl;
+		exit(0);// Print message and return if all houses in path are invalid
 	}
-
+	fs::directory_iterator it(targetDir), eod;
 	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 	{
 		if (fs::is_regular_file(p) && p.extension() == HOUSE_EXT)

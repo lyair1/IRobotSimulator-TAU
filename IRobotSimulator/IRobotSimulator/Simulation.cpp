@@ -119,7 +119,7 @@ bool Simulation :: makeSimulationStep()
 
 void Simulation::cleanResources(){
 	delete (mHouse);
-	delete(mSensor);
+//	delete(mSensor); make_unique should not be deleted
 }
 
 bool Simulation::isSimulationRunning() const{
@@ -129,9 +129,6 @@ int Simulation::getNumberOfSteps()const {
 	return mStepsCounter;
 }
 
-const AbstractSensor* Simulation::getSensor() const{
-	return mSensor;
-}
 
 int Simulation::getPositionInCompetition() const{
 	return mPositionInCompetition;

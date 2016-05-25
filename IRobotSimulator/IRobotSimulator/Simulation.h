@@ -50,7 +50,6 @@ public:
 	bool isSimulationRunning() const;
 	bool makeSimulationStep();
 	int getNumberOfSteps() const;
-	const AbstractSensor * getSensor() const;
 	int getPositionInCompetition() const;
 	int getActualPositionInCompetition() const;
 	void setPositionInCompetition(int actualPositionInCompetition);
@@ -88,7 +87,7 @@ private:
 	string mSimulationError;
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
-	Sensor* mSensor;
+	unique_ptr<Sensor>  mSensor;
 	map<string, int>* mConfiguration;
 	int mInitialDustSumInHouse;
 	bool mIsBackInDocking;

@@ -38,6 +38,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 
 	if (maxSteps < 0 || errorFlagMaxStep)
 	{
+		errorFlagMaxStep = true;
 		errorMessage+= mHouseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + stringMaxSteps + "\n";
 	}
 	else
@@ -57,6 +58,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 	}
 	if (mHouseRow <= 0 || errorFlagRows)
 	{
+		errorFlagRows = true;
 		errorMessage += mHouseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + stringHouseRows + "\n";
 	}
 	fin >> stringHouseCols;
@@ -70,6 +72,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 	}
 	if (mHouseCol <= 0 || errorFlagCols)
 	{
+		errorFlagCols = true;
 		errorMessage += mHouseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + stringHouseCols + "\n";
 	}
 
