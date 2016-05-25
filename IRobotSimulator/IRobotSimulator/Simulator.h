@@ -68,7 +68,7 @@ private:
 	void runSimuationOnHouse();
 	int countHousesInPath();
 	HouseList readAllHouses();
-	list<unique_ptr<AbstractAlgorithm>> loadAllAlgorithms(bool firstTime);
+	void loadAllAlgorithms();
 	void executeAllAlgoOnAllHouses();
 	void printScores();
 

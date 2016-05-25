@@ -58,17 +58,17 @@ void Simulator::initSimulator()
 		std::cout << "All houses files in target folder '" << mHousesPath.substr(2) << "' cannot be opened or are invalid:\n" << getHousesErrorMessages();
 		exit(0);
 	}
-	bool firstTime = true;
+
+	loadAllAlgorithms();
+	if (mAlgorithms.empty())
+	{
+		cout << "All algorithm files in target folder '" << mAlgorithmsPath.substr(2) << "' cannot be opened or are invalid: \n" << getAlgorithmErrorMessages();
+		exit(0);
+	}
 	for (HouseList::iterator listHouseIter = mHouseList.begin(); listHouseIter != mHouseList.end(); ++listHouseIter)
 	{
 		House*  house = (*listHouseIter);
-		house->mAlgorithmList = loadAllAlgorithms(firstTime);
-		if (firstTime && house->mAlgorithmList.empty())
-		{
-			cout << "All algorithm files in target folder '" << mAlgorithmsPath.substr(2) << "' cannot be opened or are invalid: \n" << getAlgorithmErrorMessages();
-			exit(0);
-		}
-		firstTime = false;
+		house->mAlgorithmList = AlgorithmLoader::getInstance().getAlgorithms(); // this function creates NEW algorithms using the factory every time it's called
 	}
 	runSimulation();
 	// Print error list
@@ -385,101 +385,58 @@ HouseList Simulator::readAllHouses()
 	return housesList;
 }
 
-list<unique_ptr<AbstractAlgorithm>> Simulator::loadAllAlgorithms(bool firstTime)
+void Simulator::loadAllAlgorithms()
 {
 #ifndef _WIN32
-	if (firstTime)
+	fs::path targetDir(mAlgorithmsPath);
+	//check if directory doesn't exist or path is not a directory or directory is empty
+	if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
 	{
-		fs::path targetDir(mAlgorithmsPath);
-		//check if directory doesn't exist or path is not a directory or directory is empty
-		if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
+		cout << USAGE;
+		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
+		exit(0);
+	}
+	fs::directory_iterator it(targetDir), eod;
+	AlgorithmLoader::getInstance().setRegistrationOn(true);
+
+	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+	{
+		if (fs::is_regular_file(p) && p.extension() == ".so" )
 		{
-			cout << USAGE;
-			cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
-			exit(0);
-		}
-		fs::directory_iterator it(targetDir), eod;
-		AlgorithmLoader::getInstance().setRegistrationOn(true);
-#ifdef _WIN32
-		int i = 0;
-#endif
-		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
-		{
-			if (fs::is_regular_file(p) && p.extension() == ".so" )
+			if ( p.string().at(p.string().length()-4) == '_') // change to _.so
 			{
-				if ( p.string().at(p.string().length()-4) == '_') // change to _.so
+				if (DEBUG)
 				{
-					if (DEBUG)
-					{
-						cout << "scan  _.so file :" << p.string() << "\n";
-					}
-#ifndef _WIN32
-					AlgorithmLoader::getInstance().loadAlgorithm(p.string(), p.stem().string());
-#else
-					AlgorithmLoader::getInstance().loadAlgorithm(new AlgorithmNaive(), "ALGO" + i);
-					i++;
-#endif
+					cout << "scan  _.so file :" << p.string() << "\n";
 				}
 
+				AlgorithmLoader::getInstance().loadAlgorithm(p.string(), p.stem().string());
 			}
 		}
-		size_t numOfAlgosLoaded = AlgorithmLoader::getInstance().size();
-		if (numOfAlgosLoaded == 0)
-		{
-			cout << USAGE;
-			cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
-			exit(0);
-		}
-		AlgorithmLoader::getInstance().setRegistrationOn(false);
-		mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
-		if (DEBUG)
-		{
-			cout << "Algorithms loading errors:: "<< mAlgorithmErrorMessages<< endl; 
-		}
-		mAlgorithmNames = AlgorithmLoader::getInstance().getAlgorithmNames(); 
-
 	}
-	list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms(); // this function creates NEW algorithms using the factory every time it's called
 
-	return algorithms;
-
-#else
-
-	list<unique_ptr<AbstractAlgorithm>> algoList;
-
-	unique_ptr<AbstractAlgorithm> algoNaive = make_unique<_200945657_A>();
-	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-	if (firstTime)
+	size_t numOfAlgosLoaded = AlgorithmLoader::getInstance().size();
+	if (numOfAlgosLoaded == 0)
 	{
-		mAlgorithmNames.push_back("algo1");
+		cout << USAGE;
+		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
+		exit(0);
 	}
-	//don't set the sensor yet.
-	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	algoList.push_back(algoNaive);
+	AlgorithmLoader::getInstance().setRegistrationOn(false);
+	mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
+	if (DEBUG)
+	{
+		cout << "Algorithms loading errors:: "<< mAlgorithmErrorMessages<< endl; 
+	}
 
-//	_200945657_B* algoNaive2 = new _200945657_B();
-//	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-//	if (firstTime)
-//	{
-//		mAlgorithmNames->push_back("algo2");
-//	}
-//	//don't set the sensor yet.
-//	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-//	algoList->push_back(algoNaive2);
-//
-//	_200945657_C* algoNaive3 = new _200945657_C();
-//	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
-//	if (firstTime)
-//	{
-//		mAlgorithmNames->push_back("algo3");
-//	}
-//	//don't set the sensor yet.
-//	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-//	algoList->push_back(algoNaive3);
-
-	return algoList;
 #endif
+	mAlgorithms = AlgorithmLoader::getInstance().getAlgorithms();
+	mAlgorithmNames = AlgorithmLoader::getInstance().getAlgorithmNames();
+	
+	return;
 }
+
+
 string Simulator::getAlgorithmErrorMessages() const
 {
 	return mAlgorithmErrorMessages;

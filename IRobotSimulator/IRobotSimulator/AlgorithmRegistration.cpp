@@ -9,6 +9,5 @@
 
 AlgorithmRegistration::AlgorithmRegistration(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
 {
-	cout << "algorithm registered" << endl;
 	AlgorithmLoader::getInstance().registerAlgorithm(algorithmFactory);
 }

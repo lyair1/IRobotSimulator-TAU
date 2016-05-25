@@ -30,27 +30,25 @@ public:
 
 	friend class AlgorithmRegistration;
 
-	//members: 
-	list <std::string> mAlgorithmNames;
-	list <std::function<unique_ptr<AbstractAlgorithm>()>> mAlgorithmFactories;
-	list < void* > mHandleList;
-	
-	
-	
 	//functions: 
 	string getAlgorithmErrorMessage();
 	void registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory);
-	void setNameForLastAlgorithm(const std::string& algorithmName);
 	bool loadAlgorithm(const string & algorithmPath_, const string& algorithmName_);
 	list<unique_ptr<AbstractAlgorithm>>  getAlgorithms() const;
-
 	const list<std::string>& getAlgorithmNames() const;
 	void setRegistrationOn(bool enableRegistration);
 	size_t size()const { return mAlgorithmFactories.size();	}
 private:
+	//members: 
+	list < void* > mHandleList;
+	list <std::function<unique_ptr<AbstractAlgorithm>()>> mAlgorithmFactories;
+	list <std::string> mAlgorithmNames;
 	string mErrorMessage;
 	bool mEnableRegistration;
 	static AlgorithmLoader instance;
+
+	//functions: 
+	void setNameForLastAlgorithm(const std::string& algorithmName);
 	
 };
 
