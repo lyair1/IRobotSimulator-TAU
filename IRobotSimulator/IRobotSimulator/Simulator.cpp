@@ -23,6 +23,7 @@ Simulator::Simulator(string scoreFormulaPath, int numThreads, string housesPath,
 	mScoreFormulaPath(scoreFormulaPath),
 	mHousesErrorMessages(""),
 	mAlgorithmErrorMessages(""),
+	mSimulationErrorMessages(""),
 	mConfiguration(NULL),
 	mIsAnySimulationScoreBad(false),
 	mNumThreads(numThreads),
@@ -72,9 +73,9 @@ void Simulator::initSimulator()
 	}
 	runSimulation();
 	// Print error list
-	if (getHousesErrorMessages().length() > 0 || getAlgorithmErrorMessages().length() > 0 || getScoreErrorMessage().length() > 0)
+	if (getHousesErrorMessages().length() > 0 || getAlgorithmErrorMessages().length() > 0 || getScoreErrorMessage().length() > 0 || getSimulationsErrorMessage().length() > 0 )
 	{
-		cout << "\nErrors:\n" << getHousesErrorMessages() << getAlgorithmErrorMessages() << getScoreErrorMessage();
+		cout << "\nErrors:\n" << getHousesErrorMessages() << getAlgorithmErrorMessages() << getScoreErrorMessage() << getSimulationsErrorMessage();
 	}
 	cleanResources();
 
@@ -461,6 +462,11 @@ string Simulator::getScoreErrorMessage() const
 }
 
 
+string Simulator::getSimulationsErrorMessage() const
+{
+	return mSimulationErrorMessages;
+}
+
 void Simulator::executeAllAlgoOnAllHouses()
 {
 	int actualThreads = mNumberOfHouses < mNumThreads ? mNumberOfHouses : mNumThreads;
@@ -496,12 +502,15 @@ void Simulator::runSimuationOnHouse()
 		//initialize a list that holds information about all simulations on current house:
 		list<unique_ptr<Simulation >> simulationListPerHouse;
 		list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms();
+		list<string> algorithmsNames = AlgorithmLoader::getInstance().getAlgorithmNames();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
+		list<string>::iterator algoName = algorithmsNames.begin();
 		for (unique_ptr<AbstractAlgorithm>& algo : algorithms)
 		{
 			House* tempHouse = new House();
 			tempHouse->fillHouseInfo(house->getHousePath(), house->getHouseFileName());
-			simulationListPerHouse.push_back(make_unique<Simulation>(*algo, tempHouse, mConfiguration->getParametersMap()));
+			simulationListPerHouse.push_back(make_unique<Simulation>(*algo, *algoName, tempHouse, mConfiguration->getParametersMap()));
+			algoName++;
 		}
 		int winnerNumberOfSteps = 0;
 
@@ -611,6 +620,7 @@ void Simulator::runSimuationOnHouse()
 			{
 				iter4->printSimulationStepsHistory();
 			}
+			mSimulationErrorMessages += iter4->getSimulationErrors();
 			iter4->cleanResources();
 			
 		}

@@ -9,7 +9,10 @@
 
 string House::fillHouseInfo(string filePath, string fileName)
 {
-
+	string errorMessage = "";
+	bool errorFlagMaxStep = false;
+	bool errorFlagRows = false;
+	bool errorFlagCols = false;
 	if (DEBUG)
 	{
 		cout << "Reading house from file path: " << filePath << " into class House" << endl;
@@ -21,23 +24,61 @@ string House::fillHouseInfo(string filePath, string fileName)
 	getline(fin, name);
 	mHouseName = name;
 	int maxSteps;
-	fin >> maxSteps;
-	if (maxSteps < 0)
-	{
-		return mHouseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + to_string(maxSteps) + "\n";
+	string stringMaxSteps;
+	string stringHouseRows;
+	string stringHouseCols;
+	fin >> stringMaxSteps;
+	try{
+		maxSteps = stoi(stringMaxSteps.c_str(), nullptr);
 	}
-	mMaxSteps = maxSteps; 
+	catch (...)
+	{
+		errorFlagMaxStep = true;
+	}
 
-	fin >> mHouseRow;
-	if (mHouseRow <= 0)
+	if (maxSteps < 0 || errorFlagMaxStep)
 	{
-		return mHouseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + to_string(mHouseRow) + "\n";
+		errorMessage+= mHouseFileName + ".house" + ": line number 2 in house file shall be a positive number, found: " + stringMaxSteps + "\n";
 	}
-	fin >> mHouseCol;
-	if (mHouseCol <= 0)
+	else
 	{
-		return mHouseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + to_string(mHouseCol) + "\n";
+		mMaxSteps = maxSteps;
 	}
+	
+
+	fin >> stringHouseRows;
+	try
+	{
+		mHouseRow = stoi(stringHouseRows.c_str(), nullptr);
+	}
+	catch (...)
+	{
+		errorFlagRows = true;
+	}
+	if (mHouseRow <= 0 || errorFlagRows)
+	{
+		errorMessage += mHouseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + stringHouseRows + "\n";
+	}
+	fin >> stringHouseCols;
+	try
+	{
+		mHouseCol = stoi(stringHouseCols.c_str(), nullptr);
+	}
+	catch (...)
+	{
+		errorFlagCols = true;
+	}
+	if (mHouseCol <= 0 || errorFlagCols)
+	{
+		errorMessage += mHouseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + stringHouseCols + "\n";
+	}
+
+
+	if (errorFlagCols || errorFlagRows || errorFlagMaxStep)
+	{
+		return errorMessage;
+	}
+
 
 	this->mHouseMatrix = new string[mHouseRow];
 	std::getline(fin, this->mHouseMatrix[0]);
@@ -72,8 +113,8 @@ string House::fillHouseInfo(string filePath, string fileName)
 			mHouseMatrix[i] += " ";
 		}
 	}
-
-	return isLegalHouse();
+	errorMessage += isLegalHouse();
+	return errorMessage;
 }
 
 //copy constructor for house:

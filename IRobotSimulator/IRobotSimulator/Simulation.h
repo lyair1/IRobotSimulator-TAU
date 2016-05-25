@@ -15,7 +15,7 @@
 class Simulation
 {
 public:
-	Simulation(AbstractAlgorithm& algorithm, House* house, map<string, int>* parametersMap):
+	Simulation(AbstractAlgorithm& algorithm, string algoName, House* house, map<string, int>* parametersMap) :
 		mStepsCounter(0),
 		mScore(0),
 		mDirtCollected(0),
@@ -25,7 +25,9 @@ public:
 		mActualPositionInCompetition(-1),
 		mIsRunning(true), // TODO: make sure the robot is in a legal location in the house before setting mIsRunning to true
 		mIsAboutToFinish(false),
-		mPrevSimulationStep(Direction::Stay)
+		mPrevSimulationStep(Direction::Stay),
+		mAlgorithmName(algoName),
+		mSimulationError("")
 	{
 		mAlgorithm = &algorithm;
 		mHouse = house;
@@ -69,7 +71,7 @@ public:
 	int getInitialDustSumInHouse () const{ return mInitialDustSumInHouse; } 
 	int getDirtCollected() const{ return mDirtCollected; } 
 	bool getIsBackInDocking() const{ return mIsBackInDocking; } 
-
+	string getSimulationErrors() const { return mSimulationError; }
 	
 private:
 	long mStepsCounter;
@@ -82,6 +84,8 @@ private:
 	bool mIsRunning;
 	bool mIsAboutToFinish;
 	Direction mPrevSimulationStep;
+	string mAlgorithmName;
+	string mSimulationError;
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	Sensor* mSensor;
@@ -95,6 +99,7 @@ private:
 	int mMaxStepsAfterWinner;
 	bool mIsOutOfBattery;
 	list<Direction> mStepsHistory;
+	
 	
 	
 };

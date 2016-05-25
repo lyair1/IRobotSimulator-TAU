@@ -77,6 +77,14 @@ echo check house with negaive lines
 simulator -house_path test/HouseTests/NegativeLine -config test/testEx1 test/AlgorithmsSO
 echo
 echo
+echo check ALL BAD HOUESE house with too many docking & no docking 
+simulator -house_path test/HouseTests/AllBadDocking -config test/testEx1 test/AlgorithmsSO
+echo
+echo
+echo check house with too many docking & no docking 
+simulator -house_path test/HouseTests/BadDocking -config test/testEx1 test/AlgorithmsSO
+echo
+echo
 echo check house with docking on wall 
 simulator -house_path test/HouseTests/DockingOnWall -config test/testEx1 test/AlgorithmsSO
 

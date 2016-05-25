@@ -54,6 +54,7 @@ private:
 	HouseList mHouseList;
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
+	string mSimulationErrorMessages;
 	ConfigReader* mConfiguration;
 	list<std::string> mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
@@ -79,6 +80,7 @@ private:
 	string getAlgorithmErrorMessages() const;
 	string getHousesErrorMessages() const;
 	string getScoreErrorMessage() const;
+	string getSimulationsErrorMessage() const;
 
 	void handleConfigFileErrors();
 	void handleScore();

@@ -93,6 +93,11 @@ bool Simulation :: makeSimulationStep()
 		{
 			mIsRunning = false;
 			mCrashedIntoWall = true;
+			std::string stepCounterString;
+			std::stringstream strstream;
+			strstream << mStepsCounter;
+			
+			mSimulationError += "Algorithm " + mAlgorithmName + " when running on House " + mHouse->getHouseFileName() + " went on a wall in step " + strstream.str() + "\n";
 			if (DEBUG)
 			{
 				cout << " Simulation terminated due to  an invalid step! (crashed into a wall) " << endl;
@@ -183,6 +188,7 @@ void Simulation::setSimulationScore(int score)
 {
 	mScore = score;
 }
+
 
 void Simulation::printSimulationStepsHistory(){
 	cout << "************************************";
