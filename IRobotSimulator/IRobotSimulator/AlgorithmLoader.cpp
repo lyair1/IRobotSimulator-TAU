@@ -9,7 +9,7 @@
 #include "200945657_A_.h"
 #endif
 
-#define _LOADER_DEBUG_ 1
+#define _LOADER_DEBUG_ 0
 // create the static field
 
 
@@ -20,7 +20,6 @@ void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorit
 {
 	if (mEnableRegistration)
 	{
-		cout << "algorithm registered" << endl;
 		instance.mAlgorithmFactories.push_back(algorithmFactory);
 	}
 }
@@ -47,7 +46,10 @@ AlgorithmLoader::~AlgorithmLoader()
 
 list<unique_ptr<AbstractAlgorithm>> AlgorithmLoader::getAlgorithms()const {
 	list<unique_ptr<AbstractAlgorithm>> algorithms;
-
+	if (_LOADER_DEBUG_)
+	{
+		cout<< "in function getAlgorithms() " << endl;
+	}
 #ifndef _WIN32
 	for (auto algorithmFactoryFunc : mAlgorithmFactories) {
 		algorithms.push_back(algorithmFactoryFunc());
