@@ -363,7 +363,7 @@ Path AlgorithmBase::connect2Paths(Path path1, Path path2)
 
 bool AlgorithmBase::isHouseMapped()
 {
-	if (mNotWallSet.size() == 0 && mMoatizationShortestPaths.size() > 0) // if there is no more 'N' and we already started it means that the house is mapped
+	if ( mNotWallSet.empty() && !mMoatizationShortestPaths.empty()) // if there is no more 'N' and we already started it means that the house is mapped
 	{
 		return true;
 	}
@@ -378,7 +378,7 @@ bool AlgorithmBase::isHouseClean()
 		return false;
 	}
 
-	return mDirtsMap.size() == 0 && mNotWallSet.size() == 0;
+	return mDirtsMap.empty() && mNotWallSet.empty();
 }
 
 bool AlgorithmBase::isUnknownPoint(Point p)

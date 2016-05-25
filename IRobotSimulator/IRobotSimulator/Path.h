@@ -7,7 +7,11 @@
 using namespace std;
 class Path {
 public:
-	Path(){};
+	Path(){
+		length = 0;
+		origin = Point(0, 0);
+		dest = Point(0, 0);
+	};
 	Path(Point origin_, Point dest_, vector<Point> path_, size_t length_) : origin(origin_), dest(dest_), path(path_), length(length_) {}
 
 	Point origin, dest;

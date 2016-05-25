@@ -5,7 +5,10 @@
 class Point {
 public:
 	int _x, _y;
-	Point(){};
+	Point(){
+		_x = 0;
+		_y = 0;
+	};
 	Point(int x_, int y_) : _x(x_), _y(y_) {}
 
 	void print(ostream& out = cout) const { out << "(" << _x << "," << _y << ")"; }
