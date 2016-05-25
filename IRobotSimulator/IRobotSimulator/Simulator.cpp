@@ -388,59 +388,59 @@ HouseList Simulator::readAllHouses()
 list<unique_ptr<AbstractAlgorithm>> Simulator::loadAllAlgorithms(bool firstTime)
 {
 #ifndef _WIN32
-	fs::path targetDir(mAlgorithmsPath);
-	//check if directory doesn't exist or path is not a directory or directory is empty
-	if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
+	if (firstTime)
 	{
-		cout << USAGE;
-		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
-		exit(0);
-	}
-	fs::directory_iterator it(targetDir), eod;
-	AlgorithmLoader::getInstance().setRegistrationOn(true);
-#ifdef _WIN32
-	int i = 0;
-#endif
-	BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
-	{
-		if (fs::is_regular_file(p) && p.extension() == ".so" )
+		fs::path targetDir(mAlgorithmsPath);
+		//check if directory doesn't exist or path is not a directory or directory is empty
+		if (!fs::exists( targetDir ) || ! fs::is_directory(targetDir) || fs::is_empty(targetDir)) 
 		{
-			if ( p.string().at(p.string().length()-4) == '_') // change to _.so
-			{
-				if (DEBUG)
-				{
-					cout << "scan  _.so file :" << p.string() << "\n";
-				}
-#ifndef _WIN32
-				AlgorithmLoader::getInstance().loadAlgorithm(p.string(), p.stem().string());
-#else
-				AlgorithmLoader::getInstance().loadAlgorithm(new AlgorithmNaive(), "ALGO" + i);
-				i++;
-#endif
-			}
-
+			cout << USAGE;
+			cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
+			exit(0);
 		}
-	}
-	size_t numOfAlgosLoaded = AlgorithmLoader::getInstance().size();
-	if (numOfAlgosLoaded == 0)
-	{
-		cout << USAGE;
-		cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
-		exit(0);
-	}
-	AlgorithmLoader::getInstance().setRegistrationOn(false);
-	list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms(); // this function creates NEW algorithms using the factory every time it's called
-	mAlgorithmNames = AlgorithmLoader::getInstance().getAlgorithmNames(); 
+		fs::directory_iterator it(targetDir), eod;
+		AlgorithmLoader::getInstance().setRegistrationOn(true);
+#ifdef _WIN32
+		int i = 0;
+#endif
+		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+		{
+			if (fs::is_regular_file(p) && p.extension() == ".so" )
+			{
+				if ( p.string().at(p.string().length()-4) == '_') // change to _.so
+				{
+					if (DEBUG)
+					{
+						cout << "scan  _.so file :" << p.string() << "\n";
+					}
+#ifndef _WIN32
+					AlgorithmLoader::getInstance().loadAlgorithm(p.string(), p.stem().string());
+#else
+					AlgorithmLoader::getInstance().loadAlgorithm(new AlgorithmNaive(), "ALGO" + i);
+					i++;
+#endif
+				}
 
-	if (DEBUG)
-	{
-		cout << "retrun algorithm list\n";
+			}
+		}
+		size_t numOfAlgosLoaded = AlgorithmLoader::getInstance().size();
+		if (numOfAlgosLoaded == 0)
+		{
+			cout << USAGE;
+			cout << "cannot find algorithm files in '" << mAlgorithmsPath << "'"<<endl; 
+			exit(0);
+		}
+		AlgorithmLoader::getInstance().setRegistrationOn(false);
+		mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
+		if (DEBUG)
+		{
+			cout << "Algorithms loading errors:: "<< mAlgorithmErrorMessages<< endl; 
+		}
+		mAlgorithmNames = AlgorithmLoader::getInstance().getAlgorithmNames(); 
+
 	}
-	mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
-	if (DEBUG)
-	{
-		cout << "Algorithms loading errors:: "<< mAlgorithmErrorMessages<< endl; 
-}
+	list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms(); // this function creates NEW algorithms using the factory every time it's called
+
 	return algorithms;
 
 #else
