@@ -15,7 +15,7 @@
 class Simulation
 {
 public:
-	Simulation(AbstractAlgorithm* algorithm, House* house, map<string, int>* parametersMap):
+	Simulation(AbstractAlgorithm& algorithm, House* house, map<string, int>* parametersMap):
 		mStepsCounter(0),
 		mScore(0),
 		mDirtCollected(0),
@@ -27,9 +27,11 @@ public:
 		mIsAboutToFinish(false),
 		mPrevSimulationStep(Direction::Stay)
 	{
-		mAlgorithm = algorithm;
+		mAlgorithm = &algorithm;
 		mHouse = house;
 		mSensor = new Sensor(mHouse->getDockingLocation(), mHouse);
+		mAlgorithm->setSensor(*mSensor);
+		mAlgorithm->setConfiguration(*parametersMap);
 		mConfiguration = parametersMap;		
 		mInitialDustSumInHouse = mHouse->getDustInHouse();
 		mIsBackInDocking = mHouse->isCleanHouse() ?true : false; // we start simulation at location 'D'. if the house is clean - we're considered back in docking

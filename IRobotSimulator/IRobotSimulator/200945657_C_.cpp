@@ -115,6 +115,5 @@ Direction _200945657_C::getNextStep(SensorInformation info, Direction prevStep)
 	return chosenDirection; // Make sure we don't get here, we can hit the wall
 }
 
-#ifndef _WIN32
+
 REGISTER_ALGORITHM(_200945657_C)
-#endif

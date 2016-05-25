@@ -117,6 +117,4 @@ Direction _200945657_B::getNextStep(SensorInformation info, Direction prevStep)
 }
 
 
-#ifndef _WIN32
 REGISTER_ALGORITHM(_200945657_B)
-#endif

@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_BASE__H_
 #define __ALGORITHM_BASE__H_
 
-#define _ALGORITHM_DEBUG_ 0
+#define _ALGORITHM_DEBUG_ 1
 
 #include <vector>
 #include <map>
@@ -27,9 +27,10 @@ class AlgorithmBase : public AbstractAlgorithm
 {
 
 public:
-	AlgorithmBase() :mSensor(NULL),
-		mLocation(-1, -1),
-		mDockingLocation(-1, -1),
+	AlgorithmBase() :
+		mSensor(NULL),
+		mLocation(0,0),
+		mDockingLocation(0, 0),
 		mLastDirection(-1),
 		mPrevLastDirection(-1),
 		mConfiguration(0, 0, 0, 0),
@@ -42,7 +43,9 @@ public:
 		lastDirection(Direction::South),
 		myPrevStep(Direction::South),
 		myPrevPoint(0, 0),
-		fakeStatistics(10)
+		stepsCount(0),
+		fakeStepsCount(0),
+		fakeStatistics(0)
 	{
 		mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 		mMoves = new list<Direction>();

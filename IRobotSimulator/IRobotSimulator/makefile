@@ -6,13 +6,13 @@ obj = $(src:.cpp=.o)
 so_src = 200945657_A_.cpp 200945657_C_.cpp 200945657_B_.cpp
 so_dep = AlgorithmBase.cpp score_formula.cpp
 s_obj = $(so_src:.cpp=.so)
-so_dep_obj = $(so_dep:.cpp=.o)
+
 
 target = simulator
 
 # flags
 CC_FLAGS = -c -O2 -Wall -pthread -std=c++11 -pedantic -g 
-SO_FLAGS = -Wall -pthread -std=c++11 -pedantic -g  -shared -fPIC
+SO_FLAGS = -Wall -pthread -std=c++1y -pedantic -g  -shared -fPIC
 LD_FLAGS = -lm -lboost_system -lboost_filesystem -ldl
 CC = g++
 
@@ -31,8 +31,7 @@ $(s_obj): %.so: %.cpp $(so_dep_obj)
 $(obj): %.o: %.cpp
 	$(CC) $(CC_FLAGS) $< -o $@
 	
-$(so_dep_obj): %.o: %.cpp
-	$(CC) $(CC_FLAGS) -fPIC $< -o $@
+
 
 clean:
 	rm -f $(obj) $(so_obj) $(s_obj) $(target)

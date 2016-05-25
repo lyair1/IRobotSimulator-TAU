@@ -29,7 +29,6 @@ Simulator::Simulator(string scoreFormulaPath, int numThreads, string housesPath,
 	mNumberOfHouses(0)
 {
 	mHouseList.clear();
-	mAlgorithmNames = new list<string>;
 	mCalculateScore = NULL;
 
 }
@@ -64,12 +63,12 @@ void Simulator::initSimulator()
 	{
 		House*  house = (*listHouseIter);
 		house->mAlgorithmList = loadAllAlgorithms(firstTime);
-		firstTime = false;
-		if (firstTime && house->mAlgorithmList == nullptr)
+		if (firstTime && house->mAlgorithmList.empty())
 		{
 			cout << "All algorithm files in target folder '" << mAlgorithmsPath.substr(2) << "' cannot be opened or are invalid: \n" << getAlgorithmErrorMessages();
 			exit(0);
 		}
+		firstTime = false;
 	}
 	runSimulation();
 	// Print error list
@@ -167,10 +166,10 @@ void Simulator::printScores()
 	int i = 0;
 	//sort algorithms by average: 
 	list <pair< double, string >> algorithmsByAvg;
-	for (list<string>::iterator it = mAlgorithmNames->begin(); it != mAlgorithmNames->end(); ++it)
+	for (string & algoName : mAlgorithmNames)
 	{
 		double averageResult = 0;
-		string algorithmLine = getAlgoPrintLine(i, (*it), averageResult);
+		string algorithmLine = getAlgoPrintLine(i, algoName, averageResult);
 		algorithmsByAvg.push_back(make_pair(averageResult, algorithmLine));
 		i++;
 	}
@@ -329,11 +328,6 @@ void Simulator::cleanResources()
 		(*listHouseIter)->cleanResources();
 		delete *listHouseIter;
 	}
-	if (mAlgorithmNames != NULL)
-	{
-		delete mAlgorithmNames;
-		mAlgorithmNames = NULL;
-	}
 	if (mConfiguration != NULL)
 	{
 		delete mConfiguration;
@@ -391,7 +385,7 @@ HouseList Simulator::readAllHouses()
 	return housesList;
 }
 
-AlgorithmList *Simulator:: loadAllAlgorithms(bool firstTime)
+list<unique_ptr<AbstractAlgorithm>> Simulator::loadAllAlgorithms(bool firstTime)
 {
 #ifndef _WIN32
 	fs::path targetDir(mAlgorithmsPath);
@@ -420,7 +414,7 @@ AlgorithmList *Simulator:: loadAllAlgorithms(bool firstTime)
 #ifndef _WIN32
 				AlgorithmLoader::getInstance().loadAlgorithm(p.string(), p.stem().string());
 #else
-				AlgorithmLoader::getInstance(new AlgorithmNaive(), "ALGO" + i);
+				AlgorithmLoader::getInstance().loadAlgorithm(new AlgorithmNaive(), "ALGO" + i);
 				i++;
 #endif
 			}
@@ -435,40 +429,33 @@ AlgorithmList *Simulator:: loadAllAlgorithms(bool firstTime)
 		exit(0);
 	}
 	AlgorithmLoader::getInstance().setRegistrationOn(false);
-	list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms();
-	list<string> algorithmsNames = AlgorithmLoader::getInstance().getAlgorithmNames();
-
-	AlgorithmList *algoList = new AlgorithmList();
-	list<string>::iterator namesItr = algorithmsNames.begin();
-	for (unique_ptr<AbstractAlgorithm>& algo : algorithms){
-		namesItr++;
-		if (firstTime)
-		{
-			mAlgorithmNames->push_back(*namesItr);	
-		}
-		algoList->push_back(algo.get());
-	}
+	list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms(); // this function creates NEW algorithms using the factory every time it's called
+	mAlgorithmNames = AlgorithmLoader::getInstance().getAlgorithmNames(); 
 
 	if (DEBUG)
 	{
 		cout << "retrun algorithm list\n";
 	}
 	mAlgorithmErrorMessages = AlgorithmLoader::getInstance().getAlgorithmErrorMessage();
-	return algoList;
+	if (DEBUG)
+	{
+		cout << "Algorithms loading errors:: "<< mAlgorithmErrorMessages<< endl; 
+}
+	return algorithms;
 
 #else
 
-	AlgorithmList *algoList = new AlgorithmList();
+	list<unique_ptr<AbstractAlgorithm>> algoList;
 
-	_200945657_A* algoNaive = new _200945657_A();
+	unique_ptr<AbstractAlgorithm> algoNaive = make_unique<_200945657_A>();
 	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
 	if (firstTime)
 	{
-		mAlgorithmNames->push_back("algo1");
+		mAlgorithmNames.push_back("algo1");
 	}
 	//don't set the sensor yet.
 	//the sensor of the algorithm is related to the house which it is running on, and is set in simulatiom constructor
-	algoList->push_back(algoNaive);
+	algoList.push_back(algoNaive);
 
 //	_200945657_B* algoNaive2 = new _200945657_B();
 //	algoNaive->setConfiguration(*mConfiguration->getParametersMap());
@@ -549,18 +536,15 @@ void Simulator::runSimuationOnHouse()
 			cout << "running from thread #" << this_thread::get_id() << endl;
 		}
 
-		Simulation* pSimulation;
 		//initialize a list that holds information about all simulations on current house:
-		SimulationList* simulationListPerHouse;
-		simulationListPerHouse = new SimulationList();
+		list<unique_ptr<Simulation >> simulationListPerHouse;
+		list<unique_ptr<AbstractAlgorithm>> algorithms = AlgorithmLoader::getInstance().getAlgorithms();
 		//insert all initialized simulations on the current house into the list simulationListPerHouse:
-		for (AlgorithmList::const_iterator listAlgorithmIter = house->mAlgorithmList->begin(); listAlgorithmIter != house->mAlgorithmList->end(); ++listAlgorithmIter)
+		for (unique_ptr<AbstractAlgorithm>& algo : algorithms)
 		{
 			House* tempHouse = new House();
 			tempHouse->fillHouseInfo(house->getHousePath(), house->getHouseFileName());
-			pSimulation = new Simulation((*listAlgorithmIter), tempHouse, mConfiguration->getParametersMap());
-			(*listAlgorithmIter)->setSensor(*(pSimulation->getSensor()));
-			simulationListPerHouse->push_back(pSimulation);
+			simulationListPerHouse.push_back(make_unique<Simulation>(*algo, tempHouse, mConfiguration->getParametersMap()));
 		}
 		int winnerNumberOfSteps = 0;
 
@@ -582,9 +566,8 @@ void Simulator::runSimuationOnHouse()
 		while (isAnyAlgorithmStillRunning)// while none of the algorithms finished cleaning and back in docking
 		{
 			isAnyAlgorithmStillRunning = false;
-			for (SimulationList::iterator iter = simulationListPerHouse->begin(); iter != simulationListPerHouse->end(); ++iter)
+			for (unique_ptr<Simulation >& simul : simulationListPerHouse)
 			{
-				Simulation *simul = (*iter);
 				if (simul->isSimulationRunning())
 				{
 					isAnyAlgorithmStillRunning = true;
@@ -594,11 +577,11 @@ void Simulator::runSimuationOnHouse()
 						{
 							isFirstWinner = false;
 							winnerNumberOfSteps = simul->getNumberOfSteps();
-							for (SimulationList::iterator iter2 = simulationListPerHouse->begin(); iter2 != simulationListPerHouse->end(); ++iter2)
+							for (unique_ptr<Simulation >& iter2 : simulationListPerHouse) 
 							{
-								if ((*iter2) != simul)//update steps counter for all OTHER algorithms BUT for the first winner 
+								if (iter2 != simul)//update steps counter for all OTHER algorithms BUT for the first winner 
 								{
-									(*iter2)->resetMaxStepsAccordingToWinner();
+									iter2->resetMaxStepsAccordingToWinner();
 								}
 							}
 						}
@@ -633,48 +616,47 @@ void Simulator::runSimuationOnHouse()
 		}
 
 		//all algorithms stopped - terminate simulation on this house and calculate scores
-		for (SimulationList::iterator iter3 = simulationListPerHouse->begin(); iter3 != simulationListPerHouse->end(); ++iter3){
+		for (unique_ptr<Simulation> & iter3 :simulationListPerHouse){
 
-			if ((*iter3)->getCrashedIntoWall())
+			if (iter3->getCrashedIntoWall())
 			{
-				(*iter3)->setSimulationScore(0);
+				iter3->setSimulationScore(0);
 			}
 			else
 			{
-				if ((*iter3)->getIsOutOfBattery())//if an algorithm is out of battery then it's this_num_steps will equal to simulation steps
+				if (iter3->getIsOutOfBattery())//if an algorithm is out of battery then it's this_num_steps will equal to simulation steps
 				{
-					(*iter3)->setStepsCounter(simulationStepsCounter);
+					iter3->setStepsCounter(simulationStepsCounter);
 				}
 				const map<string, int> score_params =
 				{
 					{ "winner_num_steps", winnerNumberOfSteps },
 					{ "simulation_steps", simulationStepsCounter },
-					{ "actual_position_in_competition", (*iter3)->getActualPositionInCompetition() },
-					{ "this_num_steps", (*iter3)->getStepsCounter() },
-					{ "sum_dirt_in_house", (*iter3)->getInitialDustSumInHouse() },
-					{ "dirt_collected", (*iter3)->getDirtCollected() },
-					{ "is_back_in_docking", (*iter3)->getIsBackInDocking() }
+					{ "actual_position_in_competition", iter3->getActualPositionInCompetition() },
+					{ "this_num_steps", iter3->getStepsCounter() },
+					{ "sum_dirt_in_house", iter3->getInitialDustSumInHouse() },
+					{ "dirt_collected", iter3->getDirtCollected() },
+					{ "is_back_in_docking", iter3->getIsBackInDocking() }
 				};
-				(*iter3)->setSimulationScore(mCalculateScore(score_params));
+				iter3->setSimulationScore(mCalculateScore(score_params));
 			}
 			
-			house->algorithmScores->push_back((*iter3)->getSimulationScore());
-			if ((*iter3)->getSimulationScore() == -1)
+			house->algorithmScores->push_back(iter3->getSimulationScore());
+			if (iter3->getSimulationScore() == -1)
 			{
 				mIsAnySimulationScoreBad = true;
 			}
 		}
 
 		// Clean simulationListPerHouse
-		for (SimulationList::iterator iter4 = simulationListPerHouse->begin(); iter4 != simulationListPerHouse->end(); ++iter4){
+		for (unique_ptr<Simulation> & iter4: simulationListPerHouse){
 			if (DEBUG)
 			{
-				(*iter4)->printSimulationStepsHistory();
+				iter4->printSimulationStepsHistory();
 			}
-			(*iter4)->cleanResources();
-			delete *iter4;
+			iter4->cleanResources();
+			
 		}
-		delete simulationListPerHouse;
 	}
 }
 

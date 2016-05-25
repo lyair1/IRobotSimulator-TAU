@@ -9,8 +9,6 @@
 // create the static field
 
 
-#ifndef _WIN32
-
 AlgorithmLoader AlgorithmLoader::instance;
 void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
 {
@@ -22,6 +20,7 @@ void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorit
 AlgorithmLoader::AlgorithmLoader(): mEnableRegistration(false)
 {
 }
+#ifndef _WIN32
 void AlgorithmLoader:: setRegistrationOn(bool enableRegistration){
 	mEnableRegistration = enableRegistration;
 }
@@ -44,7 +43,7 @@ bool AlgorithmLoader::loadAlgorithm(const string & algorithmPath_, const string&
 	}
 	if (handle == NULL)
 	{
-		mErrorMessage += algoFileName + ": file cannot be loaded or is not a valid .so";
+		mErrorMessage += algoFileName + ": file cannot be loaded or is not a valid .so\n";
 		if (_LOADER_DEBUG_)
 		{
 			cout<< "dlopen handle is NULL, algorithm name = " <<algoFileName <<"\n, dlerror()= "<<dlerror()<<"\n. file cannot be loaded or is not a valid .so"<<endl;
@@ -52,7 +51,7 @@ bool AlgorithmLoader::loadAlgorithm(const string & algorithmPath_, const string&
 		return false;
 	}
 	if (instance.size() == size) {
-		mErrorMessage += algoFileName + ": valid .so but no algorithm was registered after loading it";
+		mErrorMessage += algoFileName + ": valid .so but no algorithm was registered after loading it\n";
 		if (_LOADER_DEBUG_)
 		{
 			cout<< "instance.size() = " <<size << "algorithm name = "<<algoFileName<< ".valid .so but no algorithm was registered after loading it"<<endl;
@@ -73,9 +72,14 @@ list<unique_ptr<AbstractAlgorithm>> AlgorithmLoader::getAlgorithms()const {
 }
 
 AlgorithmLoader::~AlgorithmLoader(){
+	if (_LOADER_DEBUG_)
+	{
+		cout<< "AlgorithmLoader() destructor dlclose every handle "<<endl;
+	}
 	mAlgorithmFactories.clear();
 	for (void* handle : mHandleList)
 		dlclose(handle);
+	
 }
 void AlgorithmLoader::setNameForLastAlgorithm(const std::string& algorithmName) {
 	assert(mAlgorithmFactories.size() - 1 == mAlgorithmNames.size());
@@ -91,15 +95,15 @@ string AlgorithmLoader::getAlgorithmErrorMessage()
 	return mErrorMessage;
 }
 #else
-AlgorithmLoader::AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_)
- {
-}
+
 AlgorithmLoader::~AlgorithmLoader()
 {
+	if (_LOADER_DEBUG_)
+	{
+		cout << "AlgorithmLoader() destructor dlclose every handle " << endl;
+	}
+	mAlgorithmFactories.clear();
+	//don't call dlclose on windows
+}
 
-}
-void AlgorithmLoader::registerAlgorithm(std::function<unique_ptr<AbstractAlgorithm>()> algorithmFactory)
-{
-	mAlgorithmFactories.push_back(algorithmFactory);
-}
 #endif

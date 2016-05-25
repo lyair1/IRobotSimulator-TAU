@@ -17,25 +17,16 @@
 class AlgorithmLoader
 {
 public:
+	AlgorithmLoader();
+	~AlgorithmLoader();
 	AlgorithmLoader(AlgorithmLoader const &) = delete;	// don't implement - it's a singleton!
 	void operator = (AlgorithmLoader const &) = delete;	// don't implement - it's a singleton!
 
-#ifndef _WIN32
-	AlgorithmLoader();
-	~AlgorithmLoader();
 	static AlgorithmLoader& getInstance()
 	{ 
 		return instance;
 	}
-#else
-	AlgorithmLoader(AbstractAlgorithm* algo_, const char* algoName_);
-	static AlgorithmLoader& getInstance(AbstractAlgorithm* algo_, const char* algoName_)
-	{
-		static AlgorithmLoader instance(algo_, algoName_);
-		return instance;
-	}
-	~AlgorithmLoader();
-#endif
+
 
 	friend class AlgorithmRegistration;
 
@@ -55,9 +46,7 @@ public:
 
 	const list<std::string>& getAlgorithmNames() const;
 	void setRegistrationOn(bool enableRegistration);
-	size_t size()const {
-		return mAlgorithmFactories.size();
-	}
+	size_t size()const { return mAlgorithmFactories.size();	}
 private:
 	string mErrorMessage;
 	bool mEnableRegistration;

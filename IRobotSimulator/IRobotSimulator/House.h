@@ -14,6 +14,12 @@
 #include "Direction.h"
 #include <list>
 #include "AbstractAlgorithm.h"
+#ifndef _WIN32
+#include "MakeUnique.cpp"
+#else
+#include <memory>
+#endif
+
 using namespace std;
 
 typedef std::list<AbstractAlgorithm*> AlgorithmList;
@@ -95,7 +101,7 @@ public:
 	list<int>* algorithmScores;
 	string getHouseFileName() const;
 	string getHousePath() const;
-	AlgorithmList  *mAlgorithmList;
+	list<unique_ptr<AbstractAlgorithm>> mAlgorithmList;
 private:
 	// members:
 	string mHouseName;

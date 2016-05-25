@@ -14,11 +14,11 @@
 // setSensor is called once when the Algorithm is initialized 
 void AlgorithmBase::setSensor(const AbstractSensor& sensor)
 {
+	mSensor = &sensor;
 	mLastDirection = -1;
 	mPrevLastDirection = -1;
 	delete mMoves;
 	mMoves = new list <Direction>();
-	mSensor = &sensor;
 	mMatrixSize = DEFAULT_MATRIX_SIZE;
 	mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 	mStepsTillFinish = -1;

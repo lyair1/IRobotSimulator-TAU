@@ -142,10 +142,11 @@ int House::getMaxSteps() const {
 void House::cleanResources() const{
 	//delete mHouseMatrix;
 	// Clean algorithms
-	for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
-	{
-		delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
-	}
+	//this is now unique_ptr and should not be deleted!
+	//for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
+	//{
+	//	delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
+	//}
 }
 
 

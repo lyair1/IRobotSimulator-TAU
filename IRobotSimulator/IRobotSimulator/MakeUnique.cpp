@@ -1,3 +1,5 @@
+#ifndef _MAKE_UNIQUE_
+#define _MAKE_UNIQUE_
 #include <iostream>
 #include <string>
 #include <vector>
@@ -78,3 +80,4 @@ typename _Unique_if<T>::_Known_bound
 make_unique(Args&&...) = delete;
 
 #endif
+#endif //_MAKE_UNIQUE_

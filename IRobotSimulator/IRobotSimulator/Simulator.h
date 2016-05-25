@@ -55,7 +55,7 @@ private:
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
 	ConfigReader* mConfiguration;
-	list<string>* mAlgorithmNames;
+	list<std::string> mAlgorithmNames;
 	bool mIsAnySimulationScoreBad;
 	int mNumThreads;
 	int mNumberOfHouses;
@@ -68,7 +68,7 @@ private:
 	void runSimuationOnHouse();
 	int countHousesInPath();
 	HouseList readAllHouses();
-	AlgorithmList *loadAllAlgorithms(bool firstTime);
+	list<unique_ptr<AbstractAlgorithm>> loadAllAlgorithms(bool firstTime);
 	void executeAllAlgoOnAllHouses();
 	void printScores();
 
