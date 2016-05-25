@@ -11,7 +11,9 @@
 #include "200945657_B_.h"
 #include "200945657_A_.h"
 #include <thread>
-
+#ifndef _WIN32
+#include <dlfcn.h>
+#endif
 
 namespace fs = ::boost::filesystem;
 using namespace std;
@@ -24,6 +26,7 @@ Simulator::Simulator(string scoreFormulaPath, int numThreads, string housesPath,
 	mHousesErrorMessages(""),
 	mAlgorithmErrorMessages(""),
 	mSimulationErrorMessages(""),
+	mScoreHandle(NULL),
 	mConfiguration(NULL),
 	mIsAnySimulationScoreBad(false),
 	mNumThreads(numThreads),
@@ -102,7 +105,7 @@ void Simulator::handleScore()
 {
 	if (mScoreFormulaPath == "")//In case score_formula argument is not provided in the command line, the default score formula shall be used
 	{
-		mCalculateScore = Simulator::calculateSimulationScore;
+		mCalculateScore = calculateSimulationScore;
 		return;
 	}
 	//In case score_formula argument is not provided in the command line, the default score formula shall be used
@@ -116,15 +119,22 @@ void Simulator::handleScore()
 		exit(0);
 	}
 #ifndef _WIN32
-	void *handle = dlopen(mScoreFormulaPath.c_str(), RTLD_NOW);// Opening the .so file:
-	if (handle == NULL)
+	char* error;
+	void *mScoreHandle = dlopen(mScoreFormulaPath.c_str(), RTLD_NOW);// Opening the .so file:
+	if (mScoreHandle == NULL)
 	{
 		cout << "score_formula.so exists in '" << mScoreFormulaPath.substr(2) << "' but cannot be opened or is not a valid .so" << endl;
 		return ;
 	}
-
+	dlerror();// clear the current errors
 	// calc_score is the instance creator method
-	void* p = dlsym(handle, "calc_score");
+	void* p = dlsym(mScoreHandle, "calc_score");
+	if((error =  dlerror()) != NULL)
+	{
+		cout << "score_formula.so is a valid .so but it does not have a valid score formula" << endl;
+		cout<<error;
+		return ;
+	}
 	scoreCreator calc_score = reinterpret_cast<scoreCreator>(reinterpret_cast<long>(p));
 	if (calc_score == nullptr)
 	{
@@ -134,7 +144,7 @@ void Simulator::handleScore()
 	mCalculateScore = calc_score;
 	return ;
 #endif
-	mCalculateScore = Simulator::calculateSimulationScore; 
+	mCalculateScore = calculateSimulationScore; 
 	return;
 }
 
@@ -198,27 +208,6 @@ string Simulator::getHeaderPrintLine()
 	}
 	line += "|";
 
-	//if (DEBUG)
-	//{
-	//	cout << "BEFORE sorting by house name : " << endl;
-	//	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
-	//	{
-	//		cout << (*it)->getHouseFileName() << " ";
-	//	}
-	//	cout << endl;
-
-	//}
-	//mHouseList->sort(compareLexical);
-	//if (DEBUG)
-	//{
-	//	cout << "AFTER sorting by house name : " << endl;
-	//	for (HouseList::iterator it = mHouseList->begin(); it != mHouseList->end(); ++it)
-	//	{
-	//		cout << (*it)->getHouseFileName() << " ";
-	//	}
-	//	cout << endl;
-
-	//}
 	for (HouseList::iterator it = mHouseList.begin(); it != mHouseList.end(); ++it)
 	{
 		House* house = (*it);
@@ -269,7 +258,7 @@ string Simulator::getAlgoPrintLine(int ind, string algoName, double & averageRes
 	{
 		int i = 0;
 		House* house = (*it);
-		for (list<int>::iterator algoIt = house->algorithmScores->begin(); algoIt != house->algorithmScores->end(); ++algoIt)
+		for (list<int>::iterator algoIt = house->algorithmScores.begin(); algoIt != house->algorithmScores.end(); ++algoIt)
 		{
 			int score(*algoIt);
 			if (i == ind)
@@ -334,6 +323,13 @@ void Simulator::cleanResources()
 		delete mConfiguration;
 		mConfiguration = NULL;
 	}
+#ifndef _WIN32
+	if (mScoreHandle != NULL)
+	{
+		dlclose(mScoreHandle);
+	}
+#endif
+
 	
 }
 
@@ -406,7 +402,7 @@ void Simulator::loadAllAlgorithms()
 	{
 		if (fs::is_regular_file(p) && p.extension() == ".so" )
 		{
-			if ( p.string().at(p.string().length()-4) == '_') // change to _.so
+			if (p.string().length()>=4 && p.string().at(p.string().length()-4) == '_') // change to _.so
 			{
 				if (DEBUG)
 				{
@@ -609,7 +605,7 @@ void Simulator::runSimuationOnHouse()
 				iter3->setSimulationScore(mCalculateScore(score_params));
 			}
 			
-			house->algorithmScores->push_back(iter3->getSimulationScore());
+			house->algorithmScores.push_back(iter3->getSimulationScore());
 			if (iter3->getSimulationScore() == -1)
 			{
 				mIsAnySimulationScoreBad = true;
@@ -630,7 +626,7 @@ void Simulator::runSimuationOnHouse()
 }
 
 // this is not a member function of simulation class!!! 
-int Simulator::calculateSimulationScore(const map<string, int>& score_params){
+int calculateSimulationScore(const map<string, int>& score_params){
 	int winnerNumberOfSteps;
 	int simulationStepsCounter;
 	int positionInCompetition;
@@ -650,11 +646,11 @@ int Simulator::calculateSimulationScore(const map<string, int>& score_params){
 		dirtCollected = score_params.at("dirt_collected");
 		isBackInDocking = (score_params.at("is_back_in_docking") != 0);
 	}
-	catch (out_of_range & e)
+	catch (...)
 	{
 		if (SCORE_DEBUG)
 		{
-			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params "<<e.what() << endl;
+			cout << "calculateSimulationScore couldn't find one of the parameters of the score_params " << endl;
 			cout << "use simulationStepsCounter" << simulationStepsCounter << endl;;
 		}
 		return -1;

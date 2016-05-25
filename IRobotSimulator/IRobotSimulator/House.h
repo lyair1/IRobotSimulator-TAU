@@ -62,29 +62,18 @@ public:
 		mHouseMatrix(NULL)
 		
 	{
-		algorithmScores = new list<int>();
+		
 	}
 
 	//copy constructor for house:
-	House(const House & otherHouse);
+	House(const House & otherHouse) = delete;
 
 	//copy assignment operator
 
-	House & operator = (const House & otherHouse)
-	{
-		if (DEBUG)
-		{
-			cout << "operator \"=\" for house" << endl;
-		}
-		House * house = new House();
-		house->fillHouseInfo(otherHouse.getHousePath(), otherHouse.getHouseFileName());
-		return *house;
-	}
+	House & operator = (const House & otherHouse) = delete;
+
 	~House(){
-		if (mHouseMatrix != NULL)	{
-			delete[] mHouseMatrix;
-		}
-		delete algorithmScores;
+
 	}
 	string getName()const;
 	int getMaxSteps()const;
@@ -98,7 +87,7 @@ public:
 	pair <int, int> getDockingLocation() const;
 	int getDustInHouse() const;
 	void cleanResources()const;
-	list<int>* algorithmScores;
+	list<int> algorithmScores;
 	string getHouseFileName() const;
 	string getHousePath() const;
 	list<unique_ptr<AbstractAlgorithm>> mAlgorithmList;

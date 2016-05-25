@@ -39,7 +39,7 @@ extern "C" int calc_score(const map<string, int>& score_params)
 		dirtCollected = score_params.at("dirt_collected");
 		isBackInDocking = (score_params.at("is_back_in_docking") != 0);
 	}
-	catch(out_of_range & e)
+	catch(...)
 	{
 		if (SCORE_DEBUG)
 		{

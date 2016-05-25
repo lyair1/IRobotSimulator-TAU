@@ -20,6 +20,7 @@
 #include <atomic>
 using namespace std;
 
+int calculateSimulationScore(const map<string, int>& score_params);
 //the simulator class is responsible for running every algorithm on every house, and keeping track of the algorithms preformance according to time
 	typedef std::vector<House*> HouseList;
 	typedef std::list<Simulation*> SimulationList;
@@ -55,6 +56,7 @@ private:
 	string mHousesErrorMessages;
 	string mAlgorithmErrorMessages;
 	string mSimulationErrorMessages;
+	void* mScoreHandle;
 	ConfigReader* mConfiguration;
 	list<string> mAlgorithmNames;
 	list<string> mHouseNames;
@@ -63,6 +65,7 @@ private:
 	int mNumberOfHouses;
 	atomic_size_t mHouseIndex{0};
 	scoreCreator mCalculateScore;
+
 	
 
 	//functions:
@@ -87,7 +90,7 @@ private:
 	void handleScore();
 
 	void cleanResources();
-	static int calculateSimulationScore(const map<string, int>& score_params);
+
 };
 
 #endif //SIMULATOR_H

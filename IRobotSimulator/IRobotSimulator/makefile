@@ -1,10 +1,10 @@
 # source files and object files
-src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp AlgorithmRegistration.cpp AlgorithmLoader.cpp AlgorithmBase.cpp MakeUnique.cpp score_formula.cpp 
+src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp AlgorithmRegistration.cpp AlgorithmLoader.cpp AlgorithmBase.cpp MakeUnique.cpp
 obj = $(src:.cpp=.o)
 
 # shared object source files and object files
-so_src = 200945657_A_.cpp 200945657_C_.cpp 200945657_B_.cpp
-so_dep = AlgorithmBase.cpp score_formula.cpp
+so_src = 200945657_A_.cpp 200945657_C_.cpp 200945657_B_.cpp score_formula.cpp
+so_dep = AlgorithmBase.cpp 
 s_obj = $(so_src:.cpp=.so)
 
 

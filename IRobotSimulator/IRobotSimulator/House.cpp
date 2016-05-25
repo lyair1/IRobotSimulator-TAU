@@ -81,7 +81,10 @@ string House::fillHouseInfo(string filePath, string fileName)
 	{
 		return errorMessage;
 	}
-
+	if (this->mHouseMatrix != NULL)
+	{
+		delete[] mHouseMatrix;
+	}
 
 	this->mHouseMatrix = new string[mHouseRow];
 	std::getline(fin, this->mHouseMatrix[0]);
@@ -118,16 +121,6 @@ string House::fillHouseInfo(string filePath, string fileName)
 	}
 	errorMessage += isLegalHouse();
 	return errorMessage;
-}
-
-//copy constructor for house:
-House::House(const House & otherHouse)
-{
-	if (DEBUG)
-	{
-		cout << "copy constructor for house" << endl;
-	}
-	fillHouseInfo(otherHouse.mHousePath, otherHouse.mHouseFileName);
 }
 
 
@@ -184,13 +177,10 @@ int House::getMaxSteps() const {
 }
 
 void House::cleanResources() const{
-	//delete mHouseMatrix;
-	// Clean algorithms
-	//this is now unique_ptr and should not be deleted!
-	//for (AlgorithmList::iterator listAlgorithmIter = mAlgorithmList->begin(); listAlgorithmIter != mAlgorithmList->end(); ++listAlgorithmIter)
-	//{
-	//	delete *listAlgorithmIter; // this calls the destructor which will call cleanResources. 
-	//}
+	if (mHouseMatrix != NULL)	{
+		delete[] mHouseMatrix;
+	}
+	
 }
 
 

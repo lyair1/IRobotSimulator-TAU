@@ -20,6 +20,7 @@ void AlgorithmBase::setSensor(const AbstractSensor& sensor)
 	delete mMoves;
 	mMoves = new list <Direction>();
 	mMatrixSize = DEFAULT_MATRIX_SIZE;
+	delete [] mMatrix;
 	mMatrix = new string[DEFAULT_MATRIX_SIZE*2];
 	mStepsTillFinish = -1;
 	mWallsSet.clear();
@@ -111,7 +112,15 @@ void AlgorithmBase::aboutToFinish(int stepsTillFinishing){
 }
 
 void AlgorithmBase::cleanResources(){
-	delete mMoves;
+	if (mMoves != NULL)
+	{
+		delete mMoves;
+	}
+	if (mMatrix != NULL)
+	{
+		delete[] mMatrix;
+	}
+	
 }
 
 Direction AlgorithmBase::oppositeDirection(Direction direction_)
