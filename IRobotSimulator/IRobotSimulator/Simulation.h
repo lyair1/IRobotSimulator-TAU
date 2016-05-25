@@ -31,7 +31,7 @@ public:
 	{
 		mAlgorithm = &algorithm;
 		mHouse = house;
-		mSensor = new Sensor(mHouse->getDockingLocation(), mHouse);
+		mSensor = make_unique<Sensor>(mHouse->getDockingLocation(), mHouse);
 		mAlgorithm->setSensor(*mSensor);
 		mAlgorithm->setConfiguration(*parametersMap);
 		mConfiguration = parametersMap;		
