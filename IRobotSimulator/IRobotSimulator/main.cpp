@@ -16,9 +16,11 @@
 bool isFileExists(const string name);
 void outOfMemHandler();
 
-
+//absolute path starts with "/"
+// relative path does not start with a "/"
+//when we need to print an absolute path : if the given path does not start with "/" then it's a relative path we need to complete it 
 const string _defaultConfigFileName = "config.ini";
-const string _defaultScoreFormulaFileName = "score_formula.so";
+
 const string _pathPrefix = "./";
 const string _seperator = "/";
 const string _paramConfig = "-config";
@@ -36,33 +38,35 @@ int main(int argc, char* argv[])
 	string configFilePath = _pathPrefix + _defaultConfigFileName;
 	string scoreFormulaPath = "";
 	int num_threads = 1;
+	bool scoreFormulaReceived = false;
 	// Get parameters from arg
 	for (int i = 1; i < argc - 1; i++){ //skip program name -> i=1
 		string arg = argv[i];
 		if (arg.compare(_paramConfig) == 0) {
 			// We know the next argument *should* be the config file dir:
-			configFilePath = _pathPrefix + argv[i + 1] + _seperator + _defaultConfigFileName;
+			configFilePath = argv[i + 1] + _seperator + _defaultConfigFileName;
 
 			continue;
 		}
 
 		if (arg.compare(_paramHouse) == 0) {
 			// We know the next argument *should* be the path:
-			housesPath = _pathPrefix + argv[i + 1] + _seperator;
+			housesPath = argv[i + 1] + _seperator;
 
 			continue;
 		}
 
 		if (arg.compare(_paramAlgorithm) == 0) {
 			// We know the next argument *should* be the path:
-			algorithmsPath = _pathPrefix + argv[i + 1] + _seperator;
+			algorithmsPath = argv[i + 1] + _seperator;
 
 			continue;
 		}
 
 		if (arg.compare(_paramScoreFormula) == 0) {
 			// We know the next argument *should* be the path:
-			scoreFormulaPath = _pathPrefix + argv[i + 1] + _seperator + _defaultScoreFormulaFileName;
+			scoreFormulaPath = argv[i + 1] + _seperator;
+			scoreFormulaReceived = true;
 
 			continue;
 		}
