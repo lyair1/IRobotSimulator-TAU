@@ -93,18 +93,13 @@ int main(int argc, char* argv[])
 	if (!isFileExists(configFilePath))
 	{
 		cout << _usage;
-		cout << "cannot find config.ini file in '" << configFilePath.substr(2) << "'" << endl;
+		cout << "cannot find config.ini file in '" << configFilePath << "'" << endl;
 		exit(0);
 	}
-	if (scoreFormulaPath != "" && !isFileExists(scoreFormulaPath))
-	{
-		cout << _usage;// Show usage and return if score file doesn't exists in path
-		cout << "cannot find score_formula.so file in '" << scoreFormulaPath << "'" << endl;
-		exit(0);
-	}
+
 	//set the new_handler for handling cases where "new" failed to allocate memory
 	std::set_new_handler(outOfMemHandler);
-	Simulator::getInstance(scoreFormulaPath, num_threads, housesPath, algorithmsPath, configFilePath).initSimulator();
+	Simulator::getInstance(scoreFormulaReceived, scoreFormulaPath, num_threads, housesPath, algorithmsPath, configFilePath).initSimulator();
 
 	return 0;
 }

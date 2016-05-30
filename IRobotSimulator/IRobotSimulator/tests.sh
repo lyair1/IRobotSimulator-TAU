@@ -44,14 +44,14 @@ echo
 
 
 echo check absolute path with trailing slash
-echo simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/ -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO/
-simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/ -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO/
+echo simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/ -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO/ -config /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/
+simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/ -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO/ -config /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/
 echo
 echo
 
 echo check absolute path withOUT trailing slash
-echo simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1 -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO
-simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1 -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO
+echo simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1 -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO -config /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1
+simulator  -house_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1 -algorithm_path /specific/a/home/cc/students/cs/nirorman/irobot3/test/AlgorithmsSO -config /specific/a/home/cc/students/cs/nirorman/irobot3/test/testEx1/
 echo
 echo
 
