@@ -36,12 +36,12 @@ public:
 	
 	Simulator(Simulator const &) = delete;			// don't implement - it's a singleton!
 	void operator = (Simulator const &) = delete;	// don't implement - it's a singleton!
-	Simulator(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath);
+	Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath);
 	~Simulator();
 	void initSimulator();
-	static Simulator& getInstance(string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath)
+	static Simulator& getInstance(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath)
 	{ 
-		static Simulator simulator(scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath);
+		static Simulator simulator(scoreFormulaReceived, scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath);
 		return simulator;
 	}
 	list <unique_ptr<AbstractAlgorithm>> mAlgorithms;
@@ -62,7 +62,7 @@ private:
 	list<string> mHouseNames;
 	bool mIsAnySimulationScoreBad;
 	int mNumThreads;
-	int mNumberOfHouses;
+	bool mScoreFormulaReceived;
 	atomic_size_t mHouseIndex{0};
 	scoreCreator mCalculateScore;
 
@@ -71,8 +71,7 @@ private:
 	//functions:
 	void runSimulation();
 	void runSimuationOnHouse();
-	int countHousesInPath();
-	HouseList readAllHouses();
+	void readAllHouses();
 	void loadAllAlgorithms();
 	void executeAllAlgoOnAllHouses();
 	void printScores();
