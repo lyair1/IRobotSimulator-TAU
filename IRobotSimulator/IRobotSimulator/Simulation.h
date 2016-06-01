@@ -15,7 +15,7 @@
 class Simulation
 {
 public:
-	Simulation(AbstractAlgorithm& algorithm, string algoName, House* house, map<string, int>* parametersMap) :
+	Simulation(AbstractAlgorithm& algorithm, string algoName, House* house, map<string, int>* parametersMap, bool isVideo) :
 		mStepsCounter(0),
 		mScore(0),
 		mDirtCollected(0),
@@ -27,7 +27,8 @@ public:
 		mIsAboutToFinish(false),
 		mPrevSimulationStep(Direction::Stay),
 		mAlgorithmName(algoName),
-		mSimulationError("")
+		mSimulationError(""),
+		mIsVideo(isVideo)
 	{
 		mAlgorithm = &algorithm;
 		mHouse = house;
@@ -56,7 +57,6 @@ public:
 	void setActualPositionInCompetition(int actualPositionInCompetition);
 	void setStepsCounter(int stepsCounter);
 	void resetMaxStepsAccordingToWinner();
-	const House* getHouse() const;
 	const int getSimulationScore() const;
 	void setSimulationScore(int score) ;
 	void cleanResources();
@@ -71,6 +71,8 @@ public:
 	int getDirtCollected() const{ return mDirtCollected; } 
 	bool getIsBackInDocking() const{ return mIsBackInDocking; } 
 	string getSimulationErrors() const { return mSimulationError; }
+	string getAlgorithmName() const{ return mAlgorithmName; }
+	string getHouseFileName() const{ return mHouse->getHouseFileName(); }
 	
 private:
 	long mStepsCounter;
@@ -85,6 +87,7 @@ private:
 	Direction mPrevSimulationStep;
 	string mAlgorithmName;
 	string mSimulationError;
+	bool mIsVideo;
 	AbstractAlgorithm* mAlgorithm;
 	House* mHouse;
 	unique_ptr<Sensor>  mSensor;

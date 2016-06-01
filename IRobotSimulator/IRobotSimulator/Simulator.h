@@ -11,6 +11,7 @@
 #include "AlgorithmLoader.h"
 #include "score_formula.h"
 #include <functional>
+#include "Encoder.h"
 
 
 #ifndef _WIN32
@@ -36,12 +37,12 @@ public:
 	
 	Simulator(Simulator const &) = delete;			// don't implement - it's a singleton!
 	void operator = (Simulator const &) = delete;	// don't implement - it's a singleton!
-	Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath);
+	Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath, bool isVideo);
 	~Simulator();
 	void initSimulator();
-	static Simulator& getInstance(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath)
+	static Simulator& getInstance(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath, bool isVideo)
 	{ 
-		static Simulator simulator(scoreFormulaReceived, scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath);
+		static Simulator simulator(scoreFormulaReceived, scoreFormulaPath, numThreads, housesPath, algorithmsPath, configFilePath, isVideo);
 		return simulator;
 	}
 	list <unique_ptr<AbstractAlgorithm>> mAlgorithms;
@@ -63,6 +64,7 @@ private:
 	bool mIsAnySimulationScoreBad;
 	int mNumThreads;
 	bool mScoreFormulaReceived;
+	bool mIsVideo;
 	atomic_size_t mHouseIndex{0};
 	scoreCreator mCalculateScore;
 

@@ -105,7 +105,9 @@
     <ClInclude Include="configReader.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direction.h" />
+    <ClInclude Include="Encoder.h" />
     <ClInclude Include="House.h" />
+    <ClInclude Include="Montage.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="score_formula.h" />
@@ -122,9 +124,11 @@
     <ClCompile Include="AlgorithmLoader.cpp" />
     <ClCompile Include="AlgorithmRegistration.cpp" />
     <ClCompile Include="configReader.cpp" />
+    <ClCompile Include="Encoder.cpp" />
     <ClCompile Include="House.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MakeUnique.cpp" />
+    <ClCompile Include="Montage.cpp" />
     <ClCompile Include="score_formula.cpp" />
     <ClCompile Include="Sensor.cpp" />
     <ClCompile Include="Simulation.cpp" />

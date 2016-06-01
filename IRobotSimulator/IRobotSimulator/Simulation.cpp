@@ -24,7 +24,11 @@ bool Simulation :: makeSimulationStep()
 			if (DEBUG_LOW_LEVEL)
 			{
 				mHouse->printHouse();
-			}			
+			}	
+			if (mIsVideo)
+			{
+				mHouse->montage(mAlgorithmName,mHouse->getHouseFileName(), mStepsCounter);
+			}
 		}
 
 		/*	update the sensor on the exact location of the robot, so the sensor may answer its queries - 
@@ -172,11 +176,6 @@ void Simulation::resetMaxStepsAccordingToWinner(){
 	}
 }
 
-
-const House* Simulation::getHouse() const {
-	return mHouse;
-}
-
 const int Simulation::getSimulationScore() const {
 	return mScore;
 }
@@ -189,9 +188,9 @@ void Simulation::setSimulationScore(int score)
 
 void Simulation::printSimulationStepsHistory(){
 	cout << "************************************";
-	cout << "House file name: " << this->getHouse()->getHouseFileName();
+	cout << "House file name: " << mHouse->getHouseFileName();
 	cout << "***********************************" << endl;;
-	cout << "House name: " << this->getHouse()->getName() << endl;
+	cout << "House name: " << mHouse->getName() << endl;
 	cout << "Algorithm name: " << typeid(this->mAlgorithm).name() << endl;
 	cout << "Simulation score: " << this->getSimulationScore() << endl;
 	cout << "Simulation steps: " << this->mStepsCounter << endl;
@@ -204,9 +203,9 @@ void Simulation::printSimulationStepsHistory(){
 	for (auto step : mStepsHistory)
 		cout << getDirectionString(step) << " ";
 	cout << endl << endl;
-	this->getHouse()->printHouse();
+	mHouse->printHouse();
 	cout << "**********************************";
-	cout << "end of : " << this->getHouse()->getHouseFileName();
+	cout << "end of : " << mHouse->getHouseFileName();
 	cout << "**********************************" << endl << endl << endl;
 
 }

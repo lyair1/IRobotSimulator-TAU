@@ -18,7 +18,7 @@
 namespace fs = ::boost::filesystem;
 using namespace std;
 
-Simulator::Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath) :
+Simulator::Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int numThreads, string housesPath, string algorithmsPath, string configFilePath, bool isVideo) :
 	mHousesPath(housesPath),
 	mAlgorithmsPath(algorithmsPath),
 	mConfigFilePath(configFilePath),
@@ -30,7 +30,8 @@ Simulator::Simulator(bool scoreFormulaReceived, string scoreFormulaPath, int num
 	mConfiguration(NULL),
 	mIsAnySimulationScoreBad(false),
 	mNumThreads(numThreads),
-	mScoreFormulaReceived(scoreFormulaReceived)
+	mScoreFormulaReceived(scoreFormulaReceived),
+	mIsVideo(isVideo)
 {
 	mHouseList.clear();
 	mCalculateScore = NULL;
@@ -500,7 +501,7 @@ void Simulator::runSimuationOnHouse()
 		{
 			House* tempHouse = new House();
 			tempHouse->fillHouseInfo(house->getHousePath(), house->getHouseFileName());
-			simulationListPerHouse.push_back(make_unique<Simulation>(*algo, *algoName, tempHouse, mConfiguration->getParametersMap()));
+			simulationListPerHouse.push_back(make_unique<Simulation>(*algo, *algoName, tempHouse, mConfiguration->getParametersMap(), mIsVideo));
 			algoName++;
 		}
 		int winnerNumberOfSteps = 0;
@@ -612,8 +613,12 @@ void Simulator::runSimuationOnHouse()
 				iter4->printSimulationStepsHistory();
 			}
 			mSimulationErrorMessages += iter4->getSimulationErrors();
-			iter4->cleanResources();
 			
+			string simulationDir = "simulations/" + iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + "/";
+			string imagesExpression = simulationDir + "image%5d.jpg";
+			Encoder::encode(imagesExpression, iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + ".mpg");
+
+			iter4->cleanResources();
 		}
 	}
 }

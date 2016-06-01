@@ -1,5 +1,5 @@
 # source files and object files
-src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp AlgorithmRegistration.cpp AlgorithmLoader.cpp AlgorithmBase.cpp MakeUnique.cpp
+src = main.cpp configReader.cpp House.cpp Sensor.cpp Simulation.cpp Simulator.cpp AlgorithmRegistration.cpp AlgorithmLoader.cpp AlgorithmBase.cpp MakeUnique.cpp Encoder.cpp Montage.cpp
 obj = $(src:.cpp=.o)
 
 # shared object source files and object files
