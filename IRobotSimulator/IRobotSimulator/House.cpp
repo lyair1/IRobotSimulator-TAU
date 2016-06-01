@@ -13,6 +13,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 	bool errorFlagMaxStep = false;
 	bool errorFlagRows = false;
 	bool errorFlagCols = false;
+	int row, col;
 	if (DEBUG)
 	{
 		cout << "Reading house from file path: " << filePath << " into class House" << endl;
@@ -50,13 +51,13 @@ string House::fillHouseInfo(string filePath, string fileName)
 	fin >> stringHouseRows;
 	try
 	{
-		mHouseRow = stoi(stringHouseRows.c_str(), nullptr);
+		row = stoi(stringHouseRows.c_str(), nullptr);
 	}
 	catch (...)
 	{
 		errorFlagRows = true;
 	}
-	if (mHouseRow <= 0 || errorFlagRows)
+	if (row <= 0 || errorFlagRows)
 	{
 		errorFlagRows = true;
 		errorMessage += mHouseFileName + ".house" + ": line number 3 in house file shall be a positive number, found: " + stringHouseRows + "\n";
@@ -64,13 +65,13 @@ string House::fillHouseInfo(string filePath, string fileName)
 	fin >> stringHouseCols;
 	try
 	{
-		mHouseCol = stoi(stringHouseCols.c_str(), nullptr);
+		col = stoi(stringHouseCols.c_str(), nullptr);
 	}
 	catch (...)
 	{
 		errorFlagCols = true;
 	}
-	if (mHouseCol <= 0 || errorFlagCols)
+	if (col <= 0 || errorFlagCols)
 	{
 		errorFlagCols = true;
 		errorMessage += mHouseFileName + ".house" + ": line number 4 in house file shall be a positive number, found: " + stringHouseCols + "\n";
@@ -85,15 +86,16 @@ string House::fillHouseInfo(string filePath, string fileName)
 	{
 		delete[] mHouseMatrix;
 	}
-
+	mHouseRow = (size_t)row;
+	mHouseCol = (size_t)col;
 	this->mHouseMatrix = new string[mHouseRow];
 	std::getline(fin, this->mHouseMatrix[0]);
-	for (int i = 0; i < mHouseRow; ++i)
+	for (size_t i = 0; i < mHouseRow; ++i)
 	{
 		// Check if stream is over before the rows count
 		if (fin.eof())
 		{
-			for (int j = 0; j < mHouseCol; ++j)
+			for (size_t j = 0; j < mHouseCol; ++j)
 			{
 				mHouseMatrix[i] += " ";
 			}
@@ -105,7 +107,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 		// Check if stream isn't over but this is an empty line
 		if (mHouseMatrix[i].length() == 0)
 		{
-			for (int j = 0; j < mHouseCol; ++j)
+			for (size_t j = 0; j < mHouseCol; ++j)
 			{
 				mHouseMatrix[i] += " ";
 			}
@@ -114,7 +116,7 @@ string House::fillHouseInfo(string filePath, string fileName)
 		}
 
 		// Check if a row is shorter than expected
-		while ((int)mHouseMatrix[i].length() < mHouseCol)
+		while (mHouseMatrix[i].length() < mHouseCol)
 		{
 			mHouseMatrix[i] += " ";
 		}
@@ -129,32 +131,63 @@ void House::printHouse() const
 	cout << "Printing house from instance into standard output" << endl;
 	cout << "House name: " << getName() << endl;
 	cout << "House maxSteps: " << getMaxSteps() << endl;
-	for (int i = 0; i < mHouseRow; ++i)
+	for (size_t i = 0; i < mHouseRow; ++i)
 	{
-		for (int j = 0; j < mHouseCol; ++j)
+		for (size_t j = 0; j < mHouseCol; ++j)
 		{
-			cout << mHouseMatrix[i][j];
+				cout << mHouseMatrix[i][j];			
 		}
 		cout << endl;
 	}
 }
+//this function does not belong to the class house
+void createDirectoryIfNotExists(const string& dirPath)
+{
+	string cmd = "mkdir -p " + dirPath;
+	int ret = system(cmd.c_str());
+	if (ret == -1)
+	{
+		//handle error
+	}
+}
+
+void House::montage(const string& algoName, const string& houseName, int counter) const
+{
+	vector<string> tiles;
+	for (size_t row = 0; row < mHouseRow; ++row)
+	{
+		for (size_t col = 0; col < mHouseCol; ++col)
+		{
+			if (mHouseMatrix[row][col] == ' ')
+				tiles.push_back("0");
+			else
+				tiles.push_back(string() + mHouseMatrix[row][col]);
+		}
+	}
+	string imagesDirPath = "simulations/" + algoName + "_" + houseName;
+	createDirectoryIfNotExists(imagesDirPath);
+	string counterStr = to_string(counter);
+	string composedImage = imagesDirPath + "/image" + string(5 - counterStr.length(), '0') + counterStr + ".jpg";
+	Montage::compose(tiles, mHouseCol, mHouseRow, composedImage);
+}
+
 
 //TODO: complete this with fill rows and cols if matrix is not in size C*R
 string House::isLegalHouse(){
 	// Make sure that that house surounded by walls
-	for (int i = 0; i < mHouseRow; ++i){
+	for (size_t i = 0; i < mHouseRow; ++i){
 		mHouseMatrix[i][0] = 'W';
 		mHouseMatrix[i][mHouseCol - 1] = 'W';
 	}
-	for (int i = 0; i < mHouseCol; ++i){
+	for (size_t i = 0; i < mHouseCol; ++i){
 		mHouseMatrix[mHouseRow - 1][i] = 'W';
 		mHouseMatrix[0][i] = 'W';
 	}
 
 	// Overwrite any unknown chars to ' '
-	for (int i = 1; i < mHouseRow - 1; ++i)
+	for (size_t i = 1; i < mHouseRow - 1; ++i)
 	{
-		for (int j = 1; j < mHouseCol - 1; ++j)
+		for (size_t j = 1; j < mHouseCol - 1; ++j)
 		{
 			if (mHouseMatrix[i][j] != 'D' && mHouseMatrix[i][j] != 'W' && (mHouseMatrix[i][j] < '0' || mHouseMatrix[i][j] > '9'))
 			{
@@ -209,8 +242,8 @@ SensorInformation House::getLocationInfo(std::pair<const int, const int> locatio
 string House::initDockingLocation()
 {
 	bool didFindDocking = false;
-	for (int row = 0; row < mHouseRow; ++row) {
-		for (int col = 0; col < mHouseCol; ++col) {
+	for (size_t row = 0; row < mHouseRow; ++row) {
+		for (size_t col = 0; col < mHouseCol; ++col) {
 			if (mHouseMatrix[row][col] == 'D') {
 				if (didFindDocking == true)
 				{
@@ -259,9 +292,9 @@ bool House::isCleanHouse() const{
 
 void House::initDustInHouse(){
 	mDustInHouse = 0;
-	for (int row = 0; row < mHouseRow; ++row)
+	for (size_t row = 0; row < mHouseRow; ++row)
 	{
-		for (int col = 0; col < mHouseCol; ++col)
+		for (size_t col = 0; col < mHouseCol; ++col)
 		{
 			if (mHouseMatrix[row][col] >= '1' &&
 				mHouseMatrix[row][col] <= '9')
@@ -303,3 +336,6 @@ string House::getHousePath() const
 {
 	return mHousePath;
 }
+
+
+

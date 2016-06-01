@@ -14,8 +14,13 @@
 #include "Direction.h"
 #include <list>
 #include "AbstractAlgorithm.h"
+#include "Montage.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #ifndef _WIN32
 #include "MakeUnique.cpp"
+#include <unistd.h>
 #else
 #include <memory>
 #endif
@@ -91,12 +96,15 @@ public:
 	string getHouseFileName() const;
 	string getHousePath() const;
 	list<unique_ptr<AbstractAlgorithm>> mAlgorithmList;
+	void montage(const string& algoName, const string& houseName, const int counter) const;
+
+
 private:
 	// members:
 	string mHouseName;
 	int mMaxSteps;
-	int mHouseRow;
-	int mHouseCol;
+	size_t mHouseRow;
+	size_t mHouseCol;
 	int mDustInHouse;
 	pair <int, int> mDockingLocation;
 	string mHousePath;
@@ -106,6 +114,7 @@ private:
 	//functions:
 	string initDockingLocation();
 	void initDustInHouse();
+
 	
 
 };
