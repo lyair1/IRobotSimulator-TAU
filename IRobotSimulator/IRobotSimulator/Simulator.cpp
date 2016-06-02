@@ -318,9 +318,13 @@ void Simulator::cleanResources()
 	{
 		dlclose(mScoreHandle);
 	}
-#endif
-
-	
+	//remove simulations folder 
+	if (mIsVideo)
+	{
+		string command = "rm -r ./simulations";
+		int ret = system(command.c_str());
+	}
+#endif	
 }
 
 
