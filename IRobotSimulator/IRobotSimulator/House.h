@@ -96,7 +96,7 @@ public:
 	string getHouseFileName() const;
 	string getHousePath() const;
 	list<unique_ptr<AbstractAlgorithm>> mAlgorithmList;
-	void montage(const string& algoName, const string& houseName, const int counter) const;
+	void montage(const string& algoName, const string& houseName, const int counter, size_t robotRow, size_t robotCol) const;
 
 
 private:

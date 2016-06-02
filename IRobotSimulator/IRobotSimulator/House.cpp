@@ -151,14 +151,16 @@ void createDirectoryIfNotExists(const string& dirPath)
 	}
 }
 
-void House::montage(const string& algoName, const string& houseName, int counter) const
+void House::montage(const string& algoName, const string& houseName, int counter, size_t robotRow, size_t robotCol) const
 {
 	vector<string> tiles;
 	for (size_t row = 0; row < mHouseRow; ++row)
 	{
 		for (size_t col = 0; col < mHouseCol; ++col)
 		{
-			if (mHouseMatrix[row][col] == ' ')
+			if (row == robotRow && col == robotCol)
+				tiles.push_back("R");
+			else if (mHouseMatrix[row][col] == ' ')
 				tiles.push_back("0");
 			else
 				tiles.push_back(string() + mHouseMatrix[row][col]);
