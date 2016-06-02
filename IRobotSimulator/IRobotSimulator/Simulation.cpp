@@ -10,7 +10,6 @@ bool Simulation :: makeSimulationStep()
 {
 	SensorInformation info = mSensor->sense();
 	Direction stepInDirection = mAlgorithm->step(mPrevSimulationStep);
-	
 	// in course forum it says if battery > 0 it's enough to make a step, even if BatteryLeft< mBattreyConsumptionRate
 	if ((stepInDirection == Direction::Stay ||
 		(stepInDirection != Direction::Stay && !info.isWall[(int)stepInDirection])) &&
@@ -25,10 +24,6 @@ bool Simulation :: makeSimulationStep()
 			{
 				mHouse->printHouse();
 			}	
-			if (mIsVideo)
-			{
-				mHouse->montage(mAlgorithmName,mHouse->getHouseFileName(), mStepsCounter);
-			}
 		}
 
 		/*	update the sensor on the exact location of the robot, so the sensor may answer its queries - 

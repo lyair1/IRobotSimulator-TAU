@@ -529,7 +529,14 @@ void Simulator::runSimuationOnHouse()
 				if (simul->isSimulationRunning())
 				{
 					isAnyAlgorithmStillRunning = true;
-					if (simul->makeSimulationStep())
+					bool isSuccess = simul->makeSimulationStep();
+					if (mIsVideo)
+					{
+#ifndef _WIN32
+						simul->montageStep();
+#endif
+					}
+						if (isSuccess)
 					{
 						if (isFirstWinner)// this is the first algorithm that finished running successfully!
 						{
