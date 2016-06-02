@@ -624,10 +624,11 @@ void Simulator::runSimuationOnHouse()
 				iter4->printSimulationStepsHistory();
 			}
 			mSimulationErrorMessages += iter4->getSimulationErrors();
-			
+#ifndef _WIN32
 			string simulationDir = "simulations/" + iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + "/";
-			string imagesExpression = simulationDir + "image%5d.jpg";
+			string imagesExpression = simulationDir + "image%05d.jpg";
 			Encoder::encode(imagesExpression, iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + ".mpg");
+#endif // !_WIN32
 
 			iter4->cleanResources();
 		}

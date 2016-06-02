@@ -73,7 +73,7 @@ public:
 	string getSimulationErrors() const { return mSimulationError; }
 	string getAlgorithmName() const{ return mAlgorithmName; }
 	string getHouseFileName() const{ return mHouse->getHouseFileName(); }
-	
+	void montageStep() { mHouse->montage(mAlgorithmName, mHouse->getHouseFileName(), mStepsCounter, mSensor->getSensorLocation().second, mSensor->getSensorLocation().first); }
 private:
 	long mStepsCounter;
 	int mScore;
