@@ -10,6 +10,8 @@
 #include "AbstractAlgorithm.h"
 #include "Sensor.h"
 #include <typeinfo>
+#include "boost/filesystem.hpp"   
+using namespace boost::filesystem;
 
 
 class Simulation

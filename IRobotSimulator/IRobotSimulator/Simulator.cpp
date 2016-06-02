@@ -318,13 +318,13 @@ void Simulator::cleanResources()
 	{
 		dlclose(mScoreHandle);
 	}
-	//remove simulations folder 
-	if (mIsVideo)
+#endif
+	//remove folder: simulations
+	path simulationDir("simulations");
+	if (mIsVideo && exists(simulationDir))
 	{
-		string command = "rm -r ./simulations";
-		int ret = system(command.c_str());
+		remove_all(simulationDir);
 	}
-#endif	
 }
 
 
@@ -624,12 +624,14 @@ void Simulator::runSimuationOnHouse()
 				iter4->printSimulationStepsHistory();
 			}
 			mSimulationErrorMessages += iter4->getSimulationErrors();
+			if (mIsVideo)
+			{
 #ifndef _WIN32
-			string simulationDir = "simulations/" + iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + "/";
-			string imagesExpression = simulationDir + "image%05d.jpg";
-			Encoder::encode(imagesExpression, iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + ".mpg");
+				string simulationDir = "simulations/" + iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + "/";
+				string imagesExpression = simulationDir + "image%05d.jpg";
+				Encoder::encode(imagesExpression, iter4->getAlgorithmName() + "_" + iter4->getHouseFileName() + ".mpg");
 #endif // !_WIN32
-
+			}
 			iter4->cleanResources();
 		}
 	}

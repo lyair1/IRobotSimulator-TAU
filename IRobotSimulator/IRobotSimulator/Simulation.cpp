@@ -119,6 +119,13 @@ bool Simulation :: makeSimulationStep()
 void Simulation::cleanResources(){
 	delete (mHouse);
 //	delete(mSensor); make_unique should not be deleted
+	
+	//remove folder: algoName_HouseName
+	path simulationDir("simulations/" + mAlgorithmName + "_" + mHouse->getHouseFileName());
+	if (mIsVideo && exists(simulationDir))
+	{
+		remove_all(simulationDir);
+	}
 }
 
 bool Simulation::isSimulationRunning() const{
